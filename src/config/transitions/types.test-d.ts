@@ -38,7 +38,7 @@ expectTypeOf([
 
 // #region Finally
 
-expectTypeOf<{}>().toMatchTypeOf<Finally>();
+expectTypeOf<object>().toMatchTypeOf<Finally>();
 expectTypeOf<{ not: 'not' }>().not.toMatchTypeOf<Finally>();
 expectTypeOf<{ description: 'description' }>().toMatchTypeOf<Finally>();
 expectTypeOf<'actions'>().toMatchTypeOf<Finally>();

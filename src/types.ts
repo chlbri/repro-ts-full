@@ -13,7 +13,7 @@ export type Describer = Readonly<
   Record<(typeof DESCRIBER_KEYS)[number], string>
 >;
 
-export function isFunction(value: any): value is Function {
+export function isFunction(value: any): value is (...args: any) => any {
   return typeof value === 'function';
 }
 

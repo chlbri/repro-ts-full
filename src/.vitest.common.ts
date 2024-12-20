@@ -1,15 +1,7 @@
 import { aliasTs } from '@bemedev/vitest-alias';
 import { exclude } from '@bemedev/vitest-exclude';
-import { defineConfig, type ViteUserConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 import tsconfig from '../tsconfig.json';
-
-type ConfigTest = ViteUserConfig;
-
-const TT: ViteUserConfig = {
-  test: {
-    typecheck: {},
-  },
-};
 
 const plugins = [
   aliasTs(tsconfig as any),
