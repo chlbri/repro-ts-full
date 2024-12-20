@@ -52,6 +52,8 @@
     "rinit": "pnpm run rm && pnpm run config",
     "rinit:off": "pnpm run rm && pnpm run config:off",
     "test": "pnpm run test:coverage --no-coverage",
+    "test:type": "pnpm run test:coverage -c \"vitest.config.type.ts\" --no-coverage",
+    "test:no-type": "pnpm run test:coverage -c \"vitest.config.notype.ts\" --no-coverage",
     "test:coverage": "vitest run",
     "test:watch": "vitest",
     "rm:lib": "rm -rf lib",
@@ -89,5 +91,9 @@
     "tslib": "^2.8.1",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@bemedev/boolean-recursive": "^0.0.3",
+    "@bemedev/types": "^0.1.3"
   }
 }

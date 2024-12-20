@@ -1,5 +1,9 @@
 {
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "src/vitest..common.ts",
+    "src/.vitest.common.ts"
+  ],
   "compilerOptions": {
     "lib": ["dom", "esnext"],
     "importHelpers": true,
@@ -22,6 +26,10 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmit": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "~types": ["src/types.ts"]
+    }
   }
 }
