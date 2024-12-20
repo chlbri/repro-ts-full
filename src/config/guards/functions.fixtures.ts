@@ -1,4 +1,4 @@
-import type { EventObject } from '../events/type';
+import type { EventObject } from '../events/types';
 import { evaluateGuard } from './functions';
 import type { GuardConfig, PredicateMap } from './types';
 

@@ -1,4 +1,5 @@
 import type { Fn, TuplifyUnion, ValuesOf } from '@bemedev/types';
+import type { EventObject } from './config/events';
 import { checkKeys } from './utils';
 
 export function isArray<T>(value: any): value is T[] {
@@ -63,3 +64,9 @@ export type NotReadonly<T> = {
 };
 
 export type NotR<T> = NotReadonly<T>;
+
+export type Expr<
+  TContext extends object = object,
+  TEvents extends EventObject = EventObject,
+  T = any,
+> = Fn<[TContext, TEvents], T>;

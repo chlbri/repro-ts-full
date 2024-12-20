@@ -1,9 +1,5 @@
 {
-  "include": [
-    "src/**/*",
-    "src/vitest..common.ts",
-    "src/.vitest.common.ts"
-  ],
+  "include": ["src/**/*", "src/vitest..common.ts", "src/.vitest.ts"],
   "compilerOptions": {
     "lib": ["dom", "esnext"],
     "importHelpers": true,

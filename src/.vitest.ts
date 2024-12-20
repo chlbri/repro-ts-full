@@ -5,7 +5,13 @@ import tsconfig from '../tsconfig.json';
 
 const plugins = [
   aliasTs(tsconfig as any),
-  exclude({ ignoreCoverageFiles: ['**/index.ts'] }),
+  exclude({
+    ignoreCoverageFiles: [
+      '**/index.ts',
+      '**/*/types.ts',
+      '**/*.typegen.ts',
+    ],
+  }),
 ];
 
 const commonTest = {

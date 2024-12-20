@@ -1,4 +1,4 @@
-import { addConfig } from './src/.vitest.common';
+import { addConfig } from './src/.vitest';
 
 const output = addConfig('typecheckOnly');
 
