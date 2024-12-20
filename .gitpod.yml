@@ -1,0 +1,7 @@
+---
+# package.json repo à changer
+
+tasks:
+  - name: Configuration
+    before: npm install -g ts-node
+    command: pnpm install

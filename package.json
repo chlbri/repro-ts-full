@@ -1,0 +1,93 @@
+{
+  "name": "@bemedev///TODO",
+  "version": "0.0.1",
+  "description": "//TODO",
+  "author": {
+    "email": "bri_lvi@icloud.com",
+    "name": "chlbri",
+    "url": "https://bemedev.vercel.app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "//TODO"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "module": "lib/index.js",
+  "maintainers": [
+    {
+      "email": "bri_lvi@icloud.com",
+      "name": "chlbri",
+      "url": "https://bemedev.vercel.app"
+    }
+  ],
+  "contributors": [
+    {
+      "email": "bri_lvi@icloud.com",
+      "name": "chlbri",
+      "url": "https://bemedev.vercel.app"
+    }
+  ],
+  "keywords": [
+    "//TODO"
+  ],
+  "files": [
+    "lib",
+    "public"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "config": "pnpm install",
+    "config:off": "pnpm run config --offline",
+    "ci": "pnpm run config:off && pnpm run lint && pnpm run build && pnpm run test && pnpm run build",
+    "ci:admin": "pnpm run rm && pnpm run ci",
+    "rollup": "rollup -c",
+    "build": "pnpm rm:lib && pnpm run rollup",
+    "p-q": "pretty-quick --staged",
+    "rm": "rm -rf node_modules pnpm-lock.yaml",
+    "rinit": "pnpm run rm && pnpm run config",
+    "rinit:off": "pnpm run rm && pnpm run config:off",
+    "test": "pnpm run test:coverage --no-coverage",
+    "test:coverage": "vitest run",
+    "test:watch": "vitest",
+    "rm:lib": "rm -rf lib",
+    "clean": "pnpm run remove && pnpm run config",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "eslint": "eslint \"{src/**/*,App}.{ts,tsx}\"",
+    "lint": "pnpm run prettier && pnpm run eslint --fix",
+    "lint-watch": "onchange --await-write-finish 5500 \"**/*\" -- pnpm run lint",
+    "prepublishOnly": "",
+    "prepare": "husky",
+    "upgrade": "pnpm upgrade --latest && pnpm add -D eslint@8.57.0"
+  },
+  "devDependencies": {
+    "@bemedev/fsf": "^0.7.3",
+    "@bemedev/vitest-alias": "^0.0.3",
+    "@bemedev/vitest-exclude": "^0.0.2",
+    "@bemedev/vitest-extended": "^0.4.1",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^8.57.0",
+    "glob": "^11.0.0",
+    "globals": "^15.14.0",
+    "husky": "^9.1.7",
+    "onchange": "^7.1.0",
+    "prettier": "^3.4.2",
+    "pretty-quick": "^4.0.0",
+    "rollup": "^4.28.1",
+    "rollup-plugin-node-externals": "^8.0.0",
+    "rollup-plugin-tsc-alias": "^1.1.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
