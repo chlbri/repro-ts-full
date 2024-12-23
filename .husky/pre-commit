@@ -1,2 +1,2 @@
-pnpm run lint
+pnpm run ci
 pnpm run p-q
