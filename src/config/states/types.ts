@@ -1,10 +1,10 @@
 import type { KeysMatching } from '@bemedev/decompose';
 import type { FlatMapByKeys, PickKeysBy } from '@bemedev/types';
-import type { SingleOrArrayR } from '~types';
+import type { Define, SingleOrArrayR } from '~types';
 import type { ActionConfig } from '../action';
 import type { TransitionsConfig } from '../transitions';
 
-export type StateType = 'atomic' | 'compound' | 'parallel' | 'final';
+export type StateType = 'atomic' | 'compound' | 'parallel';
 
 export type ReducedStateNodeConfig = {
   states?: Record<string, ReducedStateNodeConfig>;
@@ -17,8 +17,7 @@ export type StateNodesConfig = Record<string, StateNodeConfig>;
 export type StateNodeConfig =
   | StateNodeConfigAtomic
   | StateNodeConfigCompound
-  | StateNodeConfigParallel
-  | StateNodeConfigFinal;
+  | StateNodeConfigParallel;
 
 export type SNC = StateNodeConfig;
 
@@ -30,7 +29,6 @@ export type StateNodeConfigAtomic = TransitionsConfig & {
   readonly exit?: SingleOrArrayR<ActionConfig>;
   readonly tags?: SingleOrArrayR<string>;
   readonly states?: never;
-  readonly return?: never;
   readonly initial?: never;
 };
 
@@ -43,7 +41,6 @@ export type StateNodeConfigCompound = TransitionsConfig & {
   readonly entry?: SingleOrArrayR<ActionConfig>;
   readonly exit?: SingleOrArrayR<ActionConfig>;
   readonly tags?: SingleOrArrayR<string>;
-  readonly return?: never;
 };
 
 export type StateNodeConfigParallel = TransitionsConfig & {
@@ -55,45 +52,40 @@ export type StateNodeConfigParallel = TransitionsConfig & {
   readonly exit?: SingleOrArrayR<ActionConfig>;
   readonly tags?: SingleOrArrayR<string>;
   readonly initial?: never;
-  readonly return?: never;
 };
 
-export type StateNodeConfigFinal = {
-  readonly type: 'final';
-  readonly id?: string;
-  readonly description?: string;
-  readonly entry?: SingleOrArrayR<ActionConfig>;
-  readonly tags?: SingleOrArrayR<string>;
-  readonly return?: string;
-  readonly states?: never;
-  readonly exit?: never;
-  readonly initial?: never;
-};
+export type ChildrenM =
+  | string
+  | { id?: string; src: string; events?: SingleOrArrayR<string> };
 
-export type StateNodeConfigForMachine =
+export type Config = (
   | StateNodeConfigCompound
   | StateNodeConfigParallel
-  | StateNodeConfigAtomic;
+  | StateNodeConfigAtomic
+) & {
+  machines?: SingleOrArrayR<ChildrenM>;
+};
 
-export type SNC_M = StateNodeConfigForMachine;
-
-export type WithChildren<
-  T,
-  With extends boolean = true,
-> = With extends true ? T : Omit<T, 'states'>;
+type _FlatMapStateNodeConfigOptions = {
+  withStates?: boolean;
+  delimiter?: string;
+};
 
 export type FlatMapStateNodeConfig<
   T extends StateNodeConfig,
-  _withStates extends boolean = false,
+  Options extends _FlatMapStateNodeConfigOptions = {
+    withStates: true;
+    delimiter: '/';
+  },
 > = 'states' extends infer S extends PickKeysBy<T, object>
   ? FlatMapByKeys<
       T,
       S,
       {
-        with: _withStates;
-        delimiter: '/';
+        with: Options['withStates'];
+        delimiter: Options['delimiter'];
       }
     >
   : {
-      '/': T;
+      [key in Define<Options['delimiter'], '/'>]: T;
     };

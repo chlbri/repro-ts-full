@@ -1,4 +1,9 @@
-import type { Fn, TuplifyUnion, ValuesOf } from '@bemedev/types';
+import type {
+  Fn,
+  NotUndefined,
+  TuplifyUnion,
+  ValuesOf,
+} from '@bemedev/types';
 import type { EventObject } from './config/events';
 import { checkKeys } from './utils';
 
@@ -70,3 +75,9 @@ export type Expr<
   TEvents extends EventObject = EventObject,
   T = any,
 > = Fn<[TContext, TEvents], T>;
+
+export type Define<T, U> = T extends undefined
+  ? U
+  : undefined extends T
+    ? NotUndefined<T>
+    : T;
