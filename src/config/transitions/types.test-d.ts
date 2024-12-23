@@ -133,23 +133,23 @@ expectTypeOf({
 } as const).toMatchTypeOf<TransitionsConfig>();
 // #endregion
 
-// #region invoke
-expectTypeOf({ invoke: [] }).toMatchTypeOf<TransitionsConfig>();
-expectTypeOf({ invoke: {} }).not.toMatchTypeOf<TransitionsConfig>();
+// #region promise
+expectTypeOf({ promise: [] }).toMatchTypeOf<TransitionsConfig>();
+expectTypeOf({ promise: {} }).not.toMatchTypeOf<TransitionsConfig>();
 expectTypeOf({
-  invoke: { src: 'promise1' },
-}).toMatchTypeOf<TransitionsConfig>();
+  promise: { src: 'promise1' },
+}).not.toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: { src: 'promise1', then: {}, catch: ['/state1'] },
+  promise: { src: 'promise1', then: {}, catch: ['/state1'] },
 } as const).toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: { src: 'promise1', then: {}, catch: [{}, '/state1'] },
+  promise: { src: 'promise1', then: {}, catch: [{}, '/state1'] },
 } as const).not.toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -157,7 +157,7 @@ expectTypeOf({
 } as const).toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -166,7 +166,7 @@ expectTypeOf({
 } as const).not.toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -175,7 +175,7 @@ expectTypeOf({
 } as const).toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -184,7 +184,7 @@ expectTypeOf({
 } as const).toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -193,7 +193,7 @@ expectTypeOf({
 } as const).not.toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -202,7 +202,7 @@ expectTypeOf({
 } as const).not.toMatchTypeOf<TransitionsConfig>();
 
 expectTypeOf({
-  invoke: {
+  promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],

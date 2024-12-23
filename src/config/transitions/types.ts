@@ -38,7 +38,7 @@ export type Finally =
   | string;
 
 export type PromiseConfig = {
-  readonly promise: string;
+  readonly src: string;
   readonly id?: string;
 
   // #region To perform
@@ -60,7 +60,7 @@ export type TransitionsConfig = {
   readonly on?: DelayedTransitions;
   readonly always?: AlwaysConfig;
   readonly after?: DelayedTransitions;
-  readonly invoke?: SingleOrArrayR<PromiseConfig>;
+  readonly promise?: SingleOrArrayR<PromiseConfig>;
 };
 
 export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {

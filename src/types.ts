@@ -1,6 +1,8 @@
+import type { SingleOrArray } from '@bemedev/boolean-recursive';
 import type {
   Fn,
   NotUndefined,
+  Primitive,
   TuplifyUnion,
   ValuesOf,
 } from '@bemedev/types';
@@ -81,3 +83,9 @@ export type Define<T, U> = T extends undefined
   : undefined extends T
     ? NotUndefined<T>
     : T;
+
+interface PrimitiveObjectMap {
+  [key: string]: SingleOrArray<PrimitiveObject>;
+}
+
+export type PrimitiveObject = Primitive | PrimitiveObjectMap;
