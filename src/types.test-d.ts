@@ -28,14 +28,14 @@ const complexObject2 = {
   f: new TC(),
 };
 
-expectTypeOf(ttString).toMatchTypeOf<PrimitiveObject>();
-expectTypeOf(ttNumber).toMatchTypeOf<PrimitiveObject>();
-expectTypeOf(ttBoolean).toMatchTypeOf<PrimitiveObject>();
+assertType<PrimitiveObject>(ttString);
+assertType<PrimitiveObject>(ttNumber);
+assertType<PrimitiveObject>(ttBoolean);
 expectTypeOf(ttArra1).not.toMatchTypeOf<PrimitiveObject>();
 expectTypeOf(ttArray2).not.toMatchTypeOf<PrimitiveObject>();
-expectTypeOf(ttObject).toMatchTypeOf<PrimitiveObject>();
+assertType<PrimitiveObject>(ttObject);
 expectTypeOf(ttFunction).not.toMatchTypeOf<PrimitiveObject>();
 expectTypeOf(ttArrowFunction).not.toMatchTypeOf<PrimitiveObject>();
 expectTypeOf(ttClass).not.toMatchTypeOf<PrimitiveObject>();
-expectTypeOf(complexObject1).toMatchTypeOf<PrimitiveObject>();
+assertType<PrimitiveObject>(complexObject1);
 expectTypeOf(complexObject2).not.toMatchTypeOf<PrimitiveObject>();

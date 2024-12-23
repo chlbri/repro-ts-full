@@ -1,5 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { getStateType } from './functions';
+import { flatMapMachine, getStateType } from './functions';
+import type { StateNodeConfig } from './types';
 
 describe('getStateType', () => {
   const useTests = createTests(getStateType);
@@ -64,18 +65,87 @@ describe('getStateType', () => {
       'parallel',
     ],
     // #endregion
+  );
+});
 
-    // #region Final
+describe('flatMapMachine', () => {
+  const useTests =
+    createTests<(config: StateNodeConfig) => any>(flatMapMachine);
+
+  useTests(
+    ['empty machine', [{}], { '/': {} }],
     [
-      'Only stateNode typed "final" is "final" => "final"',
+      'simple machine',
       [
         {
-          type: 'final',
+          always: 'always',
+          description: 'description',
         },
       ],
-      'final',
+      {
+        '/': {
+          always: 'always',
+          description: 'description',
+        },
+      },
     ],
-
-    // #endregion
+    [
+      'Machine with children states',
+      [
+        {
+          always: 'always',
+          description: 'description',
+          initial: 'state1',
+          states: {
+            state1: {},
+            state2: {},
+          },
+        },
+      ],
+      {
+        '/': {
+          always: 'always',
+          description: 'description',
+          initial: 'state1',
+        },
+        '/state1': {},
+        '/state2': {},
+      },
+    ],
+    [
+      'Complex machine',
+      [
+        {
+          always: 'always',
+          description: 'description',
+          initial: 'state1',
+          states: {
+            state1: {
+              always: 'always',
+              type: 'parallel',
+              states: {
+                state3: {},
+                state4: {},
+              },
+            },
+            state2: {},
+          },
+        },
+      ],
+      {
+        '/': {
+          always: 'always',
+          description: 'description',
+          initial: 'state1',
+        },
+        '/state1': {
+          always: 'always',
+          type: 'parallel',
+        },
+        '/state1/state3': {},
+        '/state1/state4': {},
+        '/state2': {},
+      },
+    ],
   );
 });

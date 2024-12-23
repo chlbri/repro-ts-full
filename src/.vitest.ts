@@ -8,8 +8,10 @@ const plugins = [
   exclude({
     ignoreCoverageFiles: [
       '**/index.ts',
-      '**/*/types.ts',
+      '**/types.ts',
       '**/*.typegen.ts',
+      '**/*.fixtures.ts',
+      '**/*.fixture.ts',
     ],
   }),
 ];

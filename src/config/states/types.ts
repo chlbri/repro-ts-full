@@ -58,14 +58,6 @@ export type ChildrenM =
   | string
   | { id?: string; src: string; events?: SingleOrArrayR<string> };
 
-export type Config = (
-  | StateNodeConfigCompound
-  | StateNodeConfigParallel
-  | StateNodeConfigAtomic
-) & {
-  machines?: SingleOrArrayR<ChildrenM>;
-};
-
 type _FlatMapStateNodeConfigOptions = {
   withStates?: boolean;
   delimiter?: string;

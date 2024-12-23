@@ -1,5 +1,6 @@
+import type { Config } from '../config';
 import { DEFAULT_DELIMITER } from '../constants';
-import type { Config, StateNodeConfig, StateType } from './types';
+import type { StateNodeConfig, StateType } from './types';
 
 export const createConfig = <const SN extends Config = Config>(
   config: SN,
