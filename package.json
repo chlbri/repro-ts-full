@@ -1,7 +1,7 @@
 {
   "name": "@bemedev/repro-ts-full",
   "version": "0.0.1",
-  "description": "//TODO",
+  "description": "A reprogramming method to code better",
   "author": {
     "email": "bri_lvi@icloud.com",
     "name": "chlbri",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "//TODO"
+    "url": "https://github.com/chlbri/repro-ts-full"
   },
   "license": "MIT",
   "type": "module",
@@ -31,7 +31,8 @@
     }
   ],
   "keywords": [
-    "//TODO"
+    "typescript",
+    "state machines"
   ],
   "files": [
     "lib",

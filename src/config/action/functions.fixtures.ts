@@ -1,4 +1,5 @@
 import type { TC, TE, TestParams } from 'src/types.fixtures';
+import { ERRORS } from 'src/utils';
 import { performAction } from './functions';
 import type { ActionConfig, ActionMap } from './types';
 
@@ -18,7 +19,7 @@ export const performActionTest: performActionTestF = ({
   args,
   _default = false,
 }) => {
-  if (!args) throw new Error('No params');
+  if (!args) throw ERRORS.noParams.error;
   return performAction({
     action,
     actions,

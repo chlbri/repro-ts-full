@@ -1,4 +1,9 @@
-import type { PrimitiveObject } from '~types';
+import type {
+  ChangeProperties,
+  KeyStrings,
+  PrimitiveObject,
+  Simplify,
+} from '~types';
 
 const ttString = 'str';
 const ttNumber = 55;
@@ -39,3 +44,73 @@ expectTypeOf(ttArrowFunction).not.toMatchTypeOf<PrimitiveObject>();
 expectTypeOf(ttClass).not.toMatchTypeOf<PrimitiveObject>();
 assertType<PrimitiveObject>(complexObject1);
 expectTypeOf(complexObject2).not.toMatchTypeOf<PrimitiveObject>();
+
+type _TT1 = {
+  arg1: {
+    arg11: string;
+    arg12: number;
+  };
+  arg2: number;
+  arg3: {
+    arg31: {
+      arg311: string;
+    };
+  };
+};
+
+type TT11 = Simplify<KeyStrings<_TT1>>;
+type TT12 = Simplify<ChangeProperties<_TT1, { arg1: { arg11: 'ert11' } }>>;
+type TT13 = Simplify<
+  ChangeProperties<
+    _TT1,
+    { arg1: { arg11: 'ert11'; '@my': 'ert1' }; arg3: { '@my': 'ert3' } }
+  >
+>;
+
+assertType<TT11>({
+  arg1: {
+    arg11: 'example',
+    arg12: 'str',
+    '@my': 'yyt',
+  },
+  arg2: 'str',
+  arg3: {
+    arg31: {
+      arg311: 'example',
+      '@my': 'yyt',
+    },
+    '@my': 'yyt',
+  },
+});
+
+assertType<TT11>({
+  arg1: {
+    arg11: 'example',
+    arg12: '42',
+    '@my': 'yyt',
+  },
+  arg2: '100',
+  arg3: {
+    // @ts-expect-error Test typing
+    arg31: {
+      arg311: 'example',
+    },
+    '@my': 'yyt',
+  },
+});
+
+assertType<TT12>({
+  arg1: { arg12: 45, ert11: 'string' },
+  arg2: 5,
+  arg3: {
+    arg31: { arg311: 'string' },
+  },
+});
+
+assertType<TT13>({
+  ert1: { arg12: 45, ert11: 'string' },
+  arg2: 5,
+  ert3: {
+    arg31: { arg311: 'string' },
+  },
+});

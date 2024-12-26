@@ -1,11 +1,12 @@
 import type { SingleOrArray } from '@bemedev/boolean-recursive';
 import type {
+  DeepPartial,
   Fn,
-  LengthOf,
   NOmit,
   NotUndefined,
   Primitive,
   TuplifyUnion,
+  UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
 import type { EventObject } from './config/events';
@@ -134,20 +135,59 @@ export type ChangeProperty<
         : never)
   : never;
 
-// export type ChangeProperty<
-//   T extends object,
-//   U extends PtC<T>,
-//   option extends ChangePropertyOption = 'readonly',
-// > = Simplify<_ChangeProperty<T, U, option>>;
+export interface StringMap {
+  [key: string]: _StringMap;
+}
+
+type _StringMap = string | StringMap;
+
+type _KeyStrings<
+  T extends object,
+  AddObjectKey extends boolean = true,
+  Key extends keyof T = keyof T,
+> = Key extends string
+  ? NotUndefined<T[Key]> extends object
+    ? {
+        [key in keyof T]: (T[key] extends infer T2 extends object
+          ? UnionToIntersection<_KeyStrings<T2, AddObjectKey>>
+          : never) &
+          (AddObjectKey extends true
+            ? { '@my': string }
+            : NonNullable<object>);
+      }
+    : { [key in Key]: string }
+  : never;
+
+export type KeyStrings<
+  T extends object,
+  AddObjectKey extends boolean = true,
+  Key extends keyof T = keyof T,
+> = UnionToIntersection<_KeyStrings<T, AddObjectKey, Key>>;
+
+export type HighMy = '@my';
 
 export type ChangeProperties<
   T extends object,
-  U extends PtC<T>[] = PtC<T>[],
-  option extends ChangePropertyOption = 'readonly',
-> = U extends [...infer Rest extends PtC<T>[], infer U1 extends PtC<T>]
-  ? LengthOf<Rest> extends 0
-    ? ChangeProperty<T, U1, option>
-    : Rest extends PtC<ChangeProperty<T, U1, option>>[]
-      ? ChangeProperties<ChangeProperty<T, U1, option>, Rest, option>
-      : never
-  : never;
+  U extends DeepPartial<KeyStrings<T>> = DeepPartial<KeyStrings<T>>,
+> =
+  DeepPartial<KeyStrings<T>> extends U
+    ? T
+    : Omit<T, keyof U> & {
+        [key in keyof T as key extends keyof U
+          ? U[key] extends infer U1
+            ? U1 extends { [key in HighMy]: string }
+              ? U1[HighMy]
+              : U1 extends string
+                ? U1
+                : key
+            : never
+          : key]: key extends keyof U
+          ? T[key] extends infer T1 extends object
+            ? Omit<U[key], HighMy> extends infer U1 extends DeepPartial<
+                KeyStrings<T1, true>
+              >
+              ? ChangeProperties<T1, U1>
+              : never
+            : T[key]
+          : T[key];
+      };

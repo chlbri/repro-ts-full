@@ -1,5 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
 import { DEFAULT_ARGS } from 'src/types.fixtures';
+import { ERRORS } from 'src/utils';
 import { DEFAULT_NOTHING } from '../constants';
 import { performActionTest } from './functions.fixtures';
 
@@ -9,7 +10,7 @@ describe('#1 => performAction', () => {
   describe('#1 => Errors', () => {
     test('#1 => Throw : "No params"', () => {
       const action = () => performActionTest({});
-      expect(action).toThrowError('No params');
+      expect(action).toThrowError(ERRORS.noParams.string);
     });
 
     test('#2 => Throw : "Action is undefined"', () => {

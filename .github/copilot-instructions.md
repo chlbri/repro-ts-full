@@ -47,7 +47,8 @@ commit :
 
 - Le commit peut être un breaking change, dans ce cas, ajoutez en bas
   [BREAKING CHANGE]
-- Toujuts ajouter le nom de l'auteur du commit tout en bas du message.
+- IMPORTANT!! :Toujours ajouter "chlbri: bri_lvi@icloud.com" après un saut
+  de ligne à la fin du commit.
 - Le corps ne doit pas contenir plus de 200 mots
 - Le corps est en français
 - Le titre est en anglais

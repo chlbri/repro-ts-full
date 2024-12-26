@@ -1,12 +1,13 @@
 import { createTests } from '@bemedev/vitest-extended';
 import { DEFAULT_ARGS } from 'src/types.fixtures';
+import { ERRORS } from 'src/utils';
 import { toPredicateTest } from './functions.fixtures';
 
 describe('#1 => To Predicate', () => {
   describe('#1 => Errors', () => {
     test('#1 => Throw : "No params"', () => {
       const action = () => toPredicateTest({});
-      expect(action).toThrowError('No params');
+      expect(action).toThrowError(ERRORS.noParams.string);
     });
 
     test('#2 => Throw : "Guard is undefined"', () => {
