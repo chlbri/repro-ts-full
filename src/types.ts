@@ -107,8 +107,8 @@ type DefaultReturnPrams<T> = {
 
 export type DefaultReturn = <T>(params: DefaultReturnPrams<T>) => T;
 
-type PropertyToChange<T extends object> = [keyof T, string];
-type PtC<T extends object> = PropertyToChange<T>;
+export type PropertyToChange<T extends object> = [keyof T, string];
+export type PtC<T extends object> = PropertyToChange<T>;
 
 type ChangePropertyOption =
   | 'readonly'
@@ -118,22 +118,19 @@ type ChangePropertyOption =
 
 export type ChangeProperty<
   T extends object,
-  U extends PtC<T>,
+  name extends keyof T,
+  replace extends string,
   option extends ChangePropertyOption = 'undefined',
-> = U[0] extends infer K1 extends keyof T
-  ? NOmit<T, K1> &
-      (K1 extends any
-        ? U[1] extends infer K2 extends string
-          ? option extends 'readonly'
-            ? { +readonly [key in K2]: T[K1] }
-            : option extends 'readonly_undefined'
-              ? { +readonly [key in K2]+?: T[K1] }
-              : option extends 'undefined'
-                ? { [key in K2]+?: T[K1] }
-                : { [key in K2]: T[K1] }
-          : never
-        : never)
-  : never;
+> = NOmit<T, name> &
+  (name extends any
+    ? option extends 'readonly'
+      ? { +readonly [key in replace]: T[name] }
+      : option extends 'readonly_undefined'
+        ? { +readonly [key in replace]+?: T[name] }
+        : option extends 'undefined'
+          ? { [key in replace]+?: T[name] }
+          : { [key in replace]: T[name] }
+    : never);
 
 export interface StringMap {
   [key: string]: _StringMap;
@@ -166,28 +163,51 @@ export type KeyStrings<
 
 export type HighMy = '@my';
 
+type __ChangeProperties<
+  T extends object,
+  U extends DeepPartial<KeyStrings<T>> = DeepPartial<KeyStrings<T>>,
+> = {
+  [key in keyof T as key extends keyof U
+    ? U[key] extends infer U1
+      ? U1 extends { [key in HighMy]: string }
+        ? U1[HighMy]
+        : U1 extends string
+          ? U1
+          : key
+      : never
+    : key]: key extends keyof U
+    ? T[key] extends infer T1 extends object
+      ? Omit<U[key], HighMy> extends infer U1 extends DeepPartial<
+          KeyStrings<T1, true>
+        >
+        ? __ChangeProperties<T1, U1>
+        : never
+      : T[key]
+    : T[key];
+};
+
+type _ChangeProperties<
+  T extends object,
+  U extends DeepPartial<KeyStrings<T>> = DeepPartial<KeyStrings<T>>,
+  option extends Extract<
+    ChangePropertyOption,
+    'normal' | 'undefined'
+  > = 'normal',
+> =
+  __ChangeProperties<T, U> extends infer Tn
+    ? option extends 'undefined'
+      ? DeepPartial<Tn>
+      : Tn
+    : never;
+
 export type ChangeProperties<
   T extends object,
   U extends DeepPartial<KeyStrings<T>> = DeepPartial<KeyStrings<T>>,
+  option extends Extract<
+    ChangePropertyOption,
+    'normal' | 'undefined'
+  > = 'normal',
 > =
   DeepPartial<KeyStrings<T>> extends U
     ? T
-    : Omit<T, keyof U> & {
-        [key in keyof T as key extends keyof U
-          ? U[key] extends infer U1
-            ? U1 extends { [key in HighMy]: string }
-              ? U1[HighMy]
-              : U1 extends string
-                ? U1
-                : key
-            : never
-          : key]: key extends keyof U
-          ? T[key] extends infer T1 extends object
-            ? Omit<U[key], HighMy> extends infer U1 extends DeepPartial<
-                KeyStrings<T1, true>
-              >
-              ? ChangeProperties<T1, U1>
-              : never
-            : T[key]
-          : T[key];
-      };
+    : _ChangeProperties<T, U, option>;

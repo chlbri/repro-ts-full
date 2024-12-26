@@ -23,5 +23,6 @@ export type _TestParams<T> = {
 
 export type TestParams<T, name extends string> = ChangeProperty<
   _TestParams<T>,
-  ['func', name]
+  'func',
+  name
 >;
