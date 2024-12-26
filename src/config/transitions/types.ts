@@ -1,41 +1,60 @@
 import type { ReduceArray, Require } from '@bemedev/types';
-import type { SingleOrArrayR } from '~types';
+import type { SingleOrArrayL } from '~types';
 import type { ActionConfig } from '../action';
 import type { GuardConfig } from '../guards';
 
-type TransitionConfigMap = {
-  readonly target?: SingleOrArrayR<string>;
+type _TransitionConfigMap = {
+  readonly target?: SingleOrArrayL<string>;
   // readonly internal?: boolean;
-  readonly actions?: SingleOrArrayR<ActionConfig>;
-  readonly guards?: SingleOrArrayR<GuardConfig>;
+  readonly actions?: SingleOrArrayL<ActionConfig>;
+  readonly guards?: SingleOrArrayL<GuardConfig>;
   readonly description?: string;
-  readonly in?: SingleOrArrayR<string>;
+  readonly in?: SingleOrArrayL<string>;
 };
 
-export type TransitionConfig = string | TransitionConfigMap;
+export type TransitionConfigMapF = Require<_TransitionConfigMap, 'target'>;
+export type TransitionConfigMapA = Require<
+  _TransitionConfigMap,
+  'actions'
+>;
 
-export type TransitionConfigMapF = Require<TransitionConfigMap, 'target'>;
+export type TransitionConfigMap =
+  | TransitionConfigMapF
+  | TransitionConfigMapA;
+
+export type TransitionConfig = string | TransitionConfigMap;
 
 export type TransitionConfigF = string | TransitionConfigMapF;
 
 export type ArrayTransitions = readonly [
-  ...(readonly Require<TransitionConfigMap, 'guards'>[]),
-  TransitionConfigF,
+  ...(
+    | Require<TransitionConfigMapF, 'guards'>
+    | Require<TransitionConfigMapA, 'guards'>
+    | Require<TransitionConfigMapF, 'in'>
+    | Require<TransitionConfigMapA, 'in'>
+  )[],
+  TransitionConfig,
 ];
 
 export type SingleOrArrayT = ArrayTransitions | TransitionConfig;
 
 export type Finally =
-  | (Pick<
-      TransitionConfigMap,
-      'description' | 'actions' | 'guards'
-    > extends infer F extends Pick<
-      TransitionConfigMap,
-      'description' | 'actions' | 'guards'
-    >
-      ? F | readonly [...(readonly Require<F, 'guards'>[]), F]
-      : never)
-  | string;
+  Pick<
+    TransitionConfigMapA,
+    'description' | 'actions' | 'guards' | 'in'
+  > extends infer F extends Pick<
+    TransitionConfigMapA,
+    'description' | 'actions' | 'guards' | 'in'
+  >
+    ?
+        | (F | string)
+        | readonly [
+            ...(Require<F, 'guards'> | Require<F, 'in'>)[],
+            F | string,
+          ]
+    : never;
+
+export type ThenNext = TransitionConfigMapF | TransitionConfigMapA;
 
 export type PromiseConfig = {
   readonly src: string;
@@ -52,7 +71,12 @@ export type PromiseConfig = {
   readonly finally?: Finally;
 };
 
-export type AlwaysConfig = ArrayTransitions | TransitionConfigF;
+export type AlwaysConfig =
+  | readonly [
+      ...Require<TransitionConfigMap, 'guards'>[],
+      TransitionConfigF,
+    ]
+  | TransitionConfigF;
 
 export type DelayedTransitions = Record<string, SingleOrArrayT>;
 
@@ -60,7 +84,7 @@ export type TransitionsConfig = {
   readonly on?: DelayedTransitions;
   readonly always?: AlwaysConfig;
   readonly after?: DelayedTransitions;
-  readonly promise?: SingleOrArrayR<PromiseConfig>;
+  readonly promise?: SingleOrArrayL<PromiseConfig>;
 };
 
 export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {

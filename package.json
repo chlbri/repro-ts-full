@@ -54,6 +54,7 @@
     "test": "pnpm run test:coverage --no-coverage",
     "test:type": "pnpm run test:coverage -c \"vitest.config.type.ts\" --no-coverage",
     "test:no-type": "pnpm run test:coverage -c \"vitest.config.notype.ts\" --no-coverage",
+    "test:type:watch": "vitest -c \"vitest.config.type.ts\"",
     "test:coverage": "vitest run",
     "test:watch": "vitest",
     "rm:lib": "rm -rf lib",

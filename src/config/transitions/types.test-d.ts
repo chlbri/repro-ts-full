@@ -1,160 +1,212 @@
 import type { Finally, SingleOrArrayT, TransitionsConfig } from './types';
 
+//Remplacez tous les tests de type par "asserType"
+
 // #region SingleOrArrayT
 
-expectTypeOf('57').toMatchTypeOf<SingleOrArrayT>();
-
-expectTypeOf([
-  { guards: 'ere', target: 'ere' },
-  'fddfd',
-] as const).toMatchTypeOf<SingleOrArrayT>();
+assertType<SingleOrArrayT>('ere');
+assertType<SingleOrArrayT>([{ guards: 'ere', target: 'ere' }, 'fddfd']);
 
 expectTypeOf([
   { guards: 'ere', target: 'ere' },
   { guards: 'eee' },
 ] as const).not.toMatchTypeOf<SingleOrArrayT>();
 
-expectTypeOf([
+assertType<SingleOrArrayT>([
   { guards: 'ere', target: 'ere' },
+  // @ts-expect-error for typing
+  { guards: 'eee' },
+]);
+
+assertType<SingleOrArrayT>([
+  { guards: 'ere', target: 'ere' },
+  // @ts-expect-error for typing
   {},
-] as const).not.toMatchTypeOf<SingleOrArrayT>();
+]);
 
-expectTypeOf([
+assertType<SingleOrArrayT>([
   { guards: 'ere', target: 'ere' },
+  // @ts-expect-error for typing
   56,
-] as const).not.toMatchTypeOf<SingleOrArrayT>();
+]);
 
-expectTypeOf([
+assertType<SingleOrArrayT>([
   { guards: 'ere', target: 'ere' },
   { guards: 'ere', target: 'ere' },
-] as const).toMatchTypeOf<SingleOrArrayT>();
+]);
 
-expectTypeOf([
+assertType<SingleOrArrayT>([
   { guards: 'ere', target: 'ere' },
   { target: 'ere' },
-] as const).toMatchTypeOf<SingleOrArrayT>();
+]);
 
 // #endregion
 
 // #region Finally
 
-expectTypeOf<object>().toMatchTypeOf<Finally>();
-expectTypeOf<{ not: 'not' }>().not.toMatchTypeOf<Finally>();
-expectTypeOf<{ description: 'description' }>().toMatchTypeOf<Finally>();
-expectTypeOf<'actions'>().toMatchTypeOf<Finally>();
+assertType<Finally>(
+  // @ts-expect-error for typing
+  {},
+);
+assertType<Finally>({ actions: 'actions' });
+assertType<Finally>({
+  // @ts-expect-error for typing
+  not: 'not',
+});
+assertType<Finally>(
+  // @ts-expect-error for typing
+  { description: 'description' },
+);
+assertType<Finally>({ description: 'description', actions: 'action33' });
+assertType<Finally>('string');
 
 // #endregion
 
 // #region Transitions
 
-expectTypeOf({}).toMatchTypeOf<TransitionsConfig>();
+assertType<TransitionsConfig>({});
 
 // #region on
-expectTypeOf({ on: {} }).toMatchTypeOf<TransitionsConfig>();
+assertType<TransitionsConfig>({ on: {} });
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   on: {
-    EVENT: {},
-  },
-}).toMatchTypeOf<TransitionsConfig>();
-
-expectTypeOf({
-  on: {
-    EVENT1: {
-      not: 'not',
-    },
-    EVENT2: {
+    // @ts-expect-error for typing
+    EVENT: {
       actions: [],
     },
   },
-}).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
+  on: {
+    EVENT: {
+      actions: ['action2'],
+    },
+  },
+});
+
+assertType<TransitionsConfig>({
+  on: {
+    EVENT1: {
+      // @ts-expect-error for typing
+      not: 'not',
+    },
+    EVENT2: {
+      actions: ['action1'],
+    },
+  },
+});
+
+assertType<TransitionsConfig>({
   on: {
     EVENT1: {
       target: '/state1',
     },
     EVENT2: {
-      actions: [],
+      actions: 'action1',
       in: '/state1',
     },
     EVENT3: '/state1',
   },
-}).toMatchTypeOf<TransitionsConfig>();
+});
+
 // #endregion
 
 // #region after
-expectTypeOf({ after: {} }).toMatchTypeOf<TransitionsConfig>();
+assertType<TransitionsConfig>({ after: {} });
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   after: {
-    TIME: {},
+    TIME: {
+      actions: 'action4',
+    },
   },
-}).toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   after: {
     TIME1: {
+      // @ts-expect-error for typing
       not: 'not',
     },
     TIME2: {
-      actions: [],
+      actions: ['action5'],
     },
   },
-}).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   after: {
     TIME1: {
       target: '/state1',
     },
     TIME2: {
-      actions: [],
+      actions: ['action11'],
       in: '/state1',
     },
     TIME3: '/state1',
   },
-}).toMatchTypeOf<TransitionsConfig>();
+});
+
 // #endregion
 
 // #region always
-expectTypeOf({ always: [] }).not.toMatchTypeOf<TransitionsConfig>();
-expectTypeOf({ always: 'ere' }).toMatchTypeOf<TransitionsConfig>();
-expectTypeOf({
+
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
+  always: [],
+});
+
+assertType<TransitionsConfig>({ always: 'ere' });
+
+assertType<TransitionsConfig>({
   always: ['/state1'],
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
   always: ['/state2', '/state1'],
-} as const).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   always: [{ guards: 'ert' }, '/state1'],
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
+
 // #endregion
 
 // #region promise
-expectTypeOf({ promise: [] }).toMatchTypeOf<TransitionsConfig>();
-expectTypeOf({ promise: {} }).not.toMatchTypeOf<TransitionsConfig>();
-expectTypeOf({
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
+  promise: [],
+});
+
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
+  promise: {},
+});
+
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
   promise: { src: 'promise1' },
-}).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
-  promise: { src: 'promise1', then: {}, catch: ['/state1'] },
-} as const).toMatchTypeOf<TransitionsConfig>();
+assertType<TransitionsConfig>({
+  promise: { src: 'promise1', then: 'next', catch: ['/state1'] },
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
   promise: { src: 'promise1', then: {}, catch: [{}, '/state1'] },
-} as const).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   promise: {
     src: 'promise1',
-    then: {},
-    catch: [{ guards: 'ert' }, '/state1'],
+    then: { guards: 'ert', target: 'next' },
+    catch: [{ guards: 'ert', actions: 'action0' }, '/state1'],
   },
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
 
 expectTypeOf({
   promise: {
@@ -164,51 +216,120 @@ expectTypeOf({
     finally: [],
   },
 } as const).not.toMatchTypeOf<TransitionsConfig>();
-
-expectTypeOf({
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
   promise: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
-    finally: {},
+    finally: 'actions',
   },
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   promise: {
     src: 'promise1',
-    then: {},
-    catch: [{ guards: 'ert' }, '/state1'],
-    finally: [{}],
+    then: { actions: 'action1' },
+    catch: [{ in: '/ert', target: '/state2' }, '/state1'],
+    finally: { actions: 'action12' },
   },
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   promise: {
     src: 'promise1',
-    then: {},
-    catch: [{ guards: 'ert' }, '/state1'],
+    then: { target: '/state43' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [{ actions: 'action13' }],
+  },
+});
+
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
+  promise: {
+    src: 'promise1',
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
     finally: [{}, 'actions'],
   },
-} as const).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
   promise: {
     src: 'promise1',
-    then: {},
-    catch: [{ guards: 'ert' }, '/state1'],
-    finally: [{ target: 'ert' }, {}],
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [
+      {
+        // @ts-expect-error for typing
+        target: 'ert',
+      },
+      {},
+    ],
   },
-} as const).not.toMatchTypeOf<TransitionsConfig>();
+});
 
-expectTypeOf({
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
   promise: {
     src: 'promise1',
-    then: {},
-    catch: [{ guards: 'ert' }, '/state1'],
-    finally: [{ guards: 'ert' }, {}],
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [
+      {
+        guards: 'ert',
+      },
+      {},
+    ],
   },
-} as const).toMatchTypeOf<TransitionsConfig>();
+});
+
+assertType<TransitionsConfig>({
+  // @ts-expect-error for typing
+  promise: {
+    src: 'promise1',
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [
+      {
+        guards: 'ert',
+        actions: 'action1',
+      },
+      {},
+    ],
+  },
+});
+
+assertType<TransitionsConfig>({
+  promise: {
+    src: 'promise1',
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [
+      {
+        guards: 'ert',
+        actions: 'action1',
+      },
+      'action20',
+    ],
+  },
+});
+
+assertType<TransitionsConfig>({
+  promise: {
+    src: 'promise1',
+    then: { actions: 'action1' },
+    catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
+    finally: [
+      {
+        in: '/state4',
+        actions: 'action1',
+      },
+      'action20',
+    ],
+  },
+});
+
 // #endregion
 
 // #endregion

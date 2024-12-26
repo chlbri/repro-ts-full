@@ -14,6 +14,7 @@ export function isArray<T>(value: any): value is T[] {
 }
 
 export type SingleOrArrayR<T> = T | readonly T[];
+export type SingleOrArrayL<T> = T | readonly [...(readonly T[]), T];
 
 const DESCRIBER_KEYS = ['name', 'description'] as const;
 
