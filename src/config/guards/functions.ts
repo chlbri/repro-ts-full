@@ -1,34 +1,53 @@
 import recursive from '@bemedev/boolean-recursive';
+import { defaultReturn } from 'src/utils';
 import { isDescriber, isString } from '../../types';
-import { GUARD_TYPE } from '../constants';
+import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '../constants';
 import type { EventObject } from '../events';
 import type {
-  EvaluateGuardParams,
+  EvaluateGuardF,
   GuardConfig,
   GuardUnion,
   Predicate,
   PredicateMap,
+  ToPredicateF,
 } from './types';
 
-export const returnTrue = () => true;
-export const returnFalse = () => true;
+export const returnTrue = () => {
+  console.log(`${DEFAULT_NOTHING} call true`);
+  return true;
+};
+export const returnFalse = () => {
+  console.log(`${DEFAULT_NOTHING} call false`);
+  return false;
+};
 
 function _toPredicate<TC, TE extends EventObject>(
   guard?: GuardConfig,
   predicates?: PredicateMap<TC, TE>,
+  bool = true,
 ): Predicate<TC, TE> {
-  if (!guard) return returnTrue;
+  const _return = (error: Error, _return?: Predicate<TC, TE>) => {
+    return defaultReturn({
+      _default: {
+        bool,
+        value: returnTrue,
+      },
+      _return,
+      error,
+    });
+  };
+  if (!guard) {
+    return _return(ERRORS.guard.notDefined.error);
+  }
 
   if (isString(guard)) {
     const arg = predicates?.[guard];
-    if (!arg) return returnTrue;
-    return arg;
+    return _return(ERRORS.guard.notProvided.error, arg);
   }
 
   if (isDescriber(guard)) {
     const arg = predicates?.[guard.name];
-    if (!arg) return returnTrue;
-    return arg;
+    return _return(ERRORS.guard.notDescribed.error, arg);
   }
 
   const makeArray = (guards: GuardUnion[]) => {
@@ -44,20 +63,20 @@ function _toPredicate<TC, TE extends EventObject>(
   return { or };
 }
 
-export function toPredicate<TC, TE extends EventObject>(
-  guard?: GuardConfig,
-  predicates?: PredicateMap<TC, TE>,
-) {
-  const out1 = _toPredicate(guard, predicates);
-  return recursive(out1);
-}
-
-export const evaluateGuard = <TC, TE extends EventObject>({
+export const toPredicate: ToPredicateF = ({
   guard,
   predicates,
+  _default,
+}) => {
+  const out1 = _toPredicate(guard, predicates, _default);
+  return recursive(out1);
+};
+
+export const evaluateGuard: EvaluateGuardF = ({
   args: { context, event },
-}: EvaluateGuardParams<TC, TE>) => {
-  const out1 = toPredicate(guard, predicates);
+  ...params
+}) => {
+  const out1 = toPredicate(params);
   const out2 = out1(context, event);
 
   return out2;

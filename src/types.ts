@@ -1,6 +1,8 @@
 import type { SingleOrArray } from '@bemedev/boolean-recursive';
 import type {
   Fn,
+  LengthOf,
+  NOmit,
   NotUndefined,
   Primitive,
   TuplifyUnion,
@@ -90,3 +92,62 @@ interface PrimitiveObjectMap {
 }
 
 export type PrimitiveObject = Primitive | PrimitiveObjectMap;
+
+export type DeUnionize<T> = T extends any ? T : never;
+
+type DefaultReturnPrams<T> = {
+  _return?: T;
+  error: Error;
+  _default: {
+    bool?: boolean;
+    value: T;
+  };
+};
+
+export type DefaultReturn = <T>(params: DefaultReturnPrams<T>) => T;
+
+type PropertyToChange<T extends object> = [keyof T, string];
+type PtC<T extends object> = PropertyToChange<T>;
+
+type ChangePropertyOption =
+  | 'readonly'
+  | 'readonly_undefined'
+  | 'normal'
+  | 'undefined';
+
+export type ChangeProperty<
+  T extends object,
+  U extends PtC<T>,
+  option extends ChangePropertyOption = 'undefined',
+> = U[0] extends infer K1 extends keyof T
+  ? NOmit<T, K1> &
+      (K1 extends any
+        ? U[1] extends infer K2 extends string
+          ? option extends 'readonly'
+            ? { +readonly [key in K2]: T[K1] }
+            : option extends 'readonly_undefined'
+              ? { +readonly [key in K2]+?: T[K1] }
+              : option extends 'undefined'
+                ? { [key in K2]+?: T[K1] }
+                : { [key in K2]: T[K1] }
+          : never
+        : never)
+  : never;
+
+// export type ChangeProperty<
+//   T extends object,
+//   U extends PtC<T>,
+//   option extends ChangePropertyOption = 'readonly',
+// > = Simplify<_ChangeProperty<T, U, option>>;
+
+export type ChangeProperties<
+  T extends object,
+  U extends PtC<T>[] = PtC<T>[],
+  option extends ChangePropertyOption = 'readonly',
+> = U extends [...infer Rest extends PtC<T>[], infer U1 extends PtC<T>]
+  ? LengthOf<Rest> extends 0
+    ? ChangeProperty<T, U1, option>
+    : Rest extends PtC<ChangeProperty<T, U1, option>>[]
+      ? ChangeProperties<ChangeProperty<T, U1, option>, Rest, option>
+      : never
+  : never;

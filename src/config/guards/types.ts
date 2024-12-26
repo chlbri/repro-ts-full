@@ -1,3 +1,4 @@
+import type { SimpleGuardDef } from '@bemedev/boolean-recursive';
 import type { ActionConfig } from '../action';
 import type { GUARD_TYPE } from '../constants';
 import type { EventObject } from '../events';
@@ -43,11 +44,26 @@ export type PredicateMap<TC, TE extends EventObject> = Record<
   PredicateS<TC, TE>
 >;
 
-export type EvaluateGuardParams<TC, TE extends EventObject> = {
-  guard: GuardConfig;
+type ToPredicateParams<TC, TE extends EventObject> = {
+  guard?: GuardConfig;
   predicates?: PredicateMap<TC, TE>;
+  _default?: boolean;
+};
+
+export type ToPredicateF = <TC, TE extends EventObject>(
+  params: ToPredicateParams<TC, TE>,
+) => SimpleGuardDef<[context: TC, event: TE]>;
+
+export type EvaluateGuardParams<TC, TE extends EventObject> = {
+  guard?: GuardConfig;
+  predicates?: PredicateMap<TC, TE>;
+  _default?: boolean;
   args: {
     context: TC;
     event: TE;
   };
 };
+
+export type EvaluateGuardF = <TC, TE extends EventObject>(
+  params: EvaluateGuardParams<TC, TE>,
+) => boolean;

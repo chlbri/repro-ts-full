@@ -1,4 +1,4 @@
-import { isArray } from '~types';
+import { isArray, type DefaultReturn } from '~types';
 
 export function toArray<T>(obj: any) {
   if (isArray(obj)) {
@@ -14,3 +14,18 @@ export function checkKeys<T extends object>(arg: T, ...keys: string[]) {
   }
   return true;
 }
+
+export const defaultReturn: DefaultReturn = ({
+  _default: { value, bool },
+  _return,
+  error,
+}) => {
+  if (_return) return _return;
+  if (bool) return value;
+  throw error;
+};
+
+const env = process.env.NODE_ENV;
+
+export const IS_TEST = env === 'test';
+export const IS_PRODUCTION = env === 'production';
