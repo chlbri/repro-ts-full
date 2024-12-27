@@ -4,6 +4,10 @@ import { flatMapState, resolveState } from '~states';
 import { toArray } from '~utils';
 import type { FlatMapMachine_F, ResolveConfig_F } from './types';
 
+//TODO: To test
+/**
+ *
+ */
 export const flatMapMachine: FlatMapMachine_F = (
   config,
   delimiter = DEFAULT_DELIMITER,
