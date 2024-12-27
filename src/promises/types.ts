@@ -67,7 +67,7 @@ export type ToPromise_F = <
   TC,
   TE extends EventObject = EventObject,
 >(params: {
-  config: PromiseConfig;
+  promise: PromiseConfig;
   options?: NOmit<MachineOptions<TC, TE>, 'children' | 'delays'>;
   strict?: boolean;
 }) => Promisee<TC, TE>;

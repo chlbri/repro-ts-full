@@ -1,5 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { flatMapState, getStateType, resolveState } from './functions';
+import { flatMapState, getStateType } from './functions';
+import { resolveStateTest } from './functions.fixtures';
 import type { StateNodeConfig } from './types';
 
 describe('#1 => getStateType', () => {
@@ -151,24 +152,105 @@ describe('#2 => flatMapMachine', () => {
 });
 
 describe('#3 => resolveState', () => {
-  const useTests = createTests(resolveState);
+  const useTests = createTests(resolveStateTest);
 
-  useTests([
-    'Simple',
+  useTests(
     [
+      'Empty',
+      [{}],
       {
-        config: {},
+        tags: [],
+        type: 'atomic',
+        exit: [],
+        entry: [],
+        states: [],
+        after: [],
+        always: [],
+        on: [],
+        promises: [],
       },
     ],
-    {
-      tags: [],
-      type: 'atomic',
-      exit: [],
-      entry: [],
-      states: [],
-      after: [],
-      always: [],
-      on: [],
-    },
-  ]);
+    [
+      'Atomic',
+      [
+        {
+          id: 'id',
+          description: 'A state',
+          tags: 'busy',
+          on: {},
+          after: {},
+          always: '/state1',
+        },
+      ],
+      {
+        tags: ['busy'],
+        type: 'atomic',
+        exit: [],
+        entry: [],
+        states: [],
+        after: [],
+        always: [
+          {
+            actions: [],
+            guards: [],
+            in: [],
+            target: ['/state1'],
+          },
+        ],
+        on: [],
+        promises: [],
+        id: 'id',
+        description: 'A state',
+      },
+    ],
+    [
+      'Compound',
+      [
+        {
+          states: {
+            state1: {},
+            state2: {},
+          },
+          initial: '/state1',
+        },
+      ],
+      {
+        initial: '/state1',
+        tags: [],
+        type: 'compound',
+        exit: [],
+        entry: [],
+        states: [
+          {
+            __id: 'state1',
+            after: [],
+            always: [],
+            entry: [],
+            exit: [],
+            on: [],
+            promises: [],
+            states: [],
+            tags: [],
+            type: 'atomic',
+          },
+          {
+            __id: 'state2',
+            after: [],
+            always: [],
+            entry: [],
+            exit: [],
+            on: [],
+            promises: [],
+            states: [],
+            tags: [],
+            type: 'atomic',
+          },
+        ],
+        after: [],
+        always: [],
+        on: [],
+        promises: [],
+      },
+    ],
+  );
 });

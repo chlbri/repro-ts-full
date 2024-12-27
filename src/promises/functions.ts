@@ -33,28 +33,28 @@ export const toPromiseSrc: ToPromiseSrc_F = ({
   return out(ERRORS.promise.notProvided.error, func);
 };
 
-export const toPromise: ToPromise_F = ({ config, options, strict }) => {
+export const toPromise: ToPromise_F = ({ promise, options, strict }) => {
   const src = toPromiseSrc({
-    src: config.src,
+    src: promise.src,
     promises: options?.promises,
     strict,
   });
 
-  const then = toArray<TransitionConfig>(config.then).map(transition =>
+  const then = toArray<TransitionConfig>(promise.then).map(transition =>
     toTransition(transition, options, strict),
   );
 
-  const _catch = toArray<TransitionConfig>(config.catch).map(transition =>
+  const _catch = toArray<TransitionConfig>(promise.catch).map(transition =>
     toTransition(transition, options, strict),
   );
 
-  const _finally = toArray<TransitionConfig>(config.finally).map(
+  const _finally = toArray<TransitionConfig>(promise.finally).map(
     transition => toTransition(transition, options, strict),
   );
 
   const out = { src, then, catch: _catch, finally: _finally } as any;
 
-  const { id, description } = config;
+  const { id, description } = promise;
   if (id) out.id = id;
   if (description) out.description = description;
 

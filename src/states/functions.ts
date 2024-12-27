@@ -1,6 +1,7 @@
 import { toAction, type ActionConfig } from '~actions';
 import type { Config } from '~config';
 import { DEFAULT_DELIMITER } from '~constants';
+import { toPromise, type PromiseConfig } from '~promises';
 import { toTransition, type TransitionConfig } from '~transitions';
 import { identify, toArray } from '~utils';
 import type {
@@ -127,6 +128,10 @@ export const resolveState: ResolveState_F = ({
     toTransition(transition as TransitionConfig, options, strict),
   );
 
+  const promises = toArray<PromiseConfig>(config.promises).map(promise =>
+    toPromise({ promise, options, strict }),
+  );
+
   const out = {
     type,
     entry,
@@ -136,6 +141,7 @@ export const resolveState: ResolveState_F = ({
     on,
     always,
     after,
+    promises,
   } as any;
 
   if (initial) out.initial = initial;
