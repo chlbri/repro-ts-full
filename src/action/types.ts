@@ -1,5 +1,5 @@
-import type { Describer } from '../../types';
 import type { EventObject } from '../events';
+import type { Describer } from '../types';
 
 export type ActionConfig = string | Describer;
 

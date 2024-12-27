@@ -13,6 +13,11 @@
         "panel": "new",
         "clear": false,
         "close": true
+      },
+      "hide": true,
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
       }
     },
     {
@@ -26,7 +31,7 @@
         "clear": false,
         "close": true
       },
-      "script": "config:off",
+      "script": "config",
       "isBackground": true,
       "detail": "Install deps",
       "hide": true,

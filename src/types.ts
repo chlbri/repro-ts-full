@@ -9,7 +9,7 @@ import type {
   UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
-import type { EventObject } from './config/events';
+import type { EventObject } from './events';
 import { checkKeys } from './utils';
 
 export function isArray<T>(value: any): value is T[] {

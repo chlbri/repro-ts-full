@@ -1,8 +1,8 @@
 import recursive from '@bemedev/boolean-recursive';
 import { defaultReturn } from 'src/utils';
-import { isDescriber, isString } from '../../types';
 import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '../constants';
 import type { EventObject } from '../events';
+import { isDescriber, isString } from '../types';
 import type {
   EvaluateGuardF,
   GuardConfig,

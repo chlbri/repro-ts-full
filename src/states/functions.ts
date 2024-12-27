@@ -9,7 +9,8 @@ export const createConfig = <const SN extends Config = Config>(
 };
 
 /**
- * Transformer une machine à états hiérarchique en une structure plate où chaque état est identifié par un chemin complet.
+ * Transformer une machine à états hiérarchique en une structure plate où
+ * chaque état est identifié par un chemin complet.
  * @param config  La configuration de la machine à états
  * @param delimiter  Le délimiteur à utiliser pour séparer les états,
  * par défaut '/'
