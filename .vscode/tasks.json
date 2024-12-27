@@ -5,7 +5,15 @@
     {
       "label": "pull",
       "type": "shell",
-      "command": "git pull"
+      "command": "git pull",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "clear": false,
+        "close": true
+      }
     },
     {
       "label": "pnpm:install",
@@ -14,7 +22,7 @@
         "echo": true,
         "reveal": "never",
         "focus": false,
-        "panel": "new",
+        "panel": "shared",
         "clear": false,
         "close": true
       },
