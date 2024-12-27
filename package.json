@@ -60,13 +60,13 @@
     "test:watch": "vitest",
     "rm:lib": "rm -rf lib",
     "clean": "pnpm run remove && pnpm run config",
-    "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}\" --log-level silent",
     "eslint": "eslint \"{src/**/*,App}.{ts,tsx}\"",
     "lint": "pnpm run prettier && pnpm run eslint --fix",
-    "lint-watch": "onchange --await-write-finish 5500 \"**/*\" -- pnpm run lint",
+    "lint:watch": "onchange --await-write-finish 3500 -d 500 \"**/*.ts\" -- pnpm run lint",
     "prepublishOnly": "",
     "prepare": "husky",
-    "upgrade": "pnpm upgrade --latest && pnpm add -D eslint@8.57.0"
+    "upgrade": "pnpm upgrade --latest"
   },
   "devDependencies": {
     "@bemedev/fsf": "^0.7.3",
@@ -79,7 +79,7 @@
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "@vitest/coverage-v8": "^2.1.8",
-    "eslint": "^8.57.0",
+    "eslint": "^9.17.0",
     "glob": "^11.0.0",
     "globals": "^15.14.0",
     "husky": "^9.1.7",

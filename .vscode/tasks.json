@@ -3,11 +3,16 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "pull",
+      "type": "shell",
+      "command": "git pull"
+    },
+    {
       "label": "pnpm:install",
       "type": "npm",
       "presentation": {
         "echo": true,
-        "reveal": "silent",
+        "reveal": "never",
         "focus": false,
         "panel": "new",
         "clear": false,
@@ -17,6 +22,7 @@
       "isBackground": true,
       "detail": "Install deps",
       "hide": true,
+      "dependsOn": "pull",
       "runOptions": {
         "runOn": "folderOpen",
         "instanceLimit": 1
@@ -29,7 +35,7 @@
         "echo": true,
         "reveal": "silent",
         "focus": false,
-        "panel": "new",
+        "panel": "shared",
         "clear": false,
         "close": true
       },
@@ -44,18 +50,42 @@
       }
     },
     {
-      "label": "pnpm:test:watch",
+      "label": "pnpm:lint:watch",
       "type": "npm",
       "presentation": {
         "echo": true,
         "reveal": "silent",
         "focus": false,
         "panel": "new",
-        "clear": false,
+        "group": "test",
+        "clear": true,
         "close": true
       },
+      "group": "test",
+      "script": "lint:watch",
+      "isBackground": false,
+      "detail": "Lint the package",
+      "dependsOn": "pnpm:build",
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "pnpm:test:watch",
+      "type": "npm",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "group": "test",
+        "clear": true,
+        "close": true
+      },
+      "group": "test",
       "script": "test:watch",
-      "isBackground": true,
+      "isBackground": false,
       "detail": "Test the package",
       "dependsOn": "pnpm:build",
       "runOptions": {
