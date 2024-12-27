@@ -1,14 +1,14 @@
 import type { ActionMap } from '~actions';
-import type { MachineMap } from '~children';
+import type { Child, ChildConfig, MachineMap } from '~children';
 import type { DelayMap } from '~delays';
 import type { EventObject } from '~events';
 import type { PredicateMap } from '~guards';
 import type { PromiseMap } from '~promises';
-import type { ChildrenM, FlatMapState_F, SNC } from '~states';
+import type { FlatMapState_F, SNC, StateNode } from '~states';
 import type { SingleOrArrayR } from '~types';
 
 export type Config = SNC & {
-  machines?: SingleOrArrayR<ChildrenM>;
+  machines?: SingleOrArrayR<ChildConfig>;
   strict?: boolean;
 };
 
@@ -21,3 +21,20 @@ export type MachineOptions<Tc, Te extends EventObject = EventObject> = {
   delays?: DelayMap<Tc, Te>;
   children?: MachineMap;
 };
+
+type ResoleConfigParams<Tc, Te extends EventObject = EventObject> = [
+  config: Config,
+  options?: MachineOptions<Tc, Te>,
+];
+
+export type Machine0<Tc, Te extends EventObject = EventObject> = StateNode<
+  Tc,
+  Te
+> & {
+  machines: Child[];
+  strict: boolean;
+};
+
+export type ResolveConfig_F = <Tc, Te extends EventObject = EventObject>(
+  ...params: ResoleConfigParams<Tc, Te>
+) => Machine0<Tc, Te>;

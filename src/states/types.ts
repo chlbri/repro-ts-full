@@ -56,10 +56,6 @@ export type StateNodeConfigParallel = TransitionsConfig & {
   readonly initial?: never;
 };
 
-export type ChildrenM =
-  | string
-  | { id?: string; src: string; events?: SingleOrArrayR<string> };
-
 type _FlatMapStateNodeConfigOptions = {
   withStates?: boolean;
   delimiter?: string;
@@ -105,12 +101,12 @@ export type StateNode<TC, TE extends EventObject = EventObject> = {
   initial?: string;
 } & Transitions<TC, TE>;
 
-type ResolevStateParams<Tc, Te extends EventObject = EventObject> = {
+type ResoleStateParams<Tc, Te extends EventObject = EventObject> = {
   config: StateNodeConfig;
   options?: MachineOptions<Tc, Te>;
   strict?: boolean;
 };
 
 export type ResolveState_F = <Tc, Te extends EventObject = EventObject>(
-  params: ResolevStateParams<Tc, Te>,
+  params: ResoleStateParams<Tc, Te>,
 ) => StateNode<Tc, Te>;

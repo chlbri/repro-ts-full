@@ -17,6 +17,11 @@ const promise = {
   capital: 'Promise',
 } as const satisfies STR;
 
+const machine = {
+  normal: 'machine',
+  capital: 'Machine',
+} as const satisfies STR;
+
 const notDefined = 'is undefined' as const;
 const notDescribed = 'is not described' as const;
 const notProvided = 'is not provided' as const;
@@ -64,4 +69,4 @@ const produceErrors = <const T extends STR[]>(...types: T) => {
   return out as Simplify<UnionToIntersection<Out>>;
 };
 
-export const ERRORS = produceErrors(action, guard, promise);
+export const ERRORS = produceErrors(action, guard, promise, machine);
