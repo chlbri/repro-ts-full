@@ -63,7 +63,7 @@
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\" --log-level silent",
     "eslint": "eslint \"{src/**/*,App}.{ts,tsx}\"",
     "lint": "pnpm run prettier && pnpm run eslint --fix",
-    "lint:watch": "onchange --await-write-finish 3500 -d 50000 \"**/*.ts\" -- pnpm run lint",
+    "lint:watch": "onchange --await-write-finish 5500 -d 50000 -v \"**/*.ts\" -- pnpm run lint",
     "prepublishOnly": "",
     "prepare": "husky",
     "upgrade": "pnpm upgrade --latest"

@@ -1,9 +1,10 @@
 import type { KeysMatching } from '@bemedev/decompose';
 import type { FlatMapByKeys, PickKeysBy } from '@bemedev/types';
-import type { EventObject } from '~events';
-import type { Define, Identitfy, SingleOrArrayR } from '~types';
 import type { Action, ActionConfig } from '~actions';
+import type { MachineOptions } from '~config';
+import type { EventObject } from '~events';
 import type { Transitions, TransitionsConfig } from '~transitions';
+import type { Define, Identitfy, SingleOrArrayR } from '~types';
 
 export type StateType = 'atomic' | 'compound' | 'parallel';
 
@@ -91,18 +92,25 @@ export type FlatMapState_F<T extends StateNodeConfig = StateNodeConfig> = <
   path?: string,
 ) => FlatMapStateNodeConfig<SN>;
 
-export type GetStateType_F = (config: StateNodeConfig) => StateType;
+export type GetStateType_F = (node: StateNodeConfig) => StateType;
 
-export type StateNode<
-  TC,
-  TE extends EventObject = EventObject,
-  R = any,
-> = {
-  readonly id?: string;
-  readonly description?: string;
-  readonly entry: Action<TC, TE>[];
-  readonly exit: Action<TC, TE>[];
-  readonly tags: string[];
-  readonly states: Identitfy<StateNode<TC, TE>>[];
-  readonly initial?: string;
-} & Transitions<TC, TE, R>;
+export type StateNode<TC, TE extends EventObject = EventObject> = {
+  id?: string;
+  description?: string;
+  type: StateType;
+  entry: Action<TC, TE>[];
+  exit: Action<TC, TE>[];
+  tags: string[];
+  states: Identitfy<StateNode<TC, TE>>[];
+  initial?: string;
+} & Transitions<TC, TE>;
+
+type ResolevStateParams<Tc, Te extends EventObject = EventObject> = {
+  config: StateNodeConfig;
+  options?: MachineOptions<Tc, Te>;
+  strict?: boolean;
+};
+
+export type ResolveState_F = <Tc, Te extends EventObject = EventObject>(
+  params: ResolevStateParams<Tc, Te>,
+) => StateNode<Tc, Te>;

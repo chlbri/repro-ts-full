@@ -212,4 +212,12 @@ export type ChangeProperties<
     ? T
     : _ChangeProperties<T, U, option>;
 
-export type Identitfy<T extends object> = T & { __id: string };
+export type Identitfy<T> = T extends object ? T & { __id: string } : never;
+
+export type Identify_F = <const T>(
+  arg?: Record<string, T>,
+) => Identitfy<T>[];
+
+export type Asyncfy_F = <P extends any[], R = any>(
+  fn: Fn<P, R>,
+) => Fn<P, Promise<R>>;

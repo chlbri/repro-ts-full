@@ -1,8 +1,8 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { flatMapState, getStateType } from './functions';
+import { flatMapState, getStateType, resolveState } from './functions';
 import type { StateNodeConfig } from './types';
 
-describe('getStateType', () => {
+describe('#1 => getStateType', () => {
   const useTests = createTests(getStateType);
 
   useTests(
@@ -68,7 +68,7 @@ describe('getStateType', () => {
   );
 });
 
-describe('flatMapMachine', () => {
+describe('#2 => flatMapMachine', () => {
   const useTests =
     createTests<(config: StateNodeConfig) => any>(flatMapState);
 
@@ -148,4 +148,27 @@ describe('flatMapMachine', () => {
       },
     ],
   );
+});
+
+describe('#3 => resolveState', () => {
+  const useTests = createTests(resolveState);
+
+  useTests([
+    'Simple',
+    [
+      {
+        config: {},
+      },
+    ],
+    {
+      tags: [],
+      type: 'atomic',
+      exit: [],
+      entry: [],
+      states: [],
+      after: [],
+      always: [],
+      on: [],
+    },
+  ]);
 });

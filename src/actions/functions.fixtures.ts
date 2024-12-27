@@ -1,14 +1,7 @@
-import type { TC, TE, TestParams } from '~fixtures';
+import { options, type TestParams } from 'src/fixtures';
 import { ERRORS } from '~utils';
 import { toAction } from './functions';
-import type { ActionConfig, ActionMap } from './types';
-
-export const actions: ActionMap<TC, TE> = {
-  action1: ({ val1 }, { type }) => val1 === type,
-  action2: ({ val2 }) => val2 === 5,
-  action3: ({ val1 }) => val1 === 'TIMER',
-  action4: (_, { type }) => type === 'TIMER2',
-};
+import type { ActionConfig } from './types';
 
 type performActionTestF = (
   params: TestParams<ActionConfig, 'action'>,
@@ -17,13 +10,13 @@ type performActionTestF = (
 export const performActionTest: performActionTestF = ({
   action,
   args,
-  strict = false,
+  strict = true,
 }) => {
   if (!args) throw ERRORS.noParams.error;
 
   const out = toAction({
     action,
-    actions,
+    actions: options.actions,
     strict,
   });
   const { context, event } = args;

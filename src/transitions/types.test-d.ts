@@ -1,8 +1,5 @@
-import type {
-  FinallyConfig,
-  SingleOrArrayT,
-  TransitionsConfig,
-} from './types';
+import type { FinallyConfig } from '~promises';
+import type { SingleOrArrayT, TransitionsConfig } from './types';
 
 //Remplacez tous les tests de type par "asserType"
 

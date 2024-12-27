@@ -1,5 +1,5 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { DEFAULT_ARGS } from '~fixtures';
+import { DEFAULT_ARGS } from 'src/fixtures';
 import { ERRORS } from '~utils';
 import { toPredicateTest } from './functions.fixtures';
 

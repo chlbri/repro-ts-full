@@ -1,8 +1,10 @@
-import type { Fn, NOmit, ReduceArray, Require } from '@bemedev/types';
-import type { EventObject } from '~events';
-import type { Identitfy, SingleOrArrayL } from '~types';
+import type { ReduceArray, Require } from '@bemedev/types';
 import type { Action, ActionConfig } from '~actions';
+import type { MachineOptions } from '~config';
+import type { EventObject } from '~events';
 import type { GuardConfig, Predicate } from '~guards';
+import type { PromiseConfig, Promisee } from '~promises';
+import type { Identitfy, SingleOrArrayL } from '~types';
 
 type _TransitionConfigMap = {
   readonly target?: SingleOrArrayL<string>;
@@ -39,37 +41,7 @@ export type ArrayTransitions = readonly [
 
 export type SingleOrArrayT = ArrayTransitions | TransitionConfig;
 
-export type FinallyConfig =
-  Pick<
-    TransitionConfigMapA,
-    'description' | 'actions' | 'guards' | 'in'
-  > extends infer F extends Pick<
-    TransitionConfigMapA,
-    'description' | 'actions' | 'guards' | 'in'
-  >
-    ?
-        | (F | string)
-        | readonly [
-            ...(Require<F, 'guards'> | Require<F, 'in'>)[],
-            F | string,
-          ]
-    : never;
-
 export type ThenNext = TransitionConfigMapF | TransitionConfigMapA;
-
-export type PromiseConfig = {
-  readonly src: string;
-  readonly id?: string;
-
-  // #region To perform
-  // readonly autoForward?: boolean;
-  // #endregion
-
-  readonly description?: string;
-  readonly then: SingleOrArrayT;
-  readonly catch: SingleOrArrayT;
-  readonly finally?: FinallyConfig;
-};
 
 export type AlwaysConfig =
   | readonly [
@@ -103,25 +75,18 @@ export type Transition<TC, TE extends EventObject = EventObject> = {
   readonly actions: Action<TC, TE>[];
   readonly guards: Predicate<TC, TE>[];
   readonly description?: string;
-  readonly in?: string[];
+  readonly in: string[];
 };
 
-export type Promisee<TC, TE extends EventObject = EventObject, R = any> = {
-  readonly src: Fn<[TC, TE], Promise<R>>;
-  readonly id?: string;
-  readonly description?: string;
-  readonly then: Transition<TC, TE>[];
-  readonly catch: Transition<TC, TE>[];
-  readonly finally: NOmit<Transition<TC, TE>, 'target'>[];
-};
+export type ToTransition_F = <TC, TE extends EventObject = EventObject>(
+  transition: TransitionConfig,
+  options?: Pick<MachineOptions<TC, TE>, 'guards' | 'actions'>,
+  strict?: boolean,
+) => Transition<TC, TE>;
 
-export type Transitions<
-  TC,
-  TE extends EventObject = EventObject,
-  R = any,
-> = {
+export type Transitions<TC, TE extends EventObject = EventObject> = {
   on: Identitfy<Transition<TC, TE>>[];
   always: Transition<TC, TE>[];
-  after: Transition<TC, TE>[];
-  promises: Promisee<TC, TE, R>[];
+  after: Identitfy<Transition<TC, TE>>[];
+  promises: Promisee<TC, TE>[];
 };

@@ -26,14 +26,18 @@
     "baseUrl": ".",
     "paths": {
       "~types": ["src/types.ts"],
-      "~fixtures": ["src/types.fixtures.ts"],
+      "~fixtures": ["src/fixtures.ts"],
       "~utils": ["src/utils.ts"],
       "~constants": ["src/constants/index.ts"],
+      "~promises": ["src/promises/index.ts"],
+      "~children": ["src/children/index.ts"],
+      "~delays": ["src/delays/index.ts"],
       "~states": ["src/states/index.ts"],
       "~guards": ["src/guards/index.ts"],
       "~actions": ["src/actions/index.ts"],
       "~events": ["src/events/index.ts"],
       "~transitions": ["src/transitions/index.ts"],
+      "~machine": ["src/machine.ts"],
       "~config": ["src/config/index.ts"]
     }
   }

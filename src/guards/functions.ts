@@ -1,8 +1,8 @@
 import recursive from '@bemedev/boolean-recursive';
-import { defaultReturn } from '~utils';
 import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '~constants';
 import type { EventObject } from '~events';
 import { isDescriber, isString } from '~types';
+import { defaultReturn } from '~utils';
 import type {
   GuardConfig,
   GuardUnion,
@@ -20,15 +20,15 @@ export const returnFalse = () => {
   return false;
 };
 
-function _toPredicate<TC, TE extends EventObject>(
+export function _toPredicate<TC, TE extends EventObject>(
   guard?: GuardConfig,
   predicates?: PredicateMap<TC, TE>,
-  bool = true,
+  strict = false,
 ): Predicate<TC, TE> {
   const out = (error: Error, _return?: Predicate<TC, TE>) => {
     return defaultReturn({
       config: {
-        strict: bool,
+        strict: strict,
         value: returnTrue,
       },
       _return,

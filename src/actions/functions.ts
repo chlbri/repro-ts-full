@@ -1,12 +1,12 @@
+import { ERRORS } from '~constants';
 import { isDescriber } from '~types';
 import { defaultReturn, nothing as value } from '~utils';
-import { ERRORS } from '~constants';
 import type { ToActionFunction } from './types';
 
 export const toAction: ToActionFunction = ({
   action,
   actions,
-  strict = true,
+  strict = false,
 }) => {
   const out = (error: Error, _return?: any) => {
     return defaultReturn({
