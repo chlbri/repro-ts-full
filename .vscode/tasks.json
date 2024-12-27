@@ -1,0 +1,67 @@
+//Create task to start npm build at the opening
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pnpm:install",
+      "type": "npm",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "new",
+        "clear": false,
+        "close": true
+      },
+      "script": "config:off",
+      "isBackground": true,
+      "detail": "Install deps",
+      "hide": true,
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "pnpm:build",
+      "type": "npm",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "new",
+        "clear": false,
+        "close": true
+      },
+      "script": "build",
+      "isBackground": true,
+      "detail": "Build the libary with npm",
+      "hide": true,
+      "dependsOn": "pnpm:install",
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "pnpm:test:watch",
+      "type": "npm",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "new",
+        "clear": false,
+        "close": true
+      },
+      "script": "test:watch",
+      "isBackground": true,
+      "detail": "Test the package",
+      "dependsOn": "pnpm:build",
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      }
+    }
+  ]
+}
