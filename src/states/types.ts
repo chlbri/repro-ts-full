@@ -1,8 +1,9 @@
 import type { KeysMatching } from '@bemedev/decompose';
 import type { FlatMapByKeys, PickKeysBy } from '@bemedev/types';
-import type { Define, SingleOrArrayR } from '~types';
-import type { ActionConfig } from '../action';
-import type { TransitionsConfig } from '../transitions';
+import type { EventObject } from '~events';
+import type { Define, Identitfy, SingleOrArrayR } from '~types';
+import type { Action, ActionConfig } from '~actions';
+import type { Transitions, TransitionsConfig } from '~transitions';
 
 export type StateType = 'atomic' | 'compound' | 'parallel';
 
@@ -81,3 +82,27 @@ export type FlatMapStateNodeConfig<
   : {
       [key in Define<Options['delimiter'], '/'>]: T;
     };
+
+export type FlatMapState_F<T extends StateNodeConfig = StateNodeConfig> = <
+  const SN extends T,
+>(
+  config: SN,
+  delimiter?: string,
+  path?: string,
+) => FlatMapStateNodeConfig<SN>;
+
+export type GetStateType_F = (config: StateNodeConfig) => StateType;
+
+export type StateNode<
+  TC,
+  TE extends EventObject = EventObject,
+  R = any,
+> = {
+  readonly id?: string;
+  readonly description?: string;
+  readonly entry: Action<TC, TE>[];
+  readonly exit: Action<TC, TE>[];
+  readonly tags: string[];
+  readonly states: Identitfy<StateNode<TC, TE>>[];
+  readonly initial?: string;
+} & Transitions<TC, TE, R>;

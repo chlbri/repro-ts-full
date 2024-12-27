@@ -1,6 +1,6 @@
-import type { Config } from '../config';
-import { DEFAULT_DELIMITER } from '../constants';
-import type { StateNodeConfig, StateType } from './types';
+import type { Config } from '~config';
+import { DEFAULT_DELIMITER } from '~constants';
+import type { FlatMapState_F, GetStateType_F } from './types';
 
 export const createConfig = <const SN extends Config = Config>(
   config: SN,
@@ -45,9 +45,9 @@ export const createConfig = <const SN extends Config = Config>(
  *    }
  * ```
  */
-export const flatMapMachine = <const SN extends StateNodeConfig>(
-  config: SN,
-  delimiter: string = DEFAULT_DELIMITER,
+export const flatMapState: FlatMapState_F = (
+  config,
+  delimiter = DEFAULT_DELIMITER,
   path = '',
 ) => {
   const { states, ...rest } = config;
@@ -59,7 +59,7 @@ export const flatMapMachine = <const SN extends StateNodeConfig>(
     for (const key in states) {
       if (Object.prototype.hasOwnProperty.call(states, key)) {
         const element = states[key];
-        const inner = flatMapMachine(
+        const inner = flatMapState(
           element,
           delimiter,
           `${path}${DEFAULT_DELIMITER}${key}`,
@@ -72,9 +72,7 @@ export const flatMapMachine = <const SN extends StateNodeConfig>(
   return out;
 };
 
-export const getStateType = <T extends StateNodeConfig>(
-  config: T,
-): StateType => {
+export const getStateType: GetStateType_F = config => {
   const type = config.type;
   if (type) return type;
   const states = (config as any).states;

@@ -1,4 +1,8 @@
-import type { Finally, SingleOrArrayT, TransitionsConfig } from './types';
+import type {
+  FinallyConfig,
+  SingleOrArrayT,
+  TransitionsConfig,
+} from './types';
 
 //Remplacez tous les tests de type par "asserType"
 
@@ -44,21 +48,24 @@ assertType<SingleOrArrayT>([
 
 // #region Finally
 
-assertType<Finally>(
+assertType<FinallyConfig>(
   // @ts-expect-error for typing
   {},
 );
-assertType<Finally>({ actions: 'actions' });
-assertType<Finally>({
+assertType<FinallyConfig>({ actions: 'actions' });
+assertType<FinallyConfig>({
   // @ts-expect-error for typing
   not: 'not',
 });
-assertType<Finally>(
+assertType<FinallyConfig>(
   // @ts-expect-error for typing
   { description: 'description' },
 );
-assertType<Finally>({ description: 'description', actions: 'action33' });
-assertType<Finally>('string');
+assertType<FinallyConfig>({
+  description: 'description',
+  actions: 'action33',
+});
+assertType<FinallyConfig>('string');
 
 // #endregion
 
@@ -178,30 +185,30 @@ assertType<TransitionsConfig>({
 // #region promise
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: [],
+  promises: [],
 });
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: {},
+  promises: {},
 });
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: { src: 'promise1' },
+  promises: { src: 'promise1' },
 });
 
 assertType<TransitionsConfig>({
-  promise: { src: 'promise1', then: 'next', catch: ['/state1'] },
+  promises: { src: 'promise1', then: 'next', catch: ['/state1'] },
 });
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: { src: 'promise1', then: {}, catch: [{}, '/state1'] },
+  promises: { src: 'promise1', then: {}, catch: [{}, '/state1'] },
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { guards: 'ert', target: 'next' },
     catch: [{ guards: 'ert', actions: 'action0' }, '/state1'],
@@ -218,7 +225,7 @@ expectTypeOf({
 } as const).not.toMatchTypeOf<TransitionsConfig>();
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: {
+  promises: {
     src: 'promise1',
     then: {},
     catch: [{ guards: 'ert' }, '/state1'],
@@ -227,7 +234,7 @@ assertType<TransitionsConfig>({
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ in: '/ert', target: '/state2' }, '/state1'],
@@ -236,7 +243,7 @@ assertType<TransitionsConfig>({
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { target: '/state43' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -246,7 +253,7 @@ assertType<TransitionsConfig>({
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -255,7 +262,7 @@ assertType<TransitionsConfig>({
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -271,7 +278,7 @@ assertType<TransitionsConfig>({
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -286,7 +293,7 @@ assertType<TransitionsConfig>({
 
 assertType<TransitionsConfig>({
   // @ts-expect-error for typing
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -301,7 +308,7 @@ assertType<TransitionsConfig>({
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
@@ -316,7 +323,7 @@ assertType<TransitionsConfig>({
 });
 
 assertType<TransitionsConfig>({
-  promise: {
+  promises: {
     src: 'promise1',
     then: { actions: 'action1' },
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],

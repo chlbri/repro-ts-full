@@ -1,5 +1,5 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { toArray } from './utils';
+import { toArray } from '~utils';
 
 describe('toArray', () => {
   const useTests = createTests(toArray);

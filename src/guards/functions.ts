@@ -1,10 +1,9 @@
 import recursive from '@bemedev/boolean-recursive';
-import { defaultReturn } from 'src/utils';
-import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '../constants';
-import type { EventObject } from '../events';
-import { isDescriber, isString } from '../types';
+import { defaultReturn } from '~utils';
+import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '~constants';
+import type { EventObject } from '~events';
+import { isDescriber, isString } from '~types';
 import type {
-  EvaluateGuardF,
   GuardConfig,
   GuardUnion,
   Predicate,
@@ -26,28 +25,27 @@ function _toPredicate<TC, TE extends EventObject>(
   predicates?: PredicateMap<TC, TE>,
   bool = true,
 ): Predicate<TC, TE> {
-  const _return = (error: Error, _return?: Predicate<TC, TE>) => {
+  const out = (error: Error, _return?: Predicate<TC, TE>) => {
     return defaultReturn({
-      _default: {
-        bool,
+      config: {
+        strict: bool,
         value: returnTrue,
       },
       _return,
       error,
     });
   };
-  if (!guard) {
-    return _return(ERRORS.guard.notDefined.error);
+
+  if (!guard) return out(ERRORS.guard.notDefined.error);
+
+  if (isDescriber(guard)) {
+    const arg = predicates?.[guard.name];
+    return out(ERRORS.guard.notDescribed.error, arg);
   }
 
   if (isString(guard)) {
     const arg = predicates?.[guard];
-    return _return(ERRORS.guard.notProvided.error, arg);
-  }
-
-  if (isDescriber(guard)) {
-    const arg = predicates?.[guard.name];
-    return _return(ERRORS.guard.notDescribed.error, arg);
+    return out(ERRORS.guard.notProvided.error, arg);
   }
 
   const makeArray = (guards: GuardUnion[]) => {
@@ -66,18 +64,8 @@ function _toPredicate<TC, TE extends EventObject>(
 export const toPredicate: ToPredicateF = ({
   guard,
   predicates,
-  _default,
+  strict,
 }) => {
-  const out1 = _toPredicate(guard, predicates, _default);
+  const out1 = _toPredicate(guard, predicates, strict);
   return recursive(out1);
-};
-
-export const evaluateGuard: EvaluateGuardF = ({
-  args: { context, event },
-  ...params
-}) => {
-  const out1 = toPredicate(params);
-  const out2 = out1(context, event);
-
-  return out2;
 };

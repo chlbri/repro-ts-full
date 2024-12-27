@@ -1,6 +1,6 @@
-import type { TC, TE, TestParams } from 'src/types.fixtures';
-import { ERRORS } from 'src/utils';
-import { evaluateGuard } from './functions';
+import type { TC, TE, TestParams } from '~fixtures';
+import { ERRORS } from '~utils';
+import { toPredicate } from './functions';
 import type { GuardConfig, PredicateMap } from './types';
 
 export const predicates: PredicateMap<TC, TE> = {
@@ -17,8 +17,16 @@ type toPredicateTestF = (
 export const toPredicateTest: toPredicateTestF = ({
   guard,
   args,
-  _default = false,
+  strict = false,
 }) => {
   if (!args) throw ERRORS.noParams.error;
-  return evaluateGuard({ guard, predicates, args, _default });
+
+  const out = toPredicate({
+    guard,
+    predicates,
+    strict,
+  });
+  const { context, event } = args;
+
+  return out(context, event);
 };

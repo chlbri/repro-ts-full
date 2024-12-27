@@ -1,4 +1,4 @@
-export interface EventObject<T = any> {
+export type EventObject<T = any> = {
   type: string;
   payload?: T;
-}
+};

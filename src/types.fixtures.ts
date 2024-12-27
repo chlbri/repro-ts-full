@@ -14,7 +14,7 @@ export const DEFAULT_ARGS = {
 
 export type _TestParams<T> = {
   func?: T;
-  _default?: boolean;
+  strict?: boolean;
   args?: {
     context: TC;
     event: TE;

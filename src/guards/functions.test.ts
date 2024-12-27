@@ -1,6 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { DEFAULT_ARGS } from 'src/types.fixtures';
-import { ERRORS } from 'src/utils';
+import { DEFAULT_ARGS } from '~fixtures';
+import { ERRORS } from '~utils';
 import { toPredicateTest } from './functions.fixtures';
 
 describe('#1 => To Predicate', () => {

@@ -1,4 +1,4 @@
-import { toArray } from './utils';
+import { toArray } from '~utils';
 
 expectTypeOf(toArray<string>('fdfd')).toEqualTypeOf<string[]>();
 expectTypeOf(toArray<string>('fdfd')).not.toEqualTypeOf<string>();

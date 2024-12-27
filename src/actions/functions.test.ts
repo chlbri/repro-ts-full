@@ -1,7 +1,7 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { DEFAULT_ARGS } from 'src/types.fixtures';
-import { ERRORS } from 'src/utils';
-import { DEFAULT_NOTHING } from '../constants';
+import { DEFAULT_ARGS } from '~fixtures';
+import { ERRORS } from '~utils';
+import { DEFAULT_NOTHING } from '~constants';
 import { performActionTest } from './functions.fixtures';
 
 describe('#1 => performAction', () => {
@@ -41,7 +41,7 @@ describe('#1 => performAction', () => {
     test('#1 =>', () => {
       const action = performActionTest({
         args: DEFAULT_ARGS,
-        _default: true,
+        strict: true,
       });
       expect(action).toBe(DEFAULT_NOTHING);
     });
@@ -50,7 +50,7 @@ describe('#1 => performAction', () => {
       const action = performActionTest({
         args: DEFAULT_ARGS,
         action: 'notExisted',
-        _default: true,
+        strict: true,
       });
       expect(action).toBe(DEFAULT_NOTHING);
     });
@@ -59,7 +59,7 @@ describe('#1 => performAction', () => {
       const action = performActionTest({
         args: DEFAULT_ARGS,
         action: { name: 'NotDescribed', description: 'An action' },
-        _default: true,
+        strict: true,
       });
       expect(action).toBe(DEFAULT_NOTHING);
     });

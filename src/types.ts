@@ -9,8 +9,8 @@ import type {
   UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
-import type { EventObject } from './events';
-import { checkKeys } from './utils';
+import type { EventObject } from '~events';
+import { checkKeys } from '~utils';
 
 export function isArray<T>(value: any): value is T[] {
   return Array.isArray(value);
@@ -99,8 +99,8 @@ export type DeUnionize<T> = T extends any ? T : never;
 type DefaultReturnPrams<T> = {
   _return?: T;
   error: Error;
-  _default: {
-    bool?: boolean;
+  config: {
+    strict?: boolean;
     value: T;
   };
 };
@@ -211,3 +211,5 @@ export type ChangeProperties<
   DeepPartial<KeyStrings<T>> extends U
     ? T
     : _ChangeProperties<T, U, option>;
+
+export type Identitfy<T extends object> = T & { __id: string };

@@ -1,15 +1,9 @@
+import type { ChildrenM, FlatMapState_F, SNC } from '~states';
 import type { SingleOrArrayR } from '~types';
-import type {
-  ChildrenM,
-  StateNodeConfigAtomic,
-  StateNodeConfigCompound,
-  StateNodeConfigParallel,
-} from '../states/types';
 
-export type Config = (
-  | StateNodeConfigCompound
-  | StateNodeConfigParallel
-  | StateNodeConfigAtomic
-) & {
+export type Config = SNC & {
   machines?: SingleOrArrayR<ChildrenM>;
+  strict?: boolean;
 };
+
+export type FlatMapMachine_F = FlatMapState_F<Config>;

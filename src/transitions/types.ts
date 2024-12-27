@@ -1,7 +1,8 @@
-import type { ReduceArray, Require } from '@bemedev/types';
-import type { SingleOrArrayL } from '~types';
-import type { ActionConfig } from '../action';
-import type { GuardConfig } from '../guards';
+import type { Fn, NOmit, ReduceArray, Require } from '@bemedev/types';
+import type { EventObject } from '~events';
+import type { Identitfy, SingleOrArrayL } from '~types';
+import type { Action, ActionConfig } from '~actions';
+import type { GuardConfig, Predicate } from '~guards';
 
 type _TransitionConfigMap = {
   readonly target?: SingleOrArrayL<string>;
@@ -38,7 +39,7 @@ export type ArrayTransitions = readonly [
 
 export type SingleOrArrayT = ArrayTransitions | TransitionConfig;
 
-export type Finally =
+export type FinallyConfig =
   Pick<
     TransitionConfigMapA,
     'description' | 'actions' | 'guards' | 'in'
@@ -64,11 +65,10 @@ export type PromiseConfig = {
   // readonly autoForward?: boolean;
   // #endregion
 
-  readonly innerContext?: string;
   readonly description?: string;
   readonly then: SingleOrArrayT;
   readonly catch: SingleOrArrayT;
-  readonly finally?: Finally;
+  readonly finally?: FinallyConfig;
 };
 
 export type AlwaysConfig =
@@ -84,7 +84,7 @@ export type TransitionsConfig = {
   readonly on?: DelayedTransitions;
   readonly always?: AlwaysConfig;
   readonly after?: DelayedTransitions;
-  readonly promise?: SingleOrArrayL<PromiseConfig>;
+  readonly promises?: SingleOrArrayL<PromiseConfig>;
 };
 
 export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {
@@ -96,3 +96,32 @@ export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {
 export type ExtractTargetsFromConfig<T> = _ExtractTargetsFromConfig<
   Extract<ReduceArray<T>, AlwaysConfig>
 >;
+
+export type Transition<TC, TE extends EventObject = EventObject> = {
+  readonly target: string[];
+  // readonly internal?: boolean;
+  readonly actions: Action<TC, TE>[];
+  readonly guards: Predicate<TC, TE>[];
+  readonly description?: string;
+  readonly in?: string[];
+};
+
+export type Promisee<TC, TE extends EventObject = EventObject, R = any> = {
+  readonly src: Fn<[TC, TE], Promise<R>>;
+  readonly id?: string;
+  readonly description?: string;
+  readonly then: Transition<TC, TE>[];
+  readonly catch: Transition<TC, TE>[];
+  readonly finally: NOmit<Transition<TC, TE>, 'target'>[];
+};
+
+export type Transitions<
+  TC,
+  TE extends EventObject = EventObject,
+  R = any,
+> = {
+  on: Identitfy<Transition<TC, TE>>[];
+  always: Transition<TC, TE>[];
+  after: Transition<TC, TE>[];
+  promises: Promisee<TC, TE, R>[];
+};

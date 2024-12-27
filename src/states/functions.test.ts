@@ -1,5 +1,5 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { flatMapMachine, getStateType } from './functions';
+import { flatMapState, getStateType } from './functions';
 import type { StateNodeConfig } from './types';
 
 describe('getStateType', () => {
@@ -70,7 +70,7 @@ describe('getStateType', () => {
 
 describe('flatMapMachine', () => {
   const useTests =
-    createTests<(config: StateNodeConfig) => any>(flatMapMachine);
+    createTests<(config: StateNodeConfig) => any>(flatMapState);
 
   useTests(
     ['empty machine', [{}], { '/': {} }],

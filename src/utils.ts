@@ -1,4 +1,5 @@
 import { isArray, type DefaultReturn } from '~types';
+import { DEFAULT_NOTHING } from '~constants';
 
 export function toArray<T>(obj: any) {
   if (isArray(obj)) {
@@ -16,13 +17,21 @@ export function checkKeys<T extends object>(arg: T, ...keys: string[]) {
 }
 
 export const defaultReturn: DefaultReturn = ({
-  _default: { value, bool },
+  config: { value, strict },
   _return,
   error,
 }) => {
   if (_return) return _return;
-  if (bool) return value;
+  if (strict) return value;
   throw error;
+};
+
+// @ts-expect-error No implicit return
+export const nothing = () => {
+  if (IS_TEST) {
+    console.log(`${DEFAULT_NOTHING} call ${DEFAULT_NOTHING}`);
+    return DEFAULT_NOTHING;
+  }
 };
 
 const env = process.env.NODE_ENV;
