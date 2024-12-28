@@ -4,10 +4,18 @@ import type { DelayMap } from '~delays';
 import type { EventObject } from '~events';
 import type { PredicateMap } from '~guards';
 import type { PromiseMap } from '~promises';
-import type { FlatMapState_F, SNC, StateNode } from '~states';
+import type {
+  FlatMapState_F,
+  StateNode,
+  StateNodeConfigCompound,
+  StateNodeConfigParallel,
+} from '~states';
 import type { SingleOrArrayR } from '~types';
 
-export type Config = SNC & {
+export type Config = (
+  | StateNodeConfigCompound
+  | StateNodeConfigParallel
+) & {
   machines?: SingleOrArrayR<ChildConfig>;
   strict?: boolean;
 };

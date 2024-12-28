@@ -1,5 +1,5 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { flatMapState, getStateType, toStateValue } from './functions';
+import { flatMapState, getStateType, toStateMap } from './functions';
 import { resolveStateTest } from './functions.fixtures';
 import type { StateNodeConfig } from './types';
 
@@ -255,8 +255,8 @@ describe('#3 => resolveState', () => {
   );
 });
 
-describe('#4 => toStateValue', () => {
-  const useTests = createTests(toStateValue);
+describe('#4 => toStateMap', () => {
+  const useTests = createTests(toStateMap);
 
   useTests(
     ['Empty', [{}], { type: 'atomic' }],

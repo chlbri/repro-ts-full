@@ -9,7 +9,7 @@ import type {
   FlatMapState_F,
   GetStateType_F,
   ResolveState_F,
-  ToStateValue_F,
+  ToStateValue_F as ToStateMap_F,
 } from './types';
 
 export const createConfig = <const SN extends Config = Config>(
@@ -159,14 +159,14 @@ export const resolveState: ResolveState_F = ({
   return out;
 };
 
-export const toStateValue: ToStateValue_F = node => {
+export const toStateMap: ToStateMap_F = node => {
   const { states } = node;
   const type = getStateType(node);
 
   if (states && Object.keys(states).length > 0) {
-    const out = t.anify<ReturnType<ToStateValue_F>>({
+    const out = t.anify<ReturnType<ToStateMap_F>>({
       states: Object.keys(states).reduce((acc, key) => {
-        Object.assign(acc, { [key]: toStateValue(states[key]) });
+        Object.assign(acc, { [key]: toStateMap(states[key]) });
         return acc;
       }, {} as any),
       type,

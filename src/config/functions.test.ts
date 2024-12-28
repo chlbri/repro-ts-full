@@ -1,5 +1,4 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { DEFAULT_MACHINE } from '~machine';
 import type { AnifyReturn } from '~types';
 import { flatMapMachine, resolveConfig } from './functions';
 
@@ -8,30 +7,6 @@ describe('#1 => flatMapMachine', () => {
   const useTests = createTests<Fn1>(flatMapMachine);
 
   useTests(
-    [
-      'empty machine',
-      [
-        {
-          machines: 'machine1',
-        },
-      ],
-      { '/': { machines: 'machine1' } },
-    ],
-    [
-      'simple machine',
-      [
-        {
-          always: 'always',
-          description: 'description',
-        },
-      ],
-      {
-        '/': {
-          always: 'always',
-          description: 'description',
-        },
-      },
-    ],
     [
       'Machine with children states',
       [
@@ -96,114 +71,55 @@ describe('#1 => flatMapMachine', () => {
 describe('#2 => resolveConfig', () => {
   const useTests = createTests(resolveConfig);
 
-  useTests(
+  useTests([
+    'Compound',
     [
-      'Empty',
-      [{}],
       {
-        tags: [],
-        type: 'atomic',
-        exit: [],
-        entry: [],
-        states: [],
-        after: [],
-        always: [],
-        on: [],
-        promises: [],
-        machines: [],
-        strict: false,
-      },
-    ],
-    [
-      'Atomic',
-      [
-        {
-          id: 'id',
-          description: 'A state',
-          tags: 'busy',
-          on: {},
-          after: {},
-          always: '/state1',
-          strict: false,
-          machines: ['machine1', 'machine3'],
+        states: {
+          state1: {},
+          state2: {},
         },
-      ],
-      {
-        tags: ['busy'],
-        type: 'atomic',
-        exit: [],
-        entry: [],
-        states: [],
-        after: [],
-        always: [
-          {
-            actions: [],
-            guards: [],
-            in: [],
-            target: ['/state1'],
-          },
-        ],
-        on: [],
-        promises: [],
-        id: 'id',
-        description: 'A state',
-        machines: [
-          { machine: DEFAULT_MACHINE },
-          { machine: DEFAULT_MACHINE },
-        ],
-        strict: false,
-      },
-    ],
-    [
-      'Compound',
-      [
-        {
-          states: {
-            state1: {},
-            state2: {},
-          },
-          initial: '/state1',
-        },
-      ],
-      {
         initial: '/state1',
-        tags: [],
-        type: 'compound',
-        exit: [],
-        entry: [],
-        states: [
-          {
-            __id: 'state1',
-            after: [],
-            always: [],
-            entry: [],
-            exit: [],
-            on: [],
-            promises: [],
-            states: [],
-            tags: [],
-            type: 'atomic',
-          },
-          {
-            __id: 'state2',
-            after: [],
-            always: [],
-            entry: [],
-            exit: [],
-            on: [],
-            promises: [],
-            states: [],
-            tags: [],
-            type: 'atomic',
-          },
-        ],
-        after: [],
-        always: [],
-        on: [],
-        promises: [],
-        machines: [],
-        strict: false,
       },
     ],
-  );
+    {
+      initial: '/state1',
+      tags: [],
+      type: 'compound',
+      exit: [],
+      entry: [],
+      states: [
+        {
+          __id: 'state1',
+          after: [],
+          always: [],
+          entry: [],
+          exit: [],
+          on: [],
+          promises: [],
+          states: [],
+          tags: [],
+          type: 'atomic',
+        },
+        {
+          __id: 'state2',
+          after: [],
+          always: [],
+          entry: [],
+          exit: [],
+          on: [],
+          promises: [],
+          states: [],
+          tags: [],
+          type: 'atomic',
+        },
+      ],
+      after: [],
+      always: [],
+      on: [],
+      promises: [],
+      machines: [],
+      strict: false,
+    },
+  ]);
 });
