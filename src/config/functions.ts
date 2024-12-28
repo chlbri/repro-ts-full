@@ -23,7 +23,7 @@ export const flatMapMachine: FlatMapMachine_F = (
 export const resolveConfig: ResolveConfig_F = (_config, children) => {
   const { strict, machines: _machines, ...config } = _config;
 
-  const out: any = resolveState({ config, options: children, strict });
+  const out: any = resolveState({ config, options: children });
   const machines = toArray<ChildConfig>(_machines).map(child =>
     toMachine({ child, children, strict }),
   );

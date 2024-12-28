@@ -19,6 +19,8 @@ export type toActionParams<TC, TE extends EventObject> = {
   strict?: boolean;
 };
 
-export type ToActionFunction = <TC, TE extends EventObject>(
+export type ToAction_F = <TC, TE extends EventObject>(
   params: toActionParams<TC, TE>,
 ) => Action<TC, TE>;
+
+export type ReduceAction_F = (action: ActionConfig) => string;

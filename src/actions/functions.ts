@@ -1,9 +1,9 @@
 import { ERRORS } from '~constants';
 import { isDescriber } from '~types';
 import { defaultReturn, nothing as value } from '~utils';
-import type { ToActionFunction } from './types';
+import type { ReduceAction_F, ToAction_F } from './types';
 
-export const toAction: ToActionFunction = ({
+export const toAction: ToAction_F = ({
   action,
   actions,
   strict = false,
@@ -28,4 +28,9 @@ export const toAction: ToActionFunction = ({
 
   const func = actions?.[action];
   return out(ERRORS.action.notProvided.error, func);
+};
+
+export const reduceAction: ReduceAction_F = action => {
+  if (isDescriber(action)) return action.name;
+  return action;
 };

@@ -224,3 +224,5 @@ export type Identify_F = <const T>(
 export type Asyncfy_F = <P extends any[], R = any>(
   fn: Fn<P, R>,
 ) => Fn<P, Promise<R>>;
+
+export type AnifyReturn<T extends Fn> = (...args: Parameters<T>) => any;
