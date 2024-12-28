@@ -107,6 +107,9 @@ type DefaultReturnPrams<T> = {
 
 export type DefaultReturn = <T>(params: DefaultReturnPrams<T>) => T;
 
+export type ReducedDefaultReturn<T> = (error: Error, _return?: T) => T;
+export type RDR<T> = ReducedDefaultReturn<T>;
+
 export type PropertyToChange<T extends object> = [keyof T, string];
 export type PtC<T extends object> = PropertyToChange<T>;
 

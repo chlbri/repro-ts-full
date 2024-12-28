@@ -1,14 +1,11 @@
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type { Machine } from '~machine';
-import type { SingleOrArrayR } from '~types';
-import { checkKeys } from '~utils';
+import { isDescriber, type Describer, type SingleOrArrayR } from '~types';
 
 export type MachineMap = Record<string, Machine>;
 
-export type ChildMap = {
-  id?: string;
-  src: string;
+export type ChildMap = Describer & {
   events?: SingleOrArrayR<string>;
 };
 
@@ -28,7 +25,7 @@ type ToChildrenParams = {
 };
 
 export function isChildMap(arg: any): arg is ChildMap {
-  return checkKeys(arg, 'src');
+  return isDescriber(arg);
 }
 
 export type ToMachine_F = (params: ToChildrenParams) => Child;
