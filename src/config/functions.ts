@@ -4,7 +4,6 @@ import { flatMapState, resolveState } from '~states';
 import { toArray } from '~utils';
 import type { FlatMapMachine_F, ResolveConfig_F } from './types';
 
-//TODO: To test
 /**
  *
  */
@@ -16,7 +15,6 @@ export const flatMapMachine: FlatMapMachine_F = (
   return flatMapState(config, delimiter, path);
 };
 
-//TODO: To test
 /**
  *
  */
