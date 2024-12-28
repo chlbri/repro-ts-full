@@ -28,11 +28,11 @@ export const toMachine: ToMachine_F = ({
 
   const out: RDR<Child> = error => {
     const __id = reduceAction(child) ?? '(machine)';
+    const _return = reduce(__id);
     const value = {
       __id,
       machine: DEFAULT_MACHINE,
     };
-    const _return = reduce(__id);
 
     return defaultReturn({
       config: {
