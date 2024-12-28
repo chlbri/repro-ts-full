@@ -110,3 +110,10 @@ type ResoleStateParams<Tc, Te extends EventObject = EventObject> = {
 export type ResolveState_F = <Tc, Te extends EventObject = EventObject>(
   params: ResoleStateParams<Tc, Te>,
 ) => StateNode<Tc, Te>;
+
+export type StateMap = {
+  states?: Record<string, StateMap>;
+  type: StateType;
+};
+
+export type ToStateValue_F = (node: StateNodeConfig) => StateMap;

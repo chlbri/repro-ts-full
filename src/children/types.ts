@@ -7,12 +7,13 @@ export type MachineMap = Record<string, Machine>;
 
 export type ChildMap = Describer & {
   events?: SingleOrArrayR<string>;
+  id?: string;
 };
 
 export type ChildConfig = string | ChildMap;
 
 export type Child = {
-  __id: string;
+  id?: string;
   machine: Machine;
 };
 

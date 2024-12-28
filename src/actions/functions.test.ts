@@ -5,8 +5,6 @@ import { ERRORS } from '~utils';
 import { performActionTest } from './functions.fixtures';
 
 describe('#1 => performAction', () => {
-  const useTests = createTests(performActionTest);
-
   describe('#1 => Errors', () => {
     test('#1 => Throw : "No params"', () => {
       const action = () => performActionTest({});
@@ -66,6 +64,8 @@ describe('#1 => performAction', () => {
   });
 
   describe('#3 => Running', () => {
+    const useTests = createTests(performActionTest);
+
     useTests(
       [
         'action1, true',

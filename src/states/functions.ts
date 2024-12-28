@@ -1,3 +1,4 @@
+import { t } from '@bemedev/types';
 import { toAction, type ActionConfig } from '~actions';
 import type { Config } from '~config';
 import { DEFAULT_DELIMITER } from '~constants';
@@ -8,6 +9,7 @@ import type {
   FlatMapState_F,
   GetStateType_F,
   ResolveState_F,
+  ToStateValue_F,
 } from './types';
 
 export const createConfig = <const SN extends Config = Config>(
@@ -99,34 +101,39 @@ export const resolveState: ResolveState_F = ({
   options,
   strict,
 }) => {
+  // #region functions
+  const aMapper = (action: ActionConfig) => {
+    return toAction({
+      action,
+      actions: options?.actions,
+      strict,
+    });
+  };
+
+  const tMapper = (transition: any) => {
+    return toTransition(
+      t.anify<TransitionConfig>(transition),
+      options,
+      strict,
+    );
+  };
+  // #endregion
+
   const { id, description, initial, tags: _tags } = config;
   const __id = (config as any).__id;
   const type = getStateType(config);
   const tags = toArray<string>(_tags);
 
-  const entry = toArray<ActionConfig>(config.entry).map(action => {
-    return toAction({ action, actions: options?.actions, strict });
-  });
-
-  const exit = toArray<ActionConfig>(config.exit).map(action => {
-    return toAction({ action, actions: options?.actions, strict });
-  });
+  const entry = toArray<ActionConfig>(config.entry).map(aMapper);
+  const exit = toArray<ActionConfig>(config.exit).map(aMapper);
 
   const states = identify(config.states).map(config =>
     resolveState({ config, options, strict }),
   );
 
-  const on = identify(config.on).map(transition =>
-    toTransition(transition as TransitionConfig, options, strict),
-  );
-
-  const always = toArray<TransitionConfig>(config.always).map(transition =>
-    toTransition(transition, options, strict),
-  );
-
-  const after = identify(config.on).map(transition =>
-    toTransition(transition as TransitionConfig, options, strict),
-  );
+  const on = identify(config.on).map(tMapper);
+  const always = toArray<TransitionConfig>(config.always).map(tMapper);
+  const after = identify(config.after).map(tMapper);
 
   const promises = toArray<PromiseConfig>(config.promises).map(promise =>
     toPromise({ promise, options, strict }),
@@ -144,10 +151,27 @@ export const resolveState: ResolveState_F = ({
     promises,
   } as any;
 
+  if (__id) out.__id = __id;
   if (initial) out.initial = initial;
   if (id) out.id = id;
   if (description) out.description = description;
-  if (__id) out.__id = __id;
 
   return out;
+};
+
+export const toStateValue: ToStateValue_F = node => {
+  const { states } = node;
+  const type = getStateType(node);
+
+  if (states && Object.keys(states).length > 0) {
+    const out = t.anify<ReturnType<ToStateValue_F>>({
+      states: Object.keys(states).reduce((acc, key) => {
+        Object.assign(acc, { [key]: toStateValue(states[key]) });
+        return acc;
+      }, {} as any),
+      type,
+    });
+    return out;
+  }
+  return { type };
 };

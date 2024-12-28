@@ -148,8 +148,8 @@ describe('#2 => resolveConfig', () => {
         id: 'id',
         description: 'A state',
         machines: [
-          { __id: 'machine1', machine: DEFAULT_MACHINE },
-          { __id: 'machine3', machine: DEFAULT_MACHINE },
+          { machine: DEFAULT_MACHINE },
+          { machine: DEFAULT_MACHINE },
         ],
         strict: false,
       },

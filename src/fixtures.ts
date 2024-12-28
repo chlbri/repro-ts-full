@@ -1,4 +1,5 @@
 import type { MachineOptions } from '~config';
+import { Machine } from '~machine';
 import type { ChangeProperty } from '~types';
 import { asyncfy } from '~utils';
 
@@ -49,5 +50,17 @@ export const options = {
     promise2: asyncfy(guards.guard2),
     promise3: asyncfy(guards.guard3),
     promise4: asyncfy(guards.guard4),
+  },
+  children: {
+    child1: new Machine(),
+    child2: new Machine(),
+    child3: new Machine(),
+    child4: new Machine(),
+  },
+  delays: {
+    delay1: 89,
+    delay2: 35,
+    delay3: ({ val2 }) => val2 ?? 0,
+    delay4: 89,
   },
 } satisfies MachineOptions<TC, TE>;
