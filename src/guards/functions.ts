@@ -1,31 +1,25 @@
 import recursive from '@bemedev/boolean-recursive';
 import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '~constants';
-import type { EventObject } from '~events';
 import { isDescriber, isString } from '~types';
 import { defaultReturn } from '~utils';
-import type {
-  GuardConfig,
-  GuardUnion,
-  Predicate,
-  PredicateMap,
-  ToPredicateF,
-} from './types';
+import type { _ToPredicateF, GuardUnion, ToPredicateF } from './types';
 
 export const returnTrue = () => {
   console.log(`${DEFAULT_NOTHING} call true`);
   return true;
 };
+
 export const returnFalse = () => {
   console.log(`${DEFAULT_NOTHING} call false`);
   return false;
 };
 
-export function _toPredicate<TC, TE extends EventObject>(
-  guard?: GuardConfig,
-  predicates?: PredicateMap<TC, TE>,
+const _toPredicate: _ToPredicateF = ({
+  guard,
+  predicates,
   strict = false,
-): Predicate<TC, TE> {
-  const out = (error: Error, _return?: Predicate<TC, TE>) => {
+}) => {
+  const out = (error: Error, _return?: any) => {
     return defaultReturn({
       config: {
         strict: strict,
@@ -49,7 +43,9 @@ export function _toPredicate<TC, TE extends EventObject>(
   }
 
   const makeArray = (guards: GuardUnion[]) => {
-    return guards.map(g => _toPredicate(g, predicates));
+    return guards.map(guard =>
+      _toPredicate({ guard, predicates, strict }),
+    );
   };
 
   if (GUARD_TYPE.and in guard) {
@@ -59,13 +55,13 @@ export function _toPredicate<TC, TE extends EventObject>(
 
   const or = makeArray(guard.or);
   return { or };
-}
+};
 
 export const toPredicate: ToPredicateF = ({
   guard,
   predicates,
   strict,
 }) => {
-  const out1 = _toPredicate(guard, predicates, strict);
+  const out1 = _toPredicate({ guard, predicates, strict });
   return recursive(out1);
 };

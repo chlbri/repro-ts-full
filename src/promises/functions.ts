@@ -4,9 +4,7 @@ import { isDescriber } from '~types';
 import { defaultReturn, nothing, toArray } from '~utils';
 import type { ToPromise_F, ToPromiseSrc_F } from './types';
 
-export const asyncNothing = async () => {
-  return nothing();
-};
+export const asyncNothing = async () => nothing();
 
 export const toPromiseSrc: ToPromiseSrc_F = ({
   src,

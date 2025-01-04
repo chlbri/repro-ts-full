@@ -1,6 +1,5 @@
 import { t } from '@bemedev/types';
 import { toAction, type ActionConfig } from '~actions';
-import type { Config } from '~config';
 import { DEFAULT_DELIMITER } from '~constants';
 import { toPromise, type PromiseConfig } from '~promises';
 import { toTransition, type TransitionConfig } from '~transitions';
@@ -11,12 +10,6 @@ import type {
   ResolveState_F,
   ToStateValue_F as ToStateMap_F,
 } from './types';
-
-export const createConfig = <const SN extends Config = Config>(
-  config: SN,
-) => {
-  return config;
-};
 
 /**
  * Transformer une machine à états hiérarchique en une structure plate où
@@ -102,7 +95,7 @@ export const resolveState: ResolveState_F = ({
   strict,
 }) => {
   // #region functions
-  const aMapper = (action: ActionConfig) => {
+  const aMapper = (action: any) => {
     return toAction({
       action,
       actions: options?.actions,
@@ -111,11 +104,7 @@ export const resolveState: ResolveState_F = ({
   };
 
   const tMapper = (transition: any) => {
-    return toTransition(
-      t.anify<TransitionConfig>(transition),
-      options,
-      strict,
-    );
+    return toTransition(transition, options, strict);
   };
   // #endregion
 
@@ -123,23 +112,19 @@ export const resolveState: ResolveState_F = ({
   const __id = (config as any).__id;
   const type = getStateType(config);
   const tags = toArray<string>(_tags);
-
   const entry = toArray<ActionConfig>(config.entry).map(aMapper);
   const exit = toArray<ActionConfig>(config.exit).map(aMapper);
-
   const states = identify(config.states).map(config =>
     resolveState({ config, options, strict }),
   );
-
   const on = identify(config.on).map(tMapper);
   const always = toArray<TransitionConfig>(config.always).map(tMapper);
   const after = identify(config.after).map(tMapper);
-
   const promises = toArray<PromiseConfig>(config.promises).map(promise =>
     toPromise({ promise, options, strict }),
   );
 
-  const out = {
+  const out = t.anify<any>({
     type,
     entry,
     exit,
@@ -149,7 +134,7 @@ export const resolveState: ResolveState_F = ({
     always,
     after,
     promises,
-  } as any;
+  });
 
   if (__id) out.__id = __id;
   if (initial) out.initial = initial;

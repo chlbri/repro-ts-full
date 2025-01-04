@@ -12,31 +12,30 @@ import type {
 import type { EventObject } from '~events';
 import { checkKeys } from '~utils';
 
-export function isArray<T>(value: any): value is T[] {
-  return Array.isArray(value);
-}
-
+type isArray_F = <T>(value: unknown) => value is T[];
+type IsString = (value: unknown) => value is string;
 export type SingleOrArrayR<T> = T | readonly T[];
 export type SingleOrArrayL<T> = T | readonly [...(readonly T[]), T];
 
-const DESCRIBER_KEYS = ['name', 'description'] as const;
+export const DESCRIBER_KEYS = ['name', 'description'] as const;
+export const isArray: isArray_F = value => Array.isArray(value);
 
 export type Describer = Readonly<
   Record<(typeof DESCRIBER_KEYS)[number], string>
 >;
 
-export function isFunction(value: any): value is (...args: any) => any {
+export const isFunction = (value: unknown): value is Fn => {
   return typeof value === 'function';
-}
+};
 
-export function isString(value: any): value is string {
+export const isString: IsString = value => {
   return typeof value === 'string';
-}
+};
 
-export function isDescriber(arg: any): arg is Describer {
+export const isDescriber = (arg: any): arg is Describer => {
   const out = checkKeys(arg, ...DESCRIBER_KEYS);
   return out;
-}
+};
 
 export type ExtractLargeKeys<T> = string extends T
   ? never
@@ -96,16 +95,14 @@ export type PrimitiveObject = Primitive | PrimitiveObjectMap;
 
 export type DeUnionize<T> = T extends any ? T : never;
 
-type DefaultReturnPrams<T> = {
+export type DefaultReturn = <T>(params: {
   _return?: T;
   error: Error;
   config: {
     strict?: boolean;
     value: T;
   };
-};
-
-export type DefaultReturn = <T>(params: DefaultReturnPrams<T>) => T;
+}) => T;
 
 export type ReducedDefaultReturn<T> = (error: Error, _return?: T) => T;
 export type RDR<T> = ReducedDefaultReturn<T>;
@@ -226,3 +223,10 @@ export type Asyncfy_F = <P extends any[], R = any>(
 ) => Fn<P, Promise<R>>;
 
 export type AnifyReturn<T extends Fn> = (...args: Parameters<T>) => any;
+
+export type CheckKeys_F = <T extends object>(
+  arg: T,
+  ...keys: string[]
+) => boolean;
+
+export type ToArray_F = <T>(obj: any) => T[];

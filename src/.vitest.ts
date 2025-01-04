@@ -1,6 +1,7 @@
 import { aliasTs } from '@bemedev/vitest-alias';
 import { exclude } from '@bemedev/vitest-exclude';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type ViteUserConfig } from 'vitest/config';
+import type { VitestInlineConfig } from 'vitest/dist/chunks/vite.C-N5BBZe.js';
 import tsconfig from '../tsconfig.json';
 
 const plugins = [
@@ -11,10 +12,11 @@ const plugins = [
       '**/types.ts',
       '**/*.typegen.ts',
       '**/*.fixtures.ts',
+      '**/fixtures.ts',
       '**/*.fixture.ts',
     ],
   }),
-];
+] satisfies ViteUserConfig['plugins'];
 
 const commonTest = {
   bail: 10,
@@ -30,12 +32,13 @@ const commonTest = {
     all: true,
     provider: 'v8',
   },
-} as const;
+} satisfies VitestInlineConfig;
 
 type ConfigType = 'typecheck' | 'typecheckOnly' | 'noTypeCheck';
 
 export const addConfig = (type: ConfigType) => {
-  let typecheck = undefined;
+  let typecheck: VitestInlineConfig['typecheck'] = undefined;
+
   switch (type) {
     case 'typecheck':
       typecheck = {

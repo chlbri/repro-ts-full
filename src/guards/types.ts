@@ -50,6 +50,10 @@ type ToPredicateParams<TC, TE extends EventObject> = {
   strict?: boolean;
 };
 
+export type _ToPredicateF = <TC, TE extends EventObject>(
+  params: ToPredicateParams<TC, TE>,
+) => Predicate<TC, TE>;
+
 export type ToPredicateF = <TC, TE extends EventObject>(
   params: ToPredicateParams<TC, TE>,
 ) => SimpleGuardDef<[context: TC, event: TE]>;

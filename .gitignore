@@ -3,6 +3,7 @@
 
 #For Libraries
 lib
+dist
 
 #
 ### Node ###
@@ -134,8 +135,9 @@ yarn.lock
 .env.production.local.json
 .env.test.local.json
 
-#Apple
+# misc
 **/.DS_Store
+*.pem
 
 #my
 build.npm.ts

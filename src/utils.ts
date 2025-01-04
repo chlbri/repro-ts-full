@@ -1,28 +1,30 @@
 import { DEFAULT_NOTHING } from '~constants';
-import {
-  isArray,
-  type Asyncfy_F,
-  type DefaultReturn,
-  type Identify_F,
+import type {
+  Asyncfy_F,
+  CheckKeys_F,
+  DefaultReturn,
+  Identify_F,
+  ToArray_F,
 } from '~types';
+import { isArray } from '~types';
 
-export function toArray<T>(obj: any) {
+export const toArray: ToArray_F = obj => {
   if (isArray(obj)) {
-    return obj as T[];
+    return obj;
   } else {
     if (!obj) return [];
-    return [obj] as T[];
+    return [obj];
   }
-}
+};
 
-export function checkKeys<T extends object>(arg: T, ...keys: string[]) {
+export const checkKeys: CheckKeys_F = (arg, ...keys) => {
   const argKeys = Object.keys(arg);
   for (const key of keys) {
     const check = !argKeys.includes(key);
     if (check) return false;
   }
   return true;
-}
+};
 
 export const defaultReturn: DefaultReturn = ({
   config: { value, strict },
@@ -64,8 +66,5 @@ export const identify: Identify_F = arg => {
 };
 
 export const asyncfy: Asyncfy_F = fn => {
-  type T = typeof fn;
-  return async (...args: Parameters<T>) => {
-    return fn(...args);
-  };
+  return async (...args) => fn(...args);
 };

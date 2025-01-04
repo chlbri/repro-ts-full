@@ -2,7 +2,13 @@ import { toMachine, type ChildConfig } from '~children';
 import { DEFAULT_DELIMITER } from '~constants';
 import { flatMapState, resolveState } from '~states';
 import { toArray } from '~utils';
-import type { FlatMapMachine_F, ResolveConfig_F } from './types';
+import type {
+  CreateConfig_F,
+  FlatMapMachine_F,
+  ResolveConfig_F,
+} from './types';
+
+export const createConfig: CreateConfig_F = config => config;
 
 /**
  *

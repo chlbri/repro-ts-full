@@ -46,3 +46,5 @@ export type Machine0<Tc, Te extends EventObject = EventObject> = StateNode<
 export type ResolveConfig_F = <Tc, Te extends EventObject = EventObject>(
   ...params: ResoleConfigParams<Tc, Te>
 ) => Machine0<Tc, Te>;
+
+export type CreateConfig_F = <const T extends Config>(config: T) => T;

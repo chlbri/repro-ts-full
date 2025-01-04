@@ -1,6 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
 import type { AnifyReturn } from '~types';
-import { flatMapMachine, resolveConfig } from './functions';
+import { createConfig, flatMapMachine, resolveConfig } from './functions';
 
 describe('#1 => flatMapMachine', () => {
   type Fn1 = AnifyReturn<typeof flatMapMachine>;
@@ -10,7 +10,7 @@ describe('#1 => flatMapMachine', () => {
     [
       'Machine with children states',
       [
-        {
+        createConfig({
           always: 'always',
           description: 'description',
           initial: 'state1',
@@ -18,7 +18,7 @@ describe('#1 => flatMapMachine', () => {
             state1: {},
             state2: {},
           },
-        },
+        }),
       ],
       {
         '/': {
@@ -74,13 +74,13 @@ describe('#2 => resolveConfig', () => {
   useTests([
     'Compound',
     [
-      {
+      createConfig({
         states: {
           state1: {},
           state2: {},
         },
         initial: '/state1',
-      },
+      }),
     ],
     {
       initial: '/state1',
