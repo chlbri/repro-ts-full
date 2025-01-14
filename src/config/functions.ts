@@ -1,3 +1,4 @@
+import { t } from '@bemedev/types';
 import { toMachine, type ChildConfig } from '~children';
 import { DEFAULT_DELIMITER } from '~constants';
 import { flatMapState, resolveState } from '~states';
@@ -27,7 +28,8 @@ export const flatMapMachine: FlatMapMachine_F = (
 export const resolveConfig: ResolveConfig_F = (_config, children) => {
   const { strict, machines: _machines, ...config } = _config;
 
-  const out: any = resolveState({ config, options: children });
+  const out = t.anify<any>(resolveState({ config, options: children }));
+
   const machines = toArray<ChildConfig>(_machines).map(child =>
     toMachine({ child, children, strict }),
   );

@@ -20,9 +20,12 @@ export type SingleOrArrayL<T> = T | readonly [...(readonly T[]), T];
 export const DESCRIBER_KEYS = ['name', 'description'] as const;
 export const isArray: isArray_F = value => Array.isArray(value);
 
-export type Describer = Readonly<
-  Record<(typeof DESCRIBER_KEYS)[number], string>
->;
+export type Describer = Record<(typeof DESCRIBER_KEYS)[number], string>;
+
+export type Describer2 = NOmit<Describer, 'description'> &
+  Partial<Pick<Describer, 'description'>>;
+
+export type ToDescriber_F = (arg: string | Describer) => Describer2;
 
 export const isFunction = (value: unknown): value is Fn => {
   return typeof value === 'function';
@@ -230,3 +233,5 @@ export type CheckKeys_F = <T extends object>(
 ) => boolean;
 
 export type ToArray_F = <T>(obj: any) => T[];
+
+export type ToArray<T> = T extends any[] ? T : T[];

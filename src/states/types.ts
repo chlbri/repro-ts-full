@@ -1,10 +1,15 @@
 import type { KeysMatching } from '@bemedev/decompose';
-import type { FlatMapByKeys, PickKeysBy } from '@bemedev/types';
+import type { FlatMapByKeys, Fn, PickKeysBy } from '@bemedev/types';
 import type { Action, ActionConfig } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type { Transitions, TransitionsConfig } from '~transitions';
-import type { Define, Identitfy, SingleOrArrayR } from '~types';
+import type {
+  Define,
+  Describer2,
+  Identitfy,
+  SingleOrArrayR,
+} from '~types';
 
 export type StateType = 'atomic' | 'compound' | 'parallel';
 
@@ -55,6 +60,23 @@ export type StateNodeConfigParallel = TransitionsConfig & {
   readonly tags?: SingleOrArrayR<string>;
   readonly initial?: never;
 };
+
+export type IsParallel_F = (
+  arg: unknown,
+) => arg is StateNodeConfigParallel;
+
+export type SimpleStateConfig = {
+  type: StateType;
+  initial?: string;
+  states?: Record<string, Identitfy<SimpleStateConfig>>;
+  entry: Describer2[];
+  exit: Describer2[];
+  tags: string[];
+};
+
+export type SimplifyStateConfig_F = Fn<[state: SNC], SimpleStateConfig>;
+
+export type GetInitialSimpleState_F = Fn<[body: SNC], SimpleStateConfig>;
 
 type _FlatMapStateNodeConfigOptions = {
   withStates?: boolean;
@@ -117,3 +139,41 @@ export type StateMap = {
 };
 
 export type ToStateValue_F = (node: StateNodeConfig) => StateMap;
+
+export type StateValue = string | StateValueMap;
+
+export interface StateValueMap {
+  [key: string]: StateValue;
+}
+
+type ResoleStateValueParams<Tc, Te extends EventObject = EventObject> = {
+  config: StateValue;
+  options?: MachineOptions<Tc, Te>;
+  strict?: boolean;
+};
+
+export type ResolveStateValue_F = <
+  Tc,
+  Te extends EventObject = EventObject,
+>(
+  params: ResoleStateValueParams<Tc, Te>,
+) => StateNode<Tc, Te>;
+
+export type GetInitialStateValue_F = Fn<[body: any], StateValue>;
+
+export type ValueToNodeParams = {
+  config: StateValue;
+  body: SNC;
+};
+
+// TODO: create this function
+export type ValueToNode_F = Fn<
+  [params: ValueToNodeParams],
+  SimpleStateConfig
+>;
+
+// TODO: create this function
+export type GetNextStateConfig_F = Fn<
+  [config: StateValue, body: SNC, ...targets: string[]],
+  SimpleStateConfig
+>;

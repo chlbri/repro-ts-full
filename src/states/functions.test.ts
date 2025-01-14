@@ -1,5 +1,12 @@
 import { createTests } from '@bemedev/vitest-extended';
-import { flatMapState, getStateType, toStateMap } from './functions';
+import {
+  flatMapState,
+  getInitialSimpleState,
+  getInitialStateValue,
+  getStateType,
+  simplifyStateConfig,
+  toStateMap,
+} from './functions';
 import { resolveStateTest } from './functions.fixtures';
 import type { StateNodeConfig } from './types';
 
@@ -295,6 +302,378 @@ describe('#4 => toStateMap', () => {
         },
       ],
       { type: 'atomic' },
+    ],
+  );
+});
+
+describe('#5 => simplifyStateConfig', () => {
+  const useTests = createTests(simplifyStateConfig);
+
+  const defaults = { entry: [], exit: [], tags: [] };
+
+  useTests(
+    ['Empty', [{}], { type: 'atomic', ...defaults }],
+    [
+      'Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {},
+            },
+            state2: {},
+          },
+          initial: '',
+        },
+      ],
+      {
+        states: {
+          state1: {
+            type: 'parallel',
+            states: {},
+            __id: 'state1',
+            ...defaults,
+          },
+          state2: { type: 'atomic', __id: 'state2', ...defaults },
+        },
+        initial: '',
+        type: 'compound',
+        ...defaults,
+      },
+    ],
+    [
+      'Atomic complex 1',
+      [
+        {
+          id: 'id',
+          description: 'A state',
+          tags: 'busy',
+          on: {},
+          after: {},
+          always: '/state1',
+        },
+      ],
+      {
+        ...defaults,
+        type: 'atomic',
+        tags: ['busy'],
+      },
+    ],
+  );
+});
+
+describe('#6 => getInitialSimpleState', () => {
+  const useTests = createTests(getInitialSimpleState);
+  const defaults = { entry: [], exit: [], tags: [] };
+
+  useTests(
+    ['Empty', [{}], { type: 'atomic', ...defaults }],
+    [
+      'Atomic complex 1',
+      [
+        {
+          id: 'id',
+          description: 'A state',
+          tags: 'busy',
+          on: {},
+          after: {},
+          always: '/state1',
+        },
+      ],
+      {
+        ...defaults,
+        type: 'atomic',
+        tags: ['busy'],
+      },
+    ],
+    [
+      'Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {},
+            },
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        states: {
+          state1: {
+            type: 'parallel',
+            states: {},
+            __id: 'state1',
+            ...defaults,
+          },
+        },
+        initial: 'state1',
+        type: 'compound',
+        ...defaults,
+      },
+    ],
+    [
+      'Very Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {
+                state11: {
+                  initial: 'state111',
+                  states: {
+                    state111: {},
+                    state112: {},
+                    state113: {},
+                  },
+                },
+                state12: {},
+                state13: {
+                  type: 'parallel',
+                  states: {
+                    state131: {
+                      initial: 'state1311',
+                      states: {
+                        state1311: {},
+                        state1312: {},
+                        state1313: {
+                          initial: '13131',
+                          states: {
+                            state13131: {},
+                            state13132: {},
+                          },
+                        },
+                      },
+                    },
+                    state132: {},
+                    state133: {},
+                  },
+                },
+              },
+            },
+            state2: {
+              initial: 'state21',
+              states: {
+                state21: {},
+                state22: {},
+              },
+            },
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        initial: 'state1',
+        type: 'compound',
+        ...defaults,
+
+        states: {
+          state1: {
+            __id: 'state1',
+            type: 'parallel',
+            ...defaults,
+
+            states: {
+              state11: {
+                __id: 'state11',
+                type: 'compound',
+                initial: 'state111',
+                ...defaults,
+
+                states: {
+                  state111: {
+                    __id: 'state111',
+                    type: 'atomic',
+                    ...defaults,
+                  },
+                },
+              },
+
+              state12: {
+                __id: 'state12',
+                type: 'atomic',
+                ...defaults,
+              },
+
+              state13: {
+                __id: 'state13',
+                type: 'parallel',
+                ...defaults,
+
+                states: {
+                  state131: {
+                    __id: 'state131',
+                    type: 'compound',
+                    ...defaults,
+                    initial: 'state1311',
+
+                    states: {
+                      state1311: {
+                        __id: 'state1311',
+                        type: 'atomic',
+                        ...defaults,
+                      },
+                    },
+                  },
+
+                  state132: {
+                    __id: 'state132',
+                    type: 'atomic',
+                    ...defaults,
+                  },
+
+                  state133: {
+                    __id: 'state133',
+                    type: 'atomic',
+                    ...defaults,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  );
+});
+
+describe('#7 => GetInitialStateValue', () => {
+  const useTests = createTests(getInitialStateValue);
+
+  useTests(
+    ['Empty', [{}], {}],
+    [
+      'Atomic complex 1',
+      [
+        {
+          id: 'id',
+          description: 'A state',
+          tags: 'busy',
+          on: {},
+          after: {},
+          always: '/state1',
+        },
+      ],
+      {},
+    ],
+    [
+      'Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {},
+            },
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        state1: {},
+      },
+    ],
+    [
+      'Compound  1',
+      [
+        {
+          states: {
+            state1: {},
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      'state1',
+    ],
+    [
+      'Compound deep 1',
+      [
+        {
+          states: {
+            state1: {
+              initial: 'state11',
+              states: {
+                state11: {},
+                state12: {},
+              },
+            },
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        state1: 'state11',
+      },
+    ],
+    [
+      'Very Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {
+                state11: {
+                  initial: 'state111',
+                  states: {
+                    state111: {},
+                    state112: {},
+                    state113: {},
+                  },
+                },
+                state12: {},
+                state13: {
+                  type: 'parallel',
+                  states: {
+                    state131: {
+                      initial: 'state1311',
+                      states: {
+                        state1311: {},
+                        state1312: {},
+                        state1313: {
+                          initial: '13131',
+                          states: {
+                            state13131: {},
+                            state13132: {},
+                          },
+                        },
+                      },
+                    },
+                    state132: {},
+                    state133: {},
+                  },
+                },
+              },
+            },
+            state2: {
+              initial: 'state21',
+              states: {
+                state21: {},
+                state22: {},
+              },
+            },
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        state1: {
+          state11: 'state111',
+          state12: {},
+          state13: {
+            state131: 'state1311',
+            state132: {},
+            state133: {},
+          },
+        },
+      },
     ],
   );
 });

@@ -22,12 +22,16 @@ export type Config = (
 
 export type FlatMapMachine_F = FlatMapState_F<Config>;
 
-export type MachineOptions<Tc, Te extends EventObject = EventObject> = {
+export type MachineOptions<
+  Tc,
+  Te extends EventObject = EventObject,
+  M extends MachineMap = MachineMap,
+> = {
   guards?: PredicateMap<Tc, Te>;
   actions?: ActionMap<Tc, Te>;
   promises?: PromiseMap<Tc, Te>;
   delays?: DelayMap<Tc, Te>;
-  children?: MachineMap;
+  children?: M;
 };
 
 type ResoleConfigParams<Tc, Te extends EventObject = EventObject> = [

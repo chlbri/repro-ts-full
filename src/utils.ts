@@ -5,6 +5,7 @@ import type {
   DefaultReturn,
   Identify_F,
   ToArray_F,
+  ToDescriber_F,
 } from '~types';
 import { isArray } from '~types';
 
@@ -67,4 +68,12 @@ export const identify: Identify_F = arg => {
 
 export const asyncfy: Asyncfy_F = fn => {
   return async (...args) => fn(...args);
+};
+
+export const toDescriber: ToDescriber_F = name => {
+  const check = typeof name === 'object';
+  if (check) {
+    return name;
+  }
+  return { name };
 };

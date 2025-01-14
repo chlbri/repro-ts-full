@@ -3,11 +3,18 @@ import { toAction, type ActionConfig } from '~actions';
 import { DEFAULT_DELIMITER } from '~constants';
 import { toPromise, type PromiseConfig } from '~promises';
 import { toTransition, type TransitionConfig } from '~transitions';
-import { identify, toArray } from '~utils';
+import { identify, toArray, toDescriber } from '~utils';
 import type {
   FlatMapState_F,
+  GetInitialSimpleState_F,
+  GetInitialStateValue_F,
   GetStateType_F,
   ResolveState_F,
+  SimpleStateConfig,
+  SimplifyStateConfig_F,
+  StateNodeConfigAtomic,
+  StateNodeConfigCompound,
+  StateNodeConfigParallel,
   ToStateValue_F as ToStateMap_F,
 } from './types';
 
@@ -89,6 +96,37 @@ export const getStateType: GetStateType_F = config => {
   return 'atomic';
 };
 
+export const simplifyStateConfig: SimplifyStateConfig_F = config => {
+  const type = getStateType(config);
+  const initial = config.initial;
+
+  const entry = toArray<ActionConfig>(config.entry).map(toDescriber);
+  const exit = toArray<ActionConfig>(config.exit).map(toDescriber);
+  const tags = toArray<string>(config.tags);
+
+  const _states = config.states;
+
+  const out = t.anify<any>({ type, entry, exit, tags });
+
+  if (initial !== undefined) out.initial = initial;
+
+  if (_states) {
+    const entries = Object.entries(_states);
+    const states1 = entries.map(([__id, state]) => {
+      const value = { ...simplifyStateConfig(state), __id };
+      return t.tuple(__id, value);
+    });
+    const states = states1.reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {} as any);
+
+    out.states = states;
+  }
+
+  return out;
+};
+
 export const resolveState: ResolveState_F = ({
   config,
   options,
@@ -149,7 +187,7 @@ export const toStateMap: ToStateMap_F = node => {
   const type = getStateType(node);
 
   if (states && Object.keys(states).length > 0) {
-    const out = t.anify<ReturnType<ToStateMap_F>>({
+    const out = t.anify<any>({
       states: Object.keys(states).reduce((acc, key) => {
         Object.assign(acc, { [key]: toStateMap(states[key]) });
         return acc;
@@ -159,4 +197,91 @@ export const toStateMap: ToStateMap_F = node => {
     return out;
   }
   return { type };
+};
+
+export function isParallel(arg: unknown): arg is StateNodeConfigParallel {
+  return (arg as any).type === 'parallel';
+}
+
+export function isCompound(arg: any): arg is StateNodeConfigCompound {
+  const out = getStateType(arg) === 'compound';
+  return out;
+}
+
+export function isAtomic(arg: any): arg is StateNodeConfigAtomic {
+  const out = getStateType(arg) === 'atomic';
+  return out;
+}
+
+export const getInitialSimpleState: GetInitialSimpleState_F = body => {
+  const check1 = isAtomic(body);
+  if (check1) return simplifyStateConfig(body);
+
+  const check2 = isParallel(body);
+  if (check2) {
+    const { states: states0, ...config } = body;
+    const entries = Object.entries(states0);
+
+    const states = entries.reduce(
+      (acc, [__id, _state]) => {
+        const state = {
+          ...getInitialSimpleState(_state),
+          __id,
+        };
+        acc[__id] = state;
+        return acc;
+      },
+      {} as NonNullable<SimpleStateConfig['states']>,
+    );
+    const out = simplifyStateConfig(config as any);
+
+    return { ...out, states };
+  }
+
+  const __id = body.initial;
+
+  const initial = body.states[__id];
+  if (!initial) throw 'Initial is not defined';
+
+  const out = simplifyStateConfig(body);
+
+  return {
+    ...out,
+    states: {
+      [__id]: { ...getInitialSimpleState(initial), __id },
+    },
+  };
+};
+
+export const getInitialStateValue: GetInitialStateValue_F = _body => {
+  const body = getInitialSimpleState(_body);
+
+  const check2 = isParallel(body);
+  if (check2) {
+    const { states: states0 } = body;
+    const entries = Object.entries(states0);
+
+    const out = entries.reduce((acc, [key, _state]) => {
+      const state = getInitialStateValue(_state);
+      acc[key] = state;
+      return acc;
+    }, {} as any);
+
+    return out;
+  }
+
+  const check3 = isCompound(body);
+  if (check3) {
+    const key = body.initial;
+
+    const initial = body.states[key];
+    const check4 = isAtomic(initial);
+    if (check4) return key;
+
+    return {
+      [key]: getInitialStateValue(initial),
+    };
+  }
+
+  return {};
 };

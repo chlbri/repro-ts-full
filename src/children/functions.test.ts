@@ -16,22 +16,10 @@ describe('#1 => toMachine', () => {
         toMachineTest({ name: 'notDescribed', description: 'A machine' });
       expect(child).toThrowError(ERRORS.machine.notDescribed.error);
     });
-
-    test('#3 => Throw : "Action is not provided"', () => {
-      const child = () => toMachineTest('notProvided');
-      expect(child).toThrowError(ERRORS.machine.notProvided.error);
-    });
   });
 
   describe('#2 => To nothing', () => {
     const machine = DEFAULT_MACHINE;
-    test('#1 =>', () => {
-      const child = toMachineTest('notProvided', false);
-
-      expect(child).toEqual({
-        machine,
-      });
-    });
 
     test('#2 =>', () => {
       const child = toMachineTest(
@@ -41,6 +29,7 @@ describe('#1 => toMachine', () => {
 
       expect(child).toEqual({
         machine,
+        name: 'notDescribed',
       });
     });
   });
@@ -51,16 +40,18 @@ describe('#1 => toMachine', () => {
     useTests(
       [
         'String: child1',
-        ['child1'],
+        [{ name: 'child1' }],
         {
           machine: options.children.child1,
+          name: 'child1',
         },
       ],
       [
         'String: child3',
-        ['child3'],
+        [{ name: 'child3' }],
         {
           machine: options.children.child3,
+          name: 'child3',
         },
       ],
       [
@@ -73,6 +64,7 @@ describe('#1 => toMachine', () => {
         ],
         {
           machine: options.children.child4,
+          name: 'child4',
         },
       ],
       [
@@ -81,12 +73,11 @@ describe('#1 => toMachine', () => {
           {
             description: 'A machine',
             name: 'child2',
-            id: 'id',
           },
         ],
         {
           machine: options.children.child2,
-          id: 'id',
+          name: 'child2',
         },
       ],
     );

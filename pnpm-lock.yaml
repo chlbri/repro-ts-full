@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     dependencies:
+      '@bemedev/basicfunc':
+        specifier: ^0.0.1
+        version: 0.0.1
       '@bemedev/boolean-recursive':
         specifier: ^0.0.3
         version: 0.0.3
@@ -148,6 +151,13 @@ packages:
       {
         integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==,
       }
+
+  '@bemedev/basicfunc@0.0.1':
+    resolution:
+      {
+        integrity: sha512-ALDdr5kBqI+MaKUFDUBCNfGl0P23IP3Bq1ck3D0qgLJLypPPiSOZCqwtK7Kxz6OdutgfYqFeQGzTYRmW4QQzyw==,
+      }
+    engines: { node: '>=20' }
 
   '@bemedev/boolean-recursive@0.0.3':
     resolution:
@@ -3179,6 +3189,10 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.9
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@bemedev/basicfunc@0.0.1':
+    dependencies:
+      '@bemedev/types': 0.1.3
 
   '@bemedev/boolean-recursive@0.0.3': {}
 
