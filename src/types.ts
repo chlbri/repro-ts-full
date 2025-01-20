@@ -10,10 +10,11 @@ import type {
   ValuesOf,
 } from '@bemedev/types';
 import type { EventObject } from '~events';
+import type { StateValue } from '~states';
 import { checkKeys } from '~utils';
 
 type isArray_F = <T>(value: unknown) => value is T[];
-type IsString = (value: unknown) => value is string;
+export type IsString_F = (value: unknown) => value is string;
 export type SingleOrArrayR<T> = T | readonly T[];
 export type SingleOrArrayL<T> = T | readonly [...(readonly T[]), T];
 
@@ -31,7 +32,7 @@ export const isFunction = (value: unknown): value is Fn => {
   return typeof value === 'function';
 };
 
-export const isString: IsString = value => {
+export const isString: IsString_F = value => {
   return typeof value === 'string';
 };
 
@@ -215,7 +216,7 @@ export type ChangeProperties<
     ? T
     : _ChangeProperties<T, U, option>;
 
-export type Identitfy<T> = T extends object ? T & { __id: string } : never;
+export type Identitfy<T> = T extends object ? T & { __id: string } : T;
 
 export type Identify_F = <const T>(
   arg?: Record<string, T>,
@@ -235,3 +236,16 @@ export type CheckKeys_F = <T extends object>(
 export type ToArray_F = <T>(obj: any) => T[];
 
 export type ToArray<T> = T extends any[] ? T : T[];
+
+export type EscapeRexExp_F = (arg: string) => string;
+
+export type ReplaceAll_F = (params: {
+  entry: string;
+  match: string;
+  replacement: string;
+}) => string;
+
+export type RecomposeSV_F = Fn<[arg?: string], StateValue>;
+
+export type DeleteFirst_F = Fn<[arg: string, toDelete: string], string>;
+export type DeleteF_F = Fn<[arg: string, toDelete?: string], string>;

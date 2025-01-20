@@ -1,21 +1,38 @@
+import { isDefined } from '@bemedev/basicfunc';
+import { decompose, decomposeKeys, recompose } from '@bemedev/decompose';
 import { t } from '@bemedev/types';
 import { toAction, type ActionConfig } from '~actions';
 import { DEFAULT_DELIMITER } from '~constants';
 import { toPromise, type PromiseConfig } from '~promises';
 import { toTransition, type TransitionConfig } from '~transitions';
-import { identify, toArray, toDescriber } from '~utils';
+import { isString } from '~types';
+import {
+  deleteFirst,
+  identify,
+  isStringEmpty,
+  recomposeSV,
+  replaceAll,
+  toArray,
+  toDescriber,
+} from '~utils';
+import { recomposeStateConfig } from './recompose';
 import type {
   FlatMapState_F,
   GetInitialSimpleState_F,
+  GetInitialStateConfig_F,
   GetInitialStateValue_F,
+  GetNextSimple_F,
+  GetNextStateConfig_F,
+  GetNextStateValue_F,
   GetStateType_F,
+  NodeToValue_F,
   ResolveState_F,
-  SimpleStateConfig,
-  SimplifyStateConfig_F,
   StateNodeConfigAtomic,
   StateNodeConfigCompound,
   StateNodeConfigParallel,
+  ToSimple_F,
   ToStateValue_F as ToStateMap_F,
+  ValueToNode_F,
 } from './types';
 
 /**
@@ -57,13 +74,14 @@ import type {
  */
 export const flatMapState: FlatMapState_F = (
   node,
+  withChildren = true,
   delimiter = DEFAULT_DELIMITER,
   path = '',
 ) => {
   const { states, ...rest } = node;
 
   let out: any = {};
-  out[path === '' ? DEFAULT_DELIMITER : path] = rest;
+  out[path === '' ? DEFAULT_DELIMITER : path] = withChildren ? node : rest;
 
   if (states) {
     for (const key in states) {
@@ -71,6 +89,7 @@ export const flatMapState: FlatMapState_F = (
         const element = states[key];
         const inner = flatMapState(
           element,
+          withChildren,
           delimiter,
           `${path}${DEFAULT_DELIMITER}${key}`,
         );
@@ -96,7 +115,7 @@ export const getStateType: GetStateType_F = config => {
   return 'atomic';
 };
 
-export const simplifyStateConfig: SimplifyStateConfig_F = config => {
+export const toSimple: ToSimple_F = config => {
   const type = getStateType(config);
   const initial = config.initial;
 
@@ -110,19 +129,20 @@ export const simplifyStateConfig: SimplifyStateConfig_F = config => {
 
   if (initial !== undefined) out.initial = initial;
 
-  if (_states) {
-    const entries = Object.entries(_states);
-    const states1 = entries.map(([__id, state]) => {
-      const value = { ...simplifyStateConfig(state), __id };
-      return t.tuple(__id, value);
-    });
-    const states = states1.reduce((acc, [key, value]) => {
-      acc[key] = value;
-      return acc;
-    }, {} as any);
+  const states: any[] = [];
 
-    out.states = states;
+  const check1 = isDefined(_states);
+
+  if (check1) {
+    const entries = Object.entries(_states);
+    states.push(
+      ...entries.map(([__id, state]) => {
+        const value = { ...toSimple(state), __id };
+        return value;
+      }),
+    );
   }
+  out.states = states;
 
   return out;
 };
@@ -213,29 +233,51 @@ export function isAtomic(arg: any): arg is StateNodeConfigAtomic {
   return out;
 }
 
-export const getInitialSimpleState: GetInitialSimpleState_F = body => {
+export const getInitialStateConfig: GetInitialStateConfig_F = body => {
   const check1 = isAtomic(body);
-  if (check1) return simplifyStateConfig(body);
+  if (check1) return body;
 
   const check2 = isParallel(body);
-  if (check2) {
+
+  const reducer = (
+    body: StateNodeConfigCompound | StateNodeConfigParallel,
+  ) => {
     const { states: states0, ...config } = body;
-    const entries = Object.entries(states0);
+    const entries1 = Object.entries(states0);
+    const entries2 = entries1.map(([key, state]) => {
+      const check3 = isAtomic(state);
+      if (check3) return t.tuple(key, state);
+      return t.tuple(key, getInitialStateConfig(state));
+    });
 
-    const states = entries.reduce(
-      (acc, [__id, _state]) => {
-        const state = {
-          ...getInitialSimpleState(_state),
-          __id,
-        };
-        acc[__id] = state;
+    const check4 = isCompound(body);
+    if (check4) {
+      const initial = body.initial;
+      const entries3 = entries2.filter(([key]) => key === initial);
+
+      const states = entries3.reduce((acc, [key, value]) => {
+        acc[key] = value;
         return acc;
-      },
-      {} as NonNullable<SimpleStateConfig['states']>,
-    );
-    const out = simplifyStateConfig(config as any);
+      }, {} as any);
 
-    return { ...out, states };
+      const out = { ...config, states };
+
+      return out;
+    }
+
+    const states = entries2.reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {} as any);
+
+    const out = { ...config, states };
+
+    return out;
+  };
+  if (check2) {
+    const out = reducer(body);
+
+    return out;
   }
 
   const __id = body.initial;
@@ -243,45 +285,240 @@ export const getInitialSimpleState: GetInitialSimpleState_F = body => {
   const initial = body.states[__id];
   if (!initial) throw 'Initial is not defined';
 
-  const out = simplifyStateConfig(body);
+  const check4 = isAtomic(initial);
+  if (check4) {
+    const out = { ...body, states: { [__id]: initial } };
+    return out;
+  }
 
-  return {
-    ...out,
-    states: {
-      [__id]: { ...getInitialSimpleState(initial), __id },
-    },
-  };
+  const out = { ...body, states: { [__id]: reducer(initial) } };
+  return out;
+};
+
+export const getInitialSimpleState: GetInitialSimpleState_F = body => {
+  const out1 = getInitialStateConfig(body);
+  const out2 = toSimple(out1);
+
+  return out2;
 };
 
 export const getInitialStateValue: GetInitialStateValue_F = _body => {
-  const body = getInitialSimpleState(_body);
+  const body = getInitialStateConfig(_body);
 
-  const check2 = isParallel(body);
-  if (check2) {
-    const { states: states0 } = body;
-    const entries = Object.entries(states0);
+  console.log(JSON.stringify(body, null, 2));
 
-    const out = entries.reduce((acc, [key, _state]) => {
-      const state = getInitialStateValue(_state);
-      acc[key] = state;
+  return nodeToValue(body);
+};
+
+export const getParents = (str: string) => {
+  const last = str.lastIndexOf(DEFAULT_DELIMITER);
+  if (last === -1) return [];
+  const out = [str];
+  const str2 = str.substring(0, last);
+  if (isStringEmpty(str2)) {
+    return out;
+  }
+
+  out.push(...getParents(str2));
+  return out;
+};
+
+export const getChildren = (str: string, ...keys: string[]) => {
+  const check1 = keys.length > 0;
+  const out: string[] = [];
+  if (check1) {
+    keys.forEach(key => {
+      const check2 = str !== key;
+      const check3 = key.includes(str);
+
+      const check4 = check2 && check3;
+      if (check4) {
+        out.push(key);
+      }
+    });
+  }
+
+  return out;
+};
+
+export const valueToNode: ValueToNode_F = (body, from) => {
+  const flatBody = flatMapState(body, false);
+  const keysB = Object.keys(flatBody);
+  const check1 = isString(from);
+  if (check1) {
+    const check2 = keysB.includes(from);
+    if (check2) {
+      const parents = getParents(from);
+      const children = getChildren(from, ...keysB);
+
+      const out1: any = {
+        '/': flatBody['/'],
+      };
+
+      parents.concat(children).forEach(key => {
+        out1[key] = (flatBody as any)[key];
+      });
+
+      const out: any = recomposeStateConfig(out1);
+      return out;
+    }
+    throw new Error(`${from} is not inside the body`);
+  }
+
+  const flatFrom = decompose(from);
+
+  const entries1 = Object.entries<string>(flatFrom as any);
+
+  const out1: any = {};
+
+  entries1.forEach(([_key, value]) => {
+    let key1 = _key;
+    const check3 = !(Object.keys(value).length === 0);
+
+    if (check3) {
+      key1 = `${_key}.${value}`;
+    }
+
+    const key2 = replaceAll({
+      entry: key1,
+      match: '.',
+      replacement: DEFAULT_DELIMITER,
+    });
+
+    const check4 = keysB.includes(key2);
+
+    if (check4) {
+      const all = getParents(key2);
+      all.forEach(key => {
+        out1[key] = (flatBody as any)[key];
+      });
+    }
+  });
+
+  const out2 = recompose(out1);
+  return out2;
+};
+
+export const nodeToValue: NodeToValue_F = body => {
+  const check1 = isAtomic(body);
+  if (check1) return {};
+
+  const reducer = (
+    body: StateNodeConfigCompound | StateNodeConfigParallel,
+  ) => {
+    const entries = Object.entries(body.states);
+
+    const check2 = isCompound(body);
+
+    if (check2) {
+      const length = entries.length;
+      const __id = body.initial;
+      const initial = body.states[__id];
+
+      console.log(__id, initial);
+
+      const check3 = length === 1;
+      const check4 = isAtomic(initial);
+      const check5 = check3 && check4;
+
+      if (check5) return __id;
+    }
+
+    const entries2 = entries.map(([key, value]) => {
+      const check1 = isAtomic(value);
+      if (check1) {
+        return t.tuple(key, {});
+      }
+      return t.tuple(key, nodeToValue(value));
+    });
+
+    const out = entries2.reduce((acc, [key, value]) => {
+      acc[key] = value;
       return acc;
     }, {} as any);
 
     return out;
+  };
+
+  const out = reducer(body);
+  return out;
+};
+
+export const getNextStateValue: GetNextStateValue_F = (from, target) => {
+  const check0 = isStringEmpty(from);
+  if (check0) return {};
+
+  const checkT = isDefined(target);
+
+  const check2 = isString(from);
+
+  if (check2) {
+    const check3 = !checkT || isStringEmpty(target);
+    if (check3) return from;
+    const check31 = target.includes(`${from}/`);
+
+    if (check31) {
+      const out = recomposeSV(target);
+      return out;
+    }
+    return target;
   }
 
-  const check3 = isCompound(body);
-  if (check3) {
-    const key = body.initial;
+  const keys = Object.keys(from);
 
-    const initial = body.states[key];
-    const check4 = isAtomic(initial);
-    if (check4) return key;
-
-    return {
-      [key]: getInitialStateValue(initial),
-    };
+  const check4 = keys.length === 0;
+  if (check4) {
+    if (checkT) return target;
+    return from;
   }
 
-  return {};
+  const decomposed = decompose(from);
+
+  if (checkT) {
+    const last = target.lastIndexOf(DEFAULT_DELIMITER);
+    if (last === -1) return from;
+
+    const entry = target.substring(0, last);
+
+    const _target2 = replaceAll({
+      entry,
+      match: DEFAULT_DELIMITER,
+      replacement: '.',
+    });
+
+    const target2 = deleteFirst(_target2, '.');
+    const keysD = decomposeKeys(from);
+    const check5 = keysD.includes(target2);
+
+    if (check5) {
+      decomposed[target2] = target.substring(last);
+    } else return target;
+  }
+
+  const out: any = recompose(decomposed);
+
+  return out;
+};
+
+export const getNextStateConfig: GetNextStateConfig_F = ({
+  from,
+  body,
+  to,
+}) => {
+  const flatBody = flatMapState(body);
+  const flatKeys = Object.keys(flatBody);
+
+  const check2 = !flatKeys.includes(to);
+  if (check2) throw new Error(`${to} is not inside the config`);
+
+  const nextValue = getNextStateValue(from, to);
+
+  return valueToNode(body, nextValue);
+};
+
+export const getNextSimple: GetNextSimple_F = params => {
+  const out1 = getNextStateConfig(params);
+  const out2 = toSimple(out1);
+
+  return out2;
 };

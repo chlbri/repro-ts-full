@@ -3,14 +3,21 @@ import {
   flatMapState,
   getInitialSimpleState,
   getInitialStateValue,
+  getNextSimple,
+  getNextStateValue,
   getStateType,
-  simplifyStateConfig,
+  nodeToValue,
+  toSimple,
   toStateMap,
 } from './functions';
-import { resolveStateTest } from './functions.fixtures';
-import type { StateNodeConfig } from './types';
+import {
+  body1,
+  resolveStateTest,
+  stateValue1,
+} from './functions.fixtures';
+import { restSimpleState, type StateNodeConfig } from './types';
 
-describe('#1 => getStateType', () => {
+describe('#01 => getStateType', () => {
   const useTests = createTests(getStateType);
 
   useTests(
@@ -76,7 +83,7 @@ describe('#1 => getStateType', () => {
   );
 });
 
-describe('#2 => flatMapMachine', () => {
+describe('#02 => flatMapMachine', () => {
   const useTests =
     createTests<(config: StateNodeConfig) => any>(flatMapState);
 
@@ -115,6 +122,10 @@ describe('#2 => flatMapMachine', () => {
           always: 'always',
           description: 'description',
           initial: 'state1',
+          states: {
+            state1: {},
+            state2: {},
+          },
         },
         '/state1': {},
         '/state2': {},
@@ -145,10 +156,25 @@ describe('#2 => flatMapMachine', () => {
           always: 'always',
           description: 'description',
           initial: 'state1',
+          states: {
+            state1: {
+              always: 'always',
+              states: {
+                state3: {},
+                state4: {},
+              },
+              type: 'parallel',
+            },
+            state2: {},
+          },
         },
         '/state1': {
           always: 'always',
           type: 'parallel',
+          states: {
+            state3: {},
+            state4: {},
+          },
         },
         '/state1/state3': {},
         '/state1/state4': {},
@@ -158,7 +184,7 @@ describe('#2 => flatMapMachine', () => {
   );
 });
 
-describe('#3 => resolveState', () => {
+describe('#03 => resolveState', () => {
   const useTests = createTests(resolveStateTest);
 
   useTests(
@@ -262,7 +288,7 @@ describe('#3 => resolveState', () => {
   );
 });
 
-describe('#4 => toStateMap', () => {
+describe('#04 => toStateMap', () => {
   const useTests = createTests(toStateMap);
 
   useTests(
@@ -306,13 +332,11 @@ describe('#4 => toStateMap', () => {
   );
 });
 
-describe('#5 => simplifyStateConfig', () => {
-  const useTests = createTests(simplifyStateConfig);
-
-  const defaults = { entry: [], exit: [], tags: [] };
+describe('#05 => toSimple', () => {
+  const useTests = createTests(toSimple);
 
   useTests(
-    ['Empty', [{}], { type: 'atomic', ...defaults }],
+    ['Empty', [{}], { type: 'atomic', ...restSimpleState }],
     [
       'Complex 1',
       [
@@ -328,18 +352,17 @@ describe('#5 => simplifyStateConfig', () => {
         },
       ],
       {
-        states: {
-          state1: {
+        ...restSimpleState,
+        states: [
+          {
             type: 'parallel',
-            states: {},
             __id: 'state1',
-            ...defaults,
+            ...restSimpleState,
           },
-          state2: { type: 'atomic', __id: 'state2', ...defaults },
-        },
+          { type: 'atomic', __id: 'state2', ...restSimpleState },
+        ],
         initial: '',
         type: 'compound',
-        ...defaults,
       },
     ],
     [
@@ -355,7 +378,7 @@ describe('#5 => simplifyStateConfig', () => {
         },
       ],
       {
-        ...defaults,
+        ...restSimpleState,
         type: 'atomic',
         tags: ['busy'],
       },
@@ -363,12 +386,11 @@ describe('#5 => simplifyStateConfig', () => {
   );
 });
 
-describe('#6 => getInitialSimpleState', () => {
+describe('#06 => getInitialSimpleState', () => {
   const useTests = createTests(getInitialSimpleState);
-  const defaults = { entry: [], exit: [], tags: [] };
 
   useTests(
-    ['Empty', [{}], { type: 'atomic', ...defaults }],
+    ['Empty', [{}], { type: 'atomic', ...restSimpleState }],
     [
       'Atomic complex 1',
       [
@@ -382,7 +404,7 @@ describe('#6 => getInitialSimpleState', () => {
         },
       ],
       {
-        ...defaults,
+        ...restSimpleState,
         type: 'atomic',
         tags: ['busy'],
       },
@@ -402,17 +424,16 @@ describe('#6 => getInitialSimpleState', () => {
         },
       ],
       {
-        states: {
-          state1: {
+        ...restSimpleState,
+        states: [
+          {
             type: 'parallel',
-            states: {},
+            ...restSimpleState,
             __id: 'state1',
-            ...defaults,
           },
-        },
+        ],
         initial: 'state1',
         type: 'compound',
-        ...defaults,
       },
     ],
     [
@@ -441,7 +462,7 @@ describe('#6 => getInitialSimpleState', () => {
                         state1311: {},
                         state1312: {},
                         state1313: {
-                          initial: '13131',
+                          initial: 'state13131',
                           states: {
                             state13131: {},
                             state13132: {},
@@ -469,83 +490,80 @@ describe('#6 => getInitialSimpleState', () => {
       {
         initial: 'state1',
         type: 'compound',
-        ...defaults,
+        ...restSimpleState,
 
-        states: {
-          state1: {
+        states: [
+          {
             __id: 'state1',
             type: 'parallel',
-            ...defaults,
+            ...restSimpleState,
 
-            states: {
-              state11: {
+            states: [
+              {
                 __id: 'state11',
                 type: 'compound',
                 initial: 'state111',
-                ...defaults,
+                ...restSimpleState,
 
-                states: {
-                  state111: {
-                    __id: 'state111',
-                    type: 'atomic',
-                    ...defaults,
-                  },
-                },
+                states: [
+                  { ...restSimpleState, __id: 'state111', type: 'atomic' },
+                ],
               },
 
-              state12: {
+              {
+                ...restSimpleState,
                 __id: 'state12',
                 type: 'atomic',
-                ...defaults,
               },
 
-              state13: {
+              {
                 __id: 'state13',
                 type: 'parallel',
-                ...defaults,
+                ...restSimpleState,
 
-                states: {
-                  state131: {
+                states: [
+                  {
                     __id: 'state131',
                     type: 'compound',
-                    ...defaults,
+                    ...restSimpleState,
                     initial: 'state1311',
 
-                    states: {
-                      state1311: {
+                    states: [
+                      {
+                        ...restSimpleState,
                         __id: 'state1311',
                         type: 'atomic',
-                        ...defaults,
                       },
-                    },
+                    ],
                   },
 
-                  state132: {
+                  {
+                    ...restSimpleState,
                     __id: 'state132',
                     type: 'atomic',
-                    ...defaults,
                   },
 
-                  state133: {
+                  {
+                    ...restSimpleState,
                     __id: 'state133',
                     type: 'atomic',
-                    ...defaults,
                   },
-                },
+                ],
               },
-            },
+            ],
           },
-        },
+        ],
       },
     ],
   );
 });
 
-describe('#7 => GetInitialStateValue', () => {
-  const useTests = createTests(getInitialStateValue);
+describe('07 => nodeToValue', () => {
+  const useTests = createTests(nodeToValue);
 
   useTests(
     ['Empty', [{}], {}],
+    ['Simple', [body1], { state1: {}, state2: {} }],
     [
       'Atomic complex 1',
       [
@@ -576,7 +594,166 @@ describe('#7 => GetInitialStateValue', () => {
       ],
       {
         state1: {},
+        state2: {},
       },
+    ],
+    [
+      'Compound  1',
+      [
+        {
+          states: {
+            state1: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      'state1',
+    ],
+    [
+      'Compound deep 1',
+      [
+        {
+          states: {
+            state1: {
+              initial: 'state11',
+              states: {
+                state11: {},
+              },
+            },
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        state1: 'state11',
+        state2: {},
+      },
+    ],
+    [
+      'Very Complex 1',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {
+                state11: {
+                  initial: 'state111',
+                  states: {
+                    state111: {},
+                    state112: {},
+                    state113: {},
+                  },
+                },
+                state12: {},
+                state13: {
+                  type: 'parallel',
+                  states: {
+                    state131: {
+                      initial: 'state1311',
+                      states: {
+                        state1311: {},
+                        state1312: {},
+                        state1313: {
+                          initial: 'state13131',
+                          states: {
+                            state13131: {},
+                            state13132: {},
+                          },
+                        },
+                      },
+                    },
+                    state132: {},
+                    state133: {},
+                  },
+                },
+              },
+            },
+            state2: {
+              initial: 'state21',
+              states: {
+                state21: {},
+              },
+            },
+          },
+          initial: 'state1',
+        },
+      ],
+      {
+        state1: {
+          state11: {
+            state111: {},
+            state112: {},
+            state113: {},
+          },
+          state12: {},
+          state13: {
+            state131: {
+              state1311: {},
+              state1312: {},
+              state1313: {
+                state13131: {},
+                state13132: {},
+              },
+            },
+            state132: {},
+            state133: {},
+          },
+        },
+        state2: 'state21',
+      },
+    ],
+  );
+});
+
+describe('#07 => GetInitialStateValue', () => {
+  const useTests = createTests(getInitialStateValue);
+
+  useTests(
+    ['Empty', [{}], {}],
+    [
+      'Atomic complex 1',
+      [
+        {
+          id: 'id',
+          description: 'A state',
+          tags: 'busy',
+          on: {},
+          after: {},
+          always: '/state1',
+        },
+      ],
+      {},
+    ],
+    [
+      'Complex 1',
+      [
+        {
+          states: {
+            state1: {},
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      'state1',
+    ],
+    [
+      'Complex 2',
+      [
+        {
+          states: {
+            state1: {
+              type: 'parallel',
+              states: {},
+            },
+            state2: {},
+          },
+          initial: 'state1',
+        },
+      ],
+      { state1: {} },
     ],
     [
       'Compound  1',
@@ -616,6 +793,7 @@ describe('#7 => GetInitialStateValue', () => {
       'Very Complex 1',
       [
         {
+          initial: 'state1',
           states: {
             state1: {
               type: 'parallel',
@@ -660,7 +838,6 @@ describe('#7 => GetInitialStateValue', () => {
               },
             },
           },
-          initial: 'state1',
         },
       ],
       {
@@ -676,4 +853,289 @@ describe('#7 => GetInitialStateValue', () => {
       },
     ],
   );
+});
+
+describe('#08 => getNextStateValue', () => {
+  const useTests = createTests(getNextStateValue);
+
+  useTests(
+    ['From is empty', [''], {}],
+    ['From is simple string, no targets #1', ['state'], 'state'],
+    ['From is simple string, no targets #2', ['/state'], '/state'],
+    [
+      'From is simple string, with target #1',
+      ['/state', '/state4'],
+      '/state4',
+    ],
+    [
+      'From is simple string, with target #2',
+      ['/state', '/state/state4'],
+      {
+        state: 'state4',
+      },
+    ],
+    ['Empty StateValueMap and target', [{}, '/state4'], '/state4'],
+    [
+      'StateValueMap and target #1',
+      [{ state1: 'state11' }, '/state4'],
+      '/state4',
+    ],
+    [
+      'StateValueMap and target #2',
+      [{ state1: 'state11' }, '/state1/state12'],
+      {
+        state1: '/state12',
+      },
+    ],
+    [
+      'StateValueMap and target #2',
+      [{ state1: { state11: 'state111' } }, '/state1/state12'],
+      {
+        state1: '/state12',
+      },
+    ],
+    [
+      'StateValueMap and target #3',
+      [
+        { state1: { state11: { state111: 'state1111' } } },
+        '/state1/state11/state112',
+      ],
+      {
+        state1: {
+          state11: '/state112',
+        },
+      },
+    ],
+    [
+      'StateValueMap and target #4',
+      [
+        { state1: { state11: { state111: 'state1111' } } },
+        '/state1/state11/state111/state1112',
+      ],
+      {
+        state1: {
+          state11: {
+            state111: '/state1112',
+          },
+        },
+      },
+    ],
+  );
+});
+
+describe('#09 => getNextSimpleState', () => {
+  describe('#1 => Errors', () => {
+    test('#1 => From is empty and body is empty', () => {
+      const to = 'notExists';
+      const toError = () => getNextSimple({ from: {}, body: {}, to });
+
+      expect(toError).toThrowError(`${to} is not inside the config`);
+    });
+  });
+
+  describe('#2 => No errors - Running', () => {
+    describe('#1 => No errors', () => {
+      test('#1 => not error with target inside body', () => {
+        const actual = () =>
+          getNextSimple({
+            from: stateValue1,
+            body: body1,
+            to: stateValue1,
+          });
+
+        expect(actual).not.toThrowError();
+      });
+
+      test('#1 => not error with target inside body', () => {
+        const actual = () =>
+          getNextSimple({
+            from: stateValue1,
+            body: body1,
+            to: stateValue1,
+          });
+
+        expect(actual).not.toThrowError();
+      });
+    });
+
+    describe('#2 => Running', () => {
+      const useTests = createTests(getNextSimple);
+
+      useTests(
+        // #region Todo
+        [
+          'Simple body #1',
+          [{ body: body1, from: '/state1', to: '/state2' }],
+          {
+            initial: 'state1',
+            type: 'compound',
+            ...restSimpleState,
+            states: [
+              {
+                type: 'atomic',
+                __id: 'state2',
+                ...restSimpleState,
+                entry: [{ name: 'start2' }],
+              },
+            ],
+          },
+        ],
+        [
+          'Simple body #2',
+          [{ body: body1, from: '/state2', to: '/state1' }],
+          {
+            initial: 'state1',
+            type: 'compound',
+            ...restSimpleState,
+            states: [
+              {
+                __id: 'state1',
+                type: 'atomic',
+                ...restSimpleState,
+                exit: [{ name: 'end1' }],
+              },
+            ],
+          },
+        ],
+        [
+          'Simple body #3',
+          [{ body: body1, from: '/', to: '/state2' }],
+          {
+            initial: 'state1',
+            type: 'compound',
+            ...restSimpleState,
+            states: [
+              {
+                __id: 'state2',
+                type: 'atomic',
+                ...restSimpleState,
+                entry: [{ name: 'start2' }],
+              },
+            ],
+          },
+        ],
+        [
+          'Simple body #4',
+          [{ body: body1, from: '/state2', to: '/state2' }],
+          {
+            initial: 'state1',
+            type: 'compound',
+            ...restSimpleState,
+            states: [
+              {
+                __id: 'state2',
+                type: 'atomic',
+                ...restSimpleState,
+                entry: [{ name: 'start2' }],
+              },
+            ],
+          },
+        ],
+        [
+          'Parallel body #1',
+          [
+            {
+              body: {
+                type: 'parallel',
+                states: {
+                  state1: {
+                    initial: 'state11',
+                    states: {
+                      state11: {},
+                      state12: {},
+                    },
+                  },
+                  state2: {
+                    entry: 'start2',
+                    initial: 'state21',
+                    states: {
+                      state21: {},
+                      state22: {},
+                    },
+                  },
+                },
+              },
+              from: '/state1',
+              to: '/state2',
+            },
+          ],
+          {
+            ...restSimpleState,
+            type: 'parallel',
+            states: [
+              {
+                __id: 'state2',
+                ...restSimpleState,
+                type: 'compound',
+                entry: [{ name: 'start2' }],
+                initial: 'state21',
+                states: [
+                  {
+                    __id: 'state21',
+                    type: 'atomic',
+                    ...restSimpleState,
+                  },
+                  {
+                    __id: 'state22',
+                    type: 'atomic',
+                    ...restSimpleState,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        // #endregion
+
+        [
+          'Parallel body #2',
+          [
+            {
+              body: {
+                type: 'parallel',
+                states: {
+                  state1: {
+                    initial: 'state11',
+                    states: {
+                      state11: {},
+                      state12: {},
+                    },
+                  },
+                  state2: {
+                    entry: 'start2',
+                    initial: 'state21',
+                    states: {
+                      state21: {},
+                      state22: {},
+                    },
+                  },
+                },
+              },
+              from: '/state1/state11',
+              to: '/state1/state12',
+            },
+          ],
+          {
+            ...restSimpleState,
+            type: 'parallel',
+            states: [
+              {
+                __id: 'state1',
+                ...restSimpleState,
+                type: 'compound',
+                initial: 'state11',
+                states: [
+                  {
+                    __id: 'state12',
+                    type: 'atomic',
+                    ...restSimpleState,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      );
+    });
+  });
 });

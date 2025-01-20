@@ -44,7 +44,7 @@
   "scripts": {
     "config": "pnpm install",
     "config:off": "pnpm run config --offline",
-    "ci": "pnpm run config:off && pnpm run lint && pnpm run build && pnpm run test && pnpm run build",
+    "ci": "pnpm run config:off && pnpm run lint && pnpm run test ",
     "ci:admin": "pnpm run rm && pnpm run ci",
     "rollup": "rollup -c",
     "build": "pnpm rm:lib && pnpm run rollup",
@@ -52,6 +52,7 @@
     "rm": "rm -rf node_modules pnpm-lock.yaml",
     "rinit": "pnpm run rm && pnpm run config",
     "rinit:off": "pnpm run rm && pnpm run config:off",
+    "pretest": "pnpm run build",
     "test": "pnpm run test:coverage --no-coverage",
     "test:type": "pnpm run test:coverage -c \"vitest.config.type.ts\" --no-coverage",
     "test:no-type": "pnpm run test:coverage -c \"vitest.config.notype.ts\" --no-coverage",
@@ -101,6 +102,7 @@
     "@bemedev/basicfunc": "^0.0.1",
     "@bemedev/boolean-recursive": "^0.0.3",
     "@bemedev/decompose": "^0.7.3",
-    "@bemedev/types": "^0.1.3"
+    "@bemedev/types": "^0.1.3",
+    "ts-deepmerge": "^7.0.2"
   }
 }

@@ -68,14 +68,63 @@ export type IsParallel_F = (
 export type SimpleStateConfig = {
   type: StateType;
   initial?: string;
-  states?: Record<string, Identitfy<SimpleStateConfig>>;
+  states: Identitfy<SimpleStateConfig>[];
   entry: Describer2[];
   exit: Describer2[];
   tags: string[];
 };
 
-export type SimplifyStateConfig_F = Fn<[state: SNC], SimpleStateConfig>;
+export const restSimpleState = {
+  entry: [],
+  exit: [],
+  tags: [],
+  states: [],
+};
 
+export const DEFAULT_SIMPLE_STATE_CONFIG_A: SimpleStateConfig = {
+  type: 'atomic',
+  ...restSimpleState,
+};
+
+export const DEFAULT_SIMPLE_STATE_CONFIG_C: SimpleStateConfig = {
+  type: 'compound',
+  initial: 'state1',
+  ...restSimpleState,
+  states: [
+    {
+      __id: 'state1',
+      type: 'atomic',
+      ...restSimpleState,
+    },
+  ],
+};
+
+export const DEFAULT_SIMPLE_STATE_CONFIG_P: SimpleStateConfig = {
+  type: 'parallel',
+  ...restSimpleState,
+  states: [
+    {
+      __id: 'state1',
+      type: 'atomic',
+      ...restSimpleState,
+    },
+    {
+      __id: 'state2',
+      type: 'atomic',
+      ...restSimpleState,
+    },
+  ],
+};
+
+export const DEFAULT_SIMPLE_CONFIGS = {
+  atomic: DEFAULT_SIMPLE_STATE_CONFIG_A,
+  compound: DEFAULT_SIMPLE_STATE_CONFIG_C,
+  parallel: DEFAULT_SIMPLE_STATE_CONFIG_P,
+};
+
+export type ToSimple_F = Fn<[state: SNC], SimpleStateConfig>;
+
+export type GetInitialStateConfig_F = Fn<[body: SNC], SNC>;
 export type GetInitialSimpleState_F = Fn<[body: SNC], SimpleStateConfig>;
 
 type _FlatMapStateNodeConfigOptions = {
@@ -106,6 +155,7 @@ export type FlatMapState_F<T extends StateNodeConfig = StateNodeConfig> = <
   const SN extends T,
 >(
   config: SN,
+  withChildren?: boolean,
   delimiter?: string,
   path?: string,
 ) => FlatMapStateNodeConfig<SN>;
@@ -161,19 +211,24 @@ export type ResolveStateValue_F = <
 
 export type GetInitialStateValue_F = Fn<[body: any], StateValue>;
 
-export type ValueToNodeParams = {
-  config: StateValue;
-  body: SNC;
-};
+export type ValueToNode_F = <T extends StateValue>(
+  body: StateNodeConfig,
+  from: T,
+) => StateNodeConfig;
 
-// TODO: create this function
-export type ValueToNode_F = Fn<
-  [params: ValueToNodeParams],
-  SimpleStateConfig
+export type NodeToValue_F = (body: StateNodeConfig) => StateValue;
+
+export type GetNextStateValue_F = <T extends StateValue>(
+  from: T,
+  target?: string | undefined,
+) => StateValue;
+
+export type GetNextStateConfig_F = Fn<
+  [actuals: { from: StateValue; body: SNC; to: string }],
+  StateNodeConfig
 >;
 
-// TODO: create this function
-export type GetNextStateConfig_F = Fn<
-  [config: StateValue, body: SNC, ...targets: string[]],
+export type GetNextSimple_F = Fn<
+  [actuals: { from: StateValue; body: SNC; to: string }],
   SimpleStateConfig
 >;

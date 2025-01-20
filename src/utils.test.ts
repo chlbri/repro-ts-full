@@ -1,5 +1,6 @@
 import { createTests } from '@bemedev/vitest-extended';
 import { identify, toArray } from '~utils';
+import { recomposeSV } from './utils';
 
 describe('#1 => toArray', () => {
   const useTests = createTests(toArray);
@@ -51,6 +52,34 @@ describe('#2 => identify', () => {
           },
         },
       ] as any,
+    ],
+  );
+});
+
+describe('#2 => recomposeSV', () => {
+  const useTests = createTests(recomposeSV);
+
+  useTests(
+    ['undefined', [], {}],
+    ['empty', [''], {}],
+    ['NO delimiter', ['chlbri'], 'chlbri'],
+    [
+      'One delimiter',
+      ['state1/state11'],
+      {
+        state1: 'state11',
+      },
+    ],
+    [
+      'Many delimiters',
+      ['state1/state11/state111/state1111'],
+      {
+        state1: {
+          state11: {
+            state111: 'state1111',
+          },
+        },
+      },
     ],
   );
 });

@@ -19,3 +19,17 @@ export const resolveStateTest: ResolveStateTest_F = (config, strict) => {
 
   return out;
 };
+
+export const body1 = {
+  initial: 'state1',
+  states: {
+    state1: {
+      exit: 'end1',
+    },
+    state2: {
+      entry: 'start2',
+    },
+  },
+} satisfies SNC;
+
+export const stateValue1 = '/state1';

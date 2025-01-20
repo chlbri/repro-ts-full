@@ -16,10 +16,11 @@ export const createConfig: CreateConfig_F = config => config;
  */
 export const flatMapMachine: FlatMapMachine_F = (
   config,
+  withChildren = true,
   delimiter = DEFAULT_DELIMITER,
   path = '',
 ) => {
-  return flatMapState(config, delimiter, path);
+  return flatMapState(config, withChildren, delimiter, path);
 };
 
 /**

@@ -25,6 +25,10 @@ describe('#1 => flatMapMachine', () => {
           always: 'always',
           description: 'description',
           initial: 'state1',
+          states: {
+            state1: {},
+            state2: {},
+          },
         },
         '/state1': {},
         '/state2': {},
@@ -55,10 +59,25 @@ describe('#1 => flatMapMachine', () => {
           always: 'always',
           description: 'description',
           initial: 'state1',
+          states: {
+            state1: {
+              always: 'always',
+              states: {
+                state3: {},
+                state4: {},
+              },
+              type: 'parallel',
+            },
+            state2: {},
+          },
         },
         '/state1': {
           always: 'always',
           type: 'parallel',
+          states: {
+            state3: {},
+            state4: {},
+          },
         },
         '/state1/state3': {},
         '/state1/state4': {},
