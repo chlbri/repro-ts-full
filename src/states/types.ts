@@ -8,6 +8,7 @@ import type {
   Define,
   Describer2,
   Identitfy,
+  PrimitiveObject,
   SingleOrArrayR,
 } from '~types';
 
@@ -162,7 +163,10 @@ export type FlatMapState_F<T extends StateNodeConfig = StateNodeConfig> = <
 
 export type GetStateType_F = (node: StateNodeConfig) => StateType;
 
-export type StateNode<TC, TE extends EventObject = EventObject> = {
+export type StateNode<
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = {
   id?: string;
   description?: string;
   type: StateType;
@@ -173,13 +177,19 @@ export type StateNode<TC, TE extends EventObject = EventObject> = {
   initial?: string;
 } & Transitions<TC, TE>;
 
-type ResoleStateParams<Tc, Te extends EventObject = EventObject> = {
+type ResoleStateParams<
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = {
   config: StateNodeConfig;
   options?: MachineOptions<Tc, Te>;
   strict?: boolean;
 };
 
-export type ResolveState_F = <Tc, Te extends EventObject = EventObject>(
+export type ResolveState_F = <
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+>(
   params: ResoleStateParams<Tc, Te>,
 ) => StateNode<Tc, Te>;
 
@@ -196,14 +206,17 @@ export interface StateValueMap {
   [key: string]: StateValue;
 }
 
-type ResoleStateValueParams<Tc, Te extends EventObject = EventObject> = {
+type ResoleStateValueParams<
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = {
   config: StateValue;
   options?: MachineOptions<Tc, Te>;
   strict?: boolean;
 };
 
 export type ResolveStateValue_F = <
-  Tc,
+  Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
 >(
   params: ResoleStateValueParams<Tc, Te>,

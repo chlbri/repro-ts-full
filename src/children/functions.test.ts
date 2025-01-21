@@ -1,7 +1,7 @@
 import { createTests } from '@bemedev/vitest-extended';
+import { DEFAULT_MACHINE } from 'src/machine/machine';
 import { ERRORS } from '~constants';
 import { options } from '~fixtures';
-import { DEFAULT_MACHINE } from '~machine';
 import { toMachineTest } from './functions.fixtures';
 
 describe('#1 => toMachine', () => {

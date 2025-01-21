@@ -37,7 +37,7 @@
       "~actions": ["src/actions/index.ts"],
       "~events": ["src/events/index.ts"],
       "~transitions": ["src/transitions/index.ts"],
-      "~machine": ["src/machine.ts"],
+      "~machine": ["src/machine/machine.ts"],
       "~config": ["src/config/index.ts"]
     }
   }

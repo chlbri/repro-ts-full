@@ -1,5 +1,5 @@
+import { DEFAULT_MACHINE } from 'src/machine/machine';
 import { ERRORS } from '~constants';
-import { DEFAULT_MACHINE } from '~machine';
 import { defaultReturn } from '~utils';
 import { type ToMachine_F } from './types';
 

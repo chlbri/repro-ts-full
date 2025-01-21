@@ -1,8 +1,11 @@
+import type { NotUndefined } from '@bemedev/types';
 import { aliasTs } from '@bemedev/vitest-alias';
 import { exclude } from '@bemedev/vitest-exclude';
 import { defineConfig, type ViteUserConfig } from 'vitest/config';
-import type { VitestInlineConfig } from 'vitest/dist/chunks/vite.C-N5BBZe.js';
 import tsconfig from '../tsconfig.json';
+
+type Inline = NotUndefined<ViteUserConfig['test']>;
+type Plugins = ViteUserConfig['plugins'];
 
 const plugins = [
   aliasTs(tsconfig as any),
@@ -16,7 +19,7 @@ const plugins = [
       '**/*.fixture.ts',
     ],
   }),
-] satisfies ViteUserConfig['plugins'];
+] satisfies Plugins;
 
 const commonTest = {
   bail: 10,
@@ -32,12 +35,12 @@ const commonTest = {
     all: true,
     provider: 'v8',
   },
-} satisfies VitestInlineConfig;
+} satisfies Inline;
 
 type ConfigType = 'typecheck' | 'typecheckOnly' | 'noTypeCheck';
 
 export const addConfig = (type: ConfigType) => {
-  let typecheck: VitestInlineConfig['typecheck'] = undefined;
+  let typecheck: Inline['typecheck'] = undefined;
 
   switch (type) {
     case 'typecheck':

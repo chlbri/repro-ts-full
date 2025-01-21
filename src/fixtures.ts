@@ -1,5 +1,5 @@
+import { Machine } from 'src/machine/machine';
 import type { MachineOptions } from '~config';
-import { Machine } from '~machine';
 import type { ChangeProperty } from '~types';
 import { asyncfy } from '~utils';
 

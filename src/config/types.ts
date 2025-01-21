@@ -10,7 +10,7 @@ import type {
   StateNodeConfigCompound,
   StateNodeConfigParallel,
 } from '~states';
-import type { SingleOrArrayR } from '~types';
+import type { PrimitiveObject, SingleOrArrayR } from '~types';
 
 export type Config = (
   | StateNodeConfigCompound
@@ -23,7 +23,7 @@ export type Config = (
 export type FlatMapMachine_F = FlatMapState_F<Config>;
 
 export type MachineOptions<
-  Tc,
+  Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
   M extends MachineMap = MachineMap,
 > = {
@@ -31,23 +31,27 @@ export type MachineOptions<
   actions?: ActionMap<Tc, Te>;
   promises?: PromiseMap<Tc, Te>;
   delays?: DelayMap<Tc, Te>;
+  initials?: Record<string, string>;
   children?: M;
 };
 
-type ResoleConfigParams<Tc, Te extends EventObject = EventObject> = [
-  config: Config,
-  options?: MachineOptions<Tc, Te>,
-];
+type ResoleConfigParams<
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = [config: Config, options?: MachineOptions<Tc, Te>];
 
-export type Machine0<Tc, Te extends EventObject = EventObject> = StateNode<
-  Tc,
-  Te
-> & {
+export type Machine0<
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = StateNode<Tc, Te> & {
   machines: Child[];
   strict: boolean;
 };
 
-export type ResolveConfig_F = <Tc, Te extends EventObject = EventObject>(
+export type ResolveConfig_F = <
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+>(
   ...params: ResoleConfigParams<Tc, Te>
 ) => Machine0<Tc, Te>;
 

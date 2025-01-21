@@ -3,10 +3,12 @@ import type { ActionConfig } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type {
+  ExtractActionsFromDelayed,
   SingleOrArrayT,
   Transition,
   TransitionConfigMapA,
 } from '~transitions';
+import type { PrimitiveObject } from '~types';
 
 export type PromiseFunction<Tc, Te extends EventObject, R = any> = Fn<
   [Tc, Te],
@@ -38,14 +40,22 @@ export type PromiseConfig = {
   // #region To perform
   // readonly autoForward?: boolean;
   // #endregion
-
+  readonly max?: number;
   readonly description?: string;
   readonly then: SingleOrArrayT;
   readonly catch: SingleOrArrayT;
   readonly finally?: FinallyConfig;
 };
 
-export type Promisee<TC, TE extends EventObject = EventObject> = {
+export type ExtractActionsFromPromise<T extends PromiseConfig> =
+  | ExtractActionsFromDelayed<T['then']>
+  | ExtractActionsFromDelayed<T['catch']>
+  | ExtractActionsFromDelayed<T['finally']>;
+
+export type Promisee<
+  TC extends PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = {
   readonly src: PromiseFunction<TC, TE>;
   readonly id?: string;
   readonly description?: string;
@@ -55,7 +65,7 @@ export type Promisee<TC, TE extends EventObject = EventObject> = {
 };
 
 export type ToPromiseSrc_F = <
-  TC,
+  TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
 >(params: {
   src: ActionConfig;
@@ -64,7 +74,7 @@ export type ToPromiseSrc_F = <
 }) => PromiseFunction<TC, TE>;
 
 export type ToPromise_F = <
-  TC,
+  TC extends PrimitiveObject,
   TE extends EventObject = EventObject,
 >(params: {
   promise: PromiseConfig;

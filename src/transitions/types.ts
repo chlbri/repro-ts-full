@@ -1,10 +1,19 @@
-import type { ReduceArray, Require } from '@bemedev/types';
-import type { Action, ActionConfig } from '~actions';
+import type { NotUndefined, Require } from '@bemedev/types';
+import type { Action, ActionConfig, FromAction } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type { GuardConfig, Predicate } from '~guards';
-import type { PromiseConfig, Promisee } from '~promises';
-import type { Identitfy, SingleOrArrayL } from '~types';
+import type {
+  ExtractActionsFromPromise,
+  PromiseConfig,
+  Promisee,
+} from '~promises';
+import type {
+  Identitfy,
+  PrimitiveObject,
+  ReduceArray,
+  SingleOrArrayL,
+} from '~types';
 
 type _TransitionConfigMap = {
   readonly target?: SingleOrArrayL<string>;
@@ -14,6 +23,13 @@ type _TransitionConfigMap = {
   readonly description?: string;
   readonly in?: SingleOrArrayL<string>;
 };
+
+type _ExtractActionsFromMap<
+  T extends { actions: SingleOrArrayL<ActionConfig> },
+> =
+  ReduceArray<T['actions']> extends infer R extends ActionConfig
+    ? FromAction<R>
+    : never;
 
 export type TransitionConfigMapF = Require<_TransitionConfigMap, 'target'>;
 export type TransitionConfigMapA = Require<
@@ -52,12 +68,27 @@ export type AlwaysConfig =
 
 export type DelayedTransitions = Record<string, SingleOrArrayT>;
 
+export type ExtractActionsFromDelayed<T> = _ExtractActionsFromMap<
+  Extract<T[keyof T], { actions: SingleOrArrayL<ActionConfig> }>
+>;
+
 export type TransitionsConfig = {
   readonly on?: DelayedTransitions;
   readonly always?: AlwaysConfig;
   readonly after?: DelayedTransitions;
   readonly promises?: SingleOrArrayL<PromiseConfig>;
 };
+
+export type ExtractActionsFromTransitions<T extends TransitionsConfig> =
+  | ExtractActionsFromDelayed<T['on']>
+  | ExtractActionsFromDelayed<T['after']>
+  | _ExtractActionsFromMap<
+      Extract<
+        ReduceArray<T['always']>,
+        { actions: SingleOrArrayL<ActionConfig> }
+      >
+    >
+  | ExtractActionsFromPromise<NotUndefined<ReduceArray<T['promises']>>>;
 
 export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {
   target: string;
@@ -69,7 +100,10 @@ export type ExtractTargetsFromConfig<T> = _ExtractTargetsFromConfig<
   Extract<ReduceArray<T>, AlwaysConfig>
 >;
 
-export type Transition<TC, TE extends EventObject = EventObject> = {
+export type Transition<
+  TC extends PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = {
   readonly target: string[];
   // readonly internal?: boolean;
   readonly actions: Action<TC, TE>[];
@@ -78,13 +112,19 @@ export type Transition<TC, TE extends EventObject = EventObject> = {
   readonly in: string[];
 };
 
-export type ToTransition_F = <TC, TE extends EventObject = EventObject>(
+export type ToTransition_F = <
+  TC extends PrimitiveObject,
+  TE extends EventObject = EventObject,
+>(
   transition: TransitionConfig,
   options?: Pick<MachineOptions<TC, TE>, 'guards' | 'actions'>,
   strict?: boolean,
 ) => Transition<TC, TE>;
 
-export type Transitions<TC, TE extends EventObject = EventObject> = {
+export type Transitions<
+  TC extends PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = {
   on: Identitfy<Transition<TC, TE>>[];
   always: Transition<TC, TE>[];
   after: Identitfy<Transition<TC, TE>>[];

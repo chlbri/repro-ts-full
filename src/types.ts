@@ -23,6 +23,8 @@ export const isArray: isArray_F = value => Array.isArray(value);
 
 export type Describer = Record<(typeof DESCRIBER_KEYS)[number], string>;
 
+export type FromDescriber<T extends Describer> = T['name'];
+
 export type Describer2 = NOmit<Describer, 'description'> &
   Partial<Pick<Describer, 'description'>>;
 
@@ -249,3 +251,9 @@ export type RecomposeSV_F = Fn<[arg?: string], StateValue>;
 
 export type DeleteFirst_F = Fn<[arg: string, toDelete: string], string>;
 export type DeleteF_F = Fn<[arg: string, toDelete?: string], string>;
+
+export type ReduceArray<T> = T extends readonly (infer U1)[]
+  ? U1
+  : T extends (infer U2)[]
+    ? U2
+    : T;

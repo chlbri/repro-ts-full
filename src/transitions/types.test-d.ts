@@ -1,5 +1,9 @@
 import type { FinallyConfig } from '~promises';
-import type { SingleOrArrayT, TransitionsConfig } from './types';
+import type {
+  ExtractActionsFromTransitions,
+  SingleOrArrayT,
+  TransitionsConfig,
+} from './types';
 
 //Remplacez tous les tests de type par "asserType"
 
@@ -337,3 +341,76 @@ assertType<TransitionsConfig>({
 // #endregion
 
 // #endregion
+
+type Tr1 = {
+  after: {
+    DELAY: { actions: ['dodo1', 'doré'] };
+    DELAY2: '/state2';
+    DELAY3: { actions: 'dodo2' };
+  };
+  on: {
+    EVENT: { actions: ['dodo3', 'doré1'] };
+    EVENT2: '/state4';
+    EVENT3: { actions: 'dodo5' };
+  };
+  always: [
+    { actions: 'dodo6'; guards: 'guard2'; target: '/state3' },
+    {
+      actions: ['dodo7', 'doré3', 'doré1'];
+      guards: 'guard2';
+      target: '/state3';
+    },
+    '/state1',
+  ];
+  promises: [
+    {
+      src: 'promise1';
+      then: { actions: 'action1' };
+      catch: [{ guards: 'ert'; actions: 'action14' }, '/state1'];
+      finally: [
+        {
+          actions: 'action13';
+          guards: 'guar34';
+        },
+        {
+          in: '/state4';
+          actions: 'action13';
+        },
+        'action22',
+      ];
+    },
+    {
+      src: 'promise2';
+      then: [
+        { actions: 'action4'; guards: 'guard2' },
+        { actions: 'action3' },
+      ];
+      catch: [{ guards: 'ert'; actions: 'action15' }, '/state1'];
+      finally: [
+        {
+          in: '/state4';
+          actions: 'action12';
+        },
+        'action20',
+      ];
+    },
+  ];
+};
+
+type EAFD1 = ExtractActionsFromTransitions<Tr1>;
+
+expectTypeOf<EAFD1>().toEqualTypeOf<
+  | 'action12'
+  | 'action13'
+  | 'action14'
+  | 'action15'
+  | 'dodo1'
+  | 'dodo2'
+  | 'dodo3'
+  | 'dodo5'
+  | 'dodo6'
+  | 'dodo7'
+  | 'doré'
+  | 'doré1'
+  | 'doré3'
+>();

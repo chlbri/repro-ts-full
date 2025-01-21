@@ -1,6 +1,6 @@
+import type { Machine } from 'src/machine/machine';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
-import type { Machine } from '~machine';
 import { type SingleOrArrayR } from '~types';
 
 export type MachineMap = Record<string, Machine>;

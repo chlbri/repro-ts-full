@@ -68,7 +68,7 @@
     "test:type": "pnpm run test:coverage -c \"vitest.config.type.ts\" --no-coverage",
     "test:type:watch": "vitest -c \"vitest.config.type.ts\"",
     "test:watch": "vitest",
-    "upgrade": "pnpm upgrade --latest"
+    "upgrade": "pnpm upgrade --latest && pnpm add @bemedev/vitest-extended@0.4.1"
   },
   "devDependencies": {
     "@bemedev/fsf": "^0.7.3",
@@ -76,19 +76,19 @@
     "@bemedev/vitest-exclude": "^0.0.2",
     "@bemedev/vitest-extended": "^0.4.1",
     "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.17.0",
-    "@types/node": "^22.10.4",
-    "@typescript-eslint/eslint-plugin": "^8.19.0",
-    "@typescript-eslint/parser": "^8.19.0",
-    "@vitest/coverage-v8": "^2.1.8",
-    "eslint": "^9.17.0",
-    "glob": "^11.0.0",
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.7",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "@vitest/coverage-v8": "^3.0.3",
+    "eslint": "^9.18.0",
+    "glob": "^11.0.1",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "onchange": "^7.1.0",
     "prettier": "^3.4.2",
     "pretty-quick": "^4.0.0",
-    "rollup": "^4.29.1",
+    "rollup": "^4.31.0",
     "rollup-plugin-circular-dependencies": "^1.1.2",
     "rollup-plugin-node-externals": "^8.0.0",
     "rollup-plugin-tsc-alias": "^1.1.2",
@@ -96,8 +96,8 @@
     "tsd": "^0.31.2",
     "tslib": "^2.8.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.3"
   },
   "dependencies": {
     "@bemedev/basicfunc": "^0.0.1",
