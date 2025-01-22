@@ -41,27 +41,7 @@
         "instanceLimit": 1
       }
     },
-    {
-      "label": "pnpm:build",
-      "type": "npm",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared",
-        "clear": false,
-        "close": true
-      },
-      "script": "build",
-      "isBackground": true,
-      "detail": "Build the libary with npm",
-      "hide": true,
-      "dependsOn": "pnpm:install",
-      "runOptions": {
-        "runOn": "folderOpen",
-        "instanceLimit": 1
-      }
-    },
+
     {
       "label": "pnpm:lint",
       "type": "npm",
@@ -77,7 +57,7 @@
       "isBackground": false,
       "hide": true,
       "detail": "Lint the package",
-      "dependsOn": "pnpm:build",
+      "dependsOn": "pnpm:install",
       "runOptions": {
         "runOn": "folderOpen",
         "instanceLimit": 1
