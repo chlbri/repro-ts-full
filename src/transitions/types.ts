@@ -2,9 +2,12 @@ import type { NotUndefined, Require } from '@bemedev/types';
 import type { Action, ActionConfig, FromAction } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
-import type { GuardConfig, Predicate } from '~guards';
+import type { FromGuard, GuardConfig, Predicate } from '~guards';
 import type {
   ExtractActionsFromPromise,
+  ExtractGuardsFromPromise,
+  ExtractMaxFromPromise,
+  ExtractSrcFromPromise,
   PromiseConfig,
   Promisee,
 } from '~promises';
@@ -29,6 +32,13 @@ type _ExtractActionsFromMap<
 > =
   ReduceArray<T['actions']> extends infer R extends ActionConfig
     ? FromAction<R>
+    : never;
+
+type _ExtractGuardsFromMap<
+  T extends { guards: SingleOrArrayL<GuardConfig> },
+> =
+  ReduceArray<T['guards']> extends infer R extends ActionConfig
+    ? FromGuard<R>
     : never;
 
 export type TransitionConfigMapF = Require<_TransitionConfigMap, 'target'>;
@@ -72,12 +82,22 @@ export type ExtractActionsFromDelayed<T> = _ExtractActionsFromMap<
   Extract<T[keyof T], { actions: SingleOrArrayL<ActionConfig> }>
 >;
 
+export type ExtractGuardsFromDelayed<T> = _ExtractGuardsFromMap<
+  Extract<T[keyof T], { guards: SingleOrArrayL<GuardConfig> }>
+>;
+
 export type TransitionsConfig = {
   readonly on?: DelayedTransitions;
   readonly always?: AlwaysConfig;
   readonly after?: DelayedTransitions;
   readonly promises?: SingleOrArrayL<PromiseConfig>;
 };
+
+export type ExtractDelaysFromTransitions<T extends TransitionsConfig> =
+  | ExtractMaxFromPromise<
+      Extract<ReduceArray<T['promises']>, { max: string }>
+    >
+  | (T['after'] extends undefined ? never : keyof T['after']);
 
 export type ExtractActionsFromTransitions<T extends TransitionsConfig> =
   | ExtractActionsFromDelayed<T['on']>
@@ -89,6 +109,20 @@ export type ExtractActionsFromTransitions<T extends TransitionsConfig> =
       >
     >
   | ExtractActionsFromPromise<NotUndefined<ReduceArray<T['promises']>>>;
+
+export type ExtractGuardsFromTransitions<T extends TransitionsConfig> =
+  | ExtractGuardsFromDelayed<T['on']>
+  | ExtractGuardsFromDelayed<T['after']>
+  | _ExtractGuardsFromMap<
+      Extract<
+        ReduceArray<T['always']>,
+        { guards: SingleOrArrayL<GuardConfig> }
+      >
+    >
+  | ExtractGuardsFromPromise<NotUndefined<ReduceArray<T['promises']>>>;
+
+export type ExtractSrcFromTransitions<T extends TransitionsConfig> =
+  ExtractSrcFromPromise<NotUndefined<ReduceArray<T['promises']>>>;
 
 export type _ExtractTargetsFromConfig<T extends AlwaysConfig> = T extends {
   target: string;

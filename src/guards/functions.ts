@@ -2,7 +2,7 @@ import recursive from '@bemedev/boolean-recursive';
 import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '~constants';
 import { isDescriber, isString } from '~types';
 import { defaultReturn } from '~utils';
-import type { _ToPredicateF, GuardUnion, ToPredicateF } from './types';
+import type { _ToPredicateF, GuardUnion, ToPredicate_F } from './types';
 
 export const returnTrue = () => {
   console.log(`${DEFAULT_NOTHING} call true`);
@@ -57,7 +57,7 @@ const _toPredicate: _ToPredicateF = ({
   return { or };
 };
 
-export const toPredicate: ToPredicateF = ({
+export const toPredicate: ToPredicate_F = ({
   guard,
   predicates,
   strict,

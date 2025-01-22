@@ -2,9 +2,15 @@ import type { SubType } from '@bemedev/basicfunc';
 import type { NotUndefined, UnionToIntersection2 } from '@bemedev/types';
 import type { Action, ActionConfig } from '~actions';
 import type { ChildConfig } from '~children';
+import type { Delay } from '~delays';
 import type { EventObject } from '~events';
+import type { PredicateS } from '~guards';
+import type { PromiseFunction } from '~promises';
 import type {
   ExtractActionsFromTransitions,
+  ExtractDelaysFromTransitions,
+  ExtractGuardsFromTransitions,
+  ExtractSrcFromTransitions,
   TransitionsConfig,
 } from '~transitions';
 import type { PrimitiveObject, SingleOrArrayR } from '~types';
@@ -102,7 +108,41 @@ export type GetInititals<NC extends Config> =
 type _GetKeyActionsFromFlat<Flat extends FlatMapN> = {
   [key in keyof Flat]: ExtractActionsFromTransitions<
     Extract<Flat[key], TransitionsConfig>
-  >;
+  > extends infer V
+    ? unknown extends V
+      ? never
+      : V
+    : never;
+}[keyof Flat];
+
+type _GetKeyGuardsFromFlat<Flat extends FlatMapN> = {
+  [key in keyof Flat]: ExtractGuardsFromTransitions<
+    Extract<Flat[key], TransitionsConfig>
+  > extends infer V
+    ? unknown extends V
+      ? never
+      : V
+    : never;
+}[keyof Flat];
+
+type _GetKeySrcFromFlat<Flat extends FlatMapN> = {
+  [key in keyof Flat]: ExtractSrcFromTransitions<
+    Extract<Flat[key], TransitionsConfig>
+  > extends infer V
+    ? unknown extends V
+      ? never
+      : V
+    : never;
+}[keyof Flat];
+
+export type _GetKeyDelaysFromFlat<Flat extends FlatMapN> = {
+  [key in keyof Flat]: ExtractDelaysFromTransitions<
+    Extract<Flat[key], TransitionsConfig>
+  > extends infer V
+    ? unknown extends V
+      ? never
+      : V
+    : never;
 }[keyof Flat];
 
 export type GetActionsFromFlat<
@@ -111,6 +151,24 @@ export type GetActionsFromFlat<
   Te extends EventObject,
 > = Record<_GetKeyActionsFromFlat<Flat>, Action<Tc, Te>>;
 
+export type GetGuardsFromFlat<
+  Flat extends FlatMapN,
+  Tc extends PrimitiveObject,
+  Te extends EventObject,
+> = Record<_GetKeyGuardsFromFlat<Flat>, PredicateS<Tc, Te>>;
+
+export type GetSrcFromFlat<
+  Flat extends FlatMapN,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = Record<_GetKeySrcFromFlat<Flat>, PromiseFunction<Tc, Te>>;
+
+export type GetDelaysFromFlat<
+  Flat extends FlatMapN,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = Record<_GetKeyDelaysFromFlat<Flat>, Delay<Tc, Te>>;
+
 export type MachineOptions<
   NC extends Config,
   Tc extends PrimitiveObject = PrimitiveObject,
@@ -118,7 +176,12 @@ export type MachineOptions<
   Flat extends FlatMapN<NC> = FlatMapN<NC>,
 > = {
   initials?: Partial<GetInititalsFromFlat<Flat>>;
-  actions?: GetActionsFromFlat<Flat, Tc, Te>;
+  actions?: Partial<GetActionsFromFlat<Flat, Tc, Te>>;
+  guards?: Partial<GetGuardsFromFlat<Flat, Tc, Te>>;
+  promises?: Partial<GetSrcFromFlat<Flat, Tc, Te>>;
+  delays?: Partial<GetDelaysFromFlat<Flat, Tc, Te>>;
+
+  //TODO: Add activities
 };
 
 export type CreateConfig_F = <const T extends Config>(config: T) => T;

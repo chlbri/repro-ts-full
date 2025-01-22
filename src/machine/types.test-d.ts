@@ -1,4 +1,7 @@
 import type { Action } from '~actions';
+import type { Delay } from '~delays';
+import type { PredicateS } from '~guards';
+import type { PromiseFunction } from '~promises';
 import { createConfig } from './create';
 import type { GetInititals, MachineOptions } from './types';
 
@@ -266,22 +269,30 @@ expectTypeOf<Gi1>().toEqualTypeOf<{
 
 type Mo1 = MachineOptions<C1>;
 
+type Actions =
+  | 'action12'
+  | 'action13'
+  | 'action14'
+  | 'action15'
+  | 'dodo1'
+  | 'dodo2'
+  | 'dodo3'
+  | 'dodo5'
+  | 'dodo6'
+  | 'dodo7'
+  | 'doré'
+  | 'doré1'
+  | 'doré3';
+
 expectTypeOf<Mo1>().toEqualTypeOf<{
-  initials?: Partial<Gi1>;
-  actions?: Record<
-    | 'action12'
-    | 'action13'
-    | 'action14'
-    | 'action15'
-    | 'dodo1'
-    | 'dodo2'
-    | 'dodo3'
-    | 'dodo5'
-    | 'dodo6'
-    | 'dodo7'
-    | 'doré'
-    | 'doré1'
-    | 'doré3',
-    Action
-  >;
+  initials?: {
+    readonly '/'?: 'state1' | 'state2';
+    readonly '/state1'?: 'state11' | 'state12';
+    readonly '/state1/state11'?: 'state111';
+  };
+
+  actions?: Partial<Record<Actions, Action>>;
+  guards?: Partial<Record<'ert' | 'guar34' | 'guard2', PredicateS>>;
+  promises?: Partial<Record<'promise1' | 'promise2', PromiseFunction>>;
+  delays?: Partial<Record<'DELAY' | 'DELAY2' | 'DELAY3', Delay>>;
 }>();

@@ -4,21 +4,23 @@ import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type {
   ExtractActionsFromDelayed,
+  ExtractGuardsFromDelayed,
   SingleOrArrayT,
   Transition,
   TransitionConfigMapA,
 } from '~transitions';
 import type { PrimitiveObject } from '~types';
 
-export type PromiseFunction<Tc, Te extends EventObject, R = any> = Fn<
-  [Tc, Te],
-  Promise<R>
->;
+export type PromiseFunction<
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+  R = any,
+> = Fn<[Tc, Te], Promise<R>>;
 
-export type PromiseMap<Tc, Te extends EventObject> = Record<
-  string,
-  PromiseFunction<Tc, Te>
->;
+export type PromiseMap<
+  Tc extends PrimitiveObject,
+  Te extends EventObject,
+> = Record<string, PromiseFunction<Tc, Te>>;
 
 export type FinallyConfig =
   NOmit<TransitionConfigMapA, 'target'> extends infer F extends NOmit<
@@ -34,13 +36,13 @@ export type FinallyConfig =
     : never;
 
 export type PromiseConfig = {
-  readonly src: ActionConfig;
+  readonly src: string;
   readonly id?: string;
 
   // #region To perform
   // readonly autoForward?: boolean;
   // #endregion
-  readonly max?: number;
+  readonly max?: string;
   readonly description?: string;
   readonly then: SingleOrArrayT;
   readonly catch: SingleOrArrayT;
@@ -51,6 +53,15 @@ export type ExtractActionsFromPromise<T extends PromiseConfig> =
   | ExtractActionsFromDelayed<T['then']>
   | ExtractActionsFromDelayed<T['catch']>
   | ExtractActionsFromDelayed<T['finally']>;
+
+export type ExtractSrcFromPromise<T extends { src: string }> = T['src'];
+
+export type ExtractMaxFromPromise<T extends { max: string }> = T['max'];
+
+export type ExtractGuardsFromPromise<T extends PromiseConfig> =
+  | ExtractGuardsFromDelayed<T['then']>
+  | ExtractGuardsFromDelayed<T['catch']>
+  | ExtractGuardsFromDelayed<T['finally']>;
 
 export type Promisee<
   TC extends PrimitiveObject,
