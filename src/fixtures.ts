@@ -1,7 +1,7 @@
-import { Machine } from 'src/machine/machine';
+import { asyncfy } from '@bemedev/basicfunc';
+import { DEFAULT_MACHINE } from 'src/machine/machine';
 import type { MachineOptions } from '~config';
 import type { ChangeProperty } from '~types';
-import { asyncfy } from '~utils';
 
 export type TC = {
   val1?: string;
@@ -52,10 +52,10 @@ export const options = {
     promise4: asyncfy(guards.guard4),
   },
   children: {
-    child1: new Machine(),
-    child2: new Machine(),
-    child3: new Machine(),
-    child4: new Machine(),
+    child1: DEFAULT_MACHINE,
+    child2: DEFAULT_MACHINE,
+    child3: DEFAULT_MACHINE,
+    child4: DEFAULT_MACHINE,
   },
   delays: {
     delay1: 89,
