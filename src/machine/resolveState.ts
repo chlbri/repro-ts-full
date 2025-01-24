@@ -6,11 +6,7 @@ import { identify, toArray } from '~utils';
 import { getStateType } from './getStateType';
 import { toPromise } from './toPromise';
 import { toTransition } from './toTransition';
-import type {
-  NodeConfig,
-  NodeConfigWithInitials,
-  ResolveState_F,
-} from './types';
+import type { ResolveState_F } from './types';
 
 export const resolveState: ResolveState_F = ({
   config,
@@ -38,9 +34,9 @@ export const resolveState: ResolveState_F = ({
   const entry = toArray<ActionConfig>(config.entry).map(aMapper);
   const exit = toArray<ActionConfig>(config.exit).map(aMapper);
 
-  const states = identify<NodeConfig | NodeConfigWithInitials>(
-    config.states,
-  ).map(config => resolveState({ config, options, strict }));
+  const states = identify(config.states).map(config =>
+    resolveState({ config, options, strict }),
+  );
 
   const on = identify(config.on).map(tMapper);
   const always = toArray<TransitionConfig>(config.always).map(tMapper);

@@ -1,12 +1,9 @@
 import { reFunction } from '@bemedev/basicfunc';
 import { createTests } from '@bemedev/vitest-extended';
-import { Machine } from '~machine';
-import { config1 } from './fixtures';
+import { machine1 } from './fixtures';
 
 describe('provideInitials', () => {
-  const machine = new Machine(config1);
-
-  const provide = reFunction(machine, 'provideInitials');
+  const provide = reFunction(machine1, '_provideInitials');
 
   const { acceptation, success } = createTests(provide);
 

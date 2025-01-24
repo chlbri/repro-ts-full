@@ -14,7 +14,7 @@ describe('simple', () => {
   });
 
   test('#2 => ProbideInitials', () => {
-    machine.provideInitials({
+    machine._provideInitials({
       '/': 'state1',
       '/state1': 'state11',
       '/state1/state11': 'state111',

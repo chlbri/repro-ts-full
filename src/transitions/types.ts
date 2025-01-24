@@ -135,13 +135,14 @@ export type ExtractTargetsFromConfig<T> = _ExtractTargetsFromConfig<
 >;
 
 export type Transition<
-  TC extends PrimitiveObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
 > = {
   readonly target: string[];
   // readonly internal?: boolean;
-  readonly actions: Action<TC, TE>[];
-  readonly guards: Predicate<TC, TE>[];
+  readonly actions: Action<Pc, TC, TE>[];
+  readonly guards: Predicate<Pc, TC, TE>[];
   readonly description?: string;
   readonly in: string[];
 };

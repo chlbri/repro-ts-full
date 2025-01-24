@@ -1,4 +1,4 @@
-import type { SimpleGuardDef } from '@bemedev/boolean-recursive';
+import type { GuardDefUnion } from '@bemedev/boolean-recursive';
 import type { ActionConfig, FromAction } from '~actions';
 import type { GUARD_TYPE } from '~constants';
 import type { EventObject } from '~events';
@@ -29,58 +29,70 @@ export type FromGuard<T extends GuardConfig> = T extends ActionConfig
       : never;
 
 export type PredicateS<
+  Pc = any,
   TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
-> = (context: TC, event: TE) => boolean;
+> = (pContext: Pc, context: TC, event: TE) => boolean;
 
 export type PredicateUnion<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
-> = PredicateS<TC, TE> | PredicateAnd<TC, TE> | PredicateOr<TC, TE>;
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
+> =
+  | PredicateS<Pc, TC, TE>
+  | PredicateAnd<Pc, TC, TE>
+  | PredicateOr<TC, TE>;
 
 export type PredicateAnd<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
 > = {
-  [k in and]: PredicateUnion<TC, TE>[];
+  and: PredicateUnion<Pc, TC, TE>[];
 };
 
 export type PredicateOr<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
 > = {
-  [k in or]: PredicateUnion<TC, TE>[];
+  or: PredicateUnion<Pc, TC, TE>[];
 };
 
 export type Predicate<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
-> = PredicateUnion<TC, TE>;
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = PredicateUnion<Pc, TC, TE>;
 
 export type PredicateMap<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
-> = Record<string, PredicateS<TC, TE>>;
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
+> = Record<string, PredicateS<Pc, TC, TE>>;
 
 type ToPredicateParams<
-  TC extends PrimitiveObject,
-  TE extends EventObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
 > = {
   guard?: GuardConfig;
-  predicates?: PredicateMap<TC, TE>;
+  predicates?: PredicateMap<Pc, TC, TE>;
   strict?: boolean;
 };
 
 export type _ToPredicateF = <
-  TC extends PrimitiveObject,
-  TE extends EventObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
 >(
-  params: ToPredicateParams<TC, TE>,
-) => Predicate<TC, TE>;
+  params: ToPredicateParams<Pc, TC, TE>,
+) => GuardDefUnion<[Pc, TC, TE]>;
 
 export type ToPredicate_F = <
-  TC extends PrimitiveObject,
-  TE extends EventObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
+  TE extends EventObject = EventObject,
 >(
-  params: ToPredicateParams<TC, TE>,
-) => SimpleGuardDef<[context: TC, event: TE]>;
+  params: ToPredicateParams<Pc, TC, TE>,
+) => PredicateS<Pc, TC, TE>;

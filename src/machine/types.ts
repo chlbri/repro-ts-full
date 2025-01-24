@@ -38,7 +38,7 @@ export type NodeConfig =
 export type NodeConfigWithInitials =
   | NodeConfigAtomic
   | NodeConfigCompoundWithInitials
-  | NodeConfigParallel;
+  | NodeConfigParallelWithInitials;
 
 export type SNC = NodeConfig;
 
@@ -76,15 +76,14 @@ export type CommonNodeConfig = {
 export type NodeConfigAtomic = TransitionsConfig &
   CommonNodeConfig & {
     readonly type?: 'atomic';
-    readonly initial?: never;
     readonly id?: string;
+    readonly initial?: never;
     readonly states?: never;
   };
 
 export type NodeConfigCompound = TransitionsConfig &
   CommonNodeConfig & {
     readonly type?: 'compound';
-    readonly initial?: never;
     readonly states: NodesConfig;
   };
 
@@ -99,12 +98,18 @@ export type NodeConfigParallel = TransitionsConfig &
   CommonNodeConfig & {
     readonly type: 'parallel';
     readonly states: NodesConfig;
+  };
+
+export type NodeConfigParallelWithInitials = TransitionsConfig &
+  CommonNodeConfig & {
+    readonly type: 'parallel';
     readonly initial?: never;
+    readonly states: NodesConfigWithInitials;
   };
 
 export type Config = (NodeConfigCompound | NodeConfigParallel) & {
-  machines?: SingleOrArrayR<ChildConfig>;
-  strict?: boolean;
+  readonly machines?: SingleOrArrayR<ActionConfig>;
+  readonly strict?: boolean;
 };
 
 export type ConfigWithInitials = (
@@ -225,52 +230,108 @@ export type _GetKeyDelaysFromFlat<Flat extends FlatMapN> = {
 
 export type GetActionsFromFlat<
   Flat extends FlatMapN,
-  Tc extends PrimitiveObject,
-  Te extends EventObject,
-> = Record<_GetKeyActionsFromFlat<Flat>, Action<Tc, Te>>;
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = Record<_GetKeyActionsFromFlat<Flat>, Action<Pc, Tc, Te>>;
 
 export type GetGuardsFromFlat<
   Flat extends FlatMapN,
-  Tc extends PrimitiveObject,
-  Te extends EventObject,
-> = Record<_GetKeyGuardsFromFlat<Flat>, PredicateS<Tc, Te>>;
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = Record<_GetKeyGuardsFromFlat<Flat>, PredicateS<Pc, Tc, Te>>;
 
 export type GetSrcFromFlat<
   Flat extends FlatMapN,
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
-> = Record<_GetKeySrcFromFlat<Flat>, PromiseFunction<Tc, Te>>;
+> = Record<_GetKeySrcFromFlat<Flat>, PromiseFunction<Pc, Tc, Te>>;
 
 export type GetDelaysFromFlat<
   Flat extends FlatMapN,
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
-> = Record<_GetKeyDelaysFromFlat<Flat>, Delay<Tc, Te>>;
+> = Record<_GetKeyDelaysFromFlat<Flat>, Delay<Pc, Tc, Te>>;
 
 export type MachineOptions<
-  NC extends NodeConfig,
+  NC extends Config,
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
   Flat extends FlatMapN<NC> = FlatMapN<NC>,
 > = {
   initials: GetInititalsFromFlat<Flat>;
-  actions?: Partial<GetActionsFromFlat<Flat, Tc, Te>>;
-  guards?: Partial<GetGuardsFromFlat<Flat, Tc, Te>>;
-  promises?: Partial<GetSrcFromFlat<Flat, Tc, Te>>;
-  delays?: Partial<GetDelaysFromFlat<Flat, Tc, Te>>;
+  actions?: Partial<GetActionsFromFlat<Flat, Pc, Tc, Te>>;
+  guards?: Partial<GetGuardsFromFlat<Flat, Pc, Tc, Te>>;
+  promises?: Partial<GetSrcFromFlat<Flat, Pc, Tc, Te>>;
+  delays?: Partial<GetDelaysFromFlat<Flat, Pc, Tc, Te>>;
 };
+
+export type KeyU<S extends string> = Record<S, unknown>;
+
+export type MachineOptionsFrom<T extends KeyU<'mo'>> = T['mo'];
+
+export type MoF<T extends KeyU<'mo'>> = MachineOptionsFrom<T>;
+
+export type ConfigFrom<T extends KeyU<'preConfig'>> = T['preConfig'];
+
+export type PrivateContextFrom<T extends KeyU<'pContext'>> = T['pContext'];
+
+export type ContextFrom<T extends KeyU<'context'>> = T['context'];
+
+export type EventsMapFrom<T extends KeyU<'eventsMap'>> = T['eventsMap'];
+
+export type EventsFrom<T extends KeyU<'events'>> = T['events'];
+
+export type ActionsFrom<T extends KeyU<'actions'>> = NotUndefined<
+  T['actions']
+>;
+
+export type ActionKeysFrom<T extends KeyU<'actions'>> =
+  keyof ActionsFrom<T>;
+
+export type GuardsFrom<T extends KeyU<'guards'>> = NotUndefined<
+  T['guards']
+>;
+
+export type GuardKeysFrom<T extends KeyU<'guards'>> = keyof GuardsFrom<T>;
+
+export type DelaysFrom<T extends KeyU<'delays'>> = NotUndefined<
+  T['delays']
+>;
+
+export type DelayKeysFrom<T extends KeyU<'delays'>> = keyof DelaysFrom<T>;
+
+export type PromisesFrom<T extends KeyU<'promises'>> = NotUndefined<
+  T['promises']
+>;
+
+export type PromiseKeysFrom<T extends KeyU<'promises'>> =
+  keyof PromisesFrom<T>;
 
 export type RecordS<T> = Record<string, T>;
 
 export type SimpleMachineOptions<
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
 > = {
   initials: RecordS<string>;
-  actions?: Partial<RecordS<Action<Tc, Te>>>;
-  guards?: Partial<RecordS<PredicateS<Tc, Te>>>;
-  promises?: Partial<RecordS<PromiseFunction<Tc, Te>>>;
+  actions?: Partial<RecordS<Action<Pc, Tc, Te>>>;
+  guards?: Partial<RecordS<PredicateS<Pc, Tc, Te>>>;
+  promises?: Partial<RecordS<PromiseFunction<Pc, Tc, Te>>>;
   delays?: Partial<RecordS<Delay<Tc, Te>>>;
+};
+
+export type SimpleMachineOptions2 = {
+  initials: any;
+  actions?: any;
+  guards?: any;
+  promises?: any;
+  delays?: any;
 };
 
 export type CreateConfig_F = <const T extends Config>(config: T) => T;
@@ -296,7 +357,7 @@ type ResoleStateParams<
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
 > = {
-  config: NodeConfig | NodeConfigWithInitials;
+  config: NodeConfigWithInitials;
   options?: SimpleMachineOptions<Tc, Te>;
   strict?: boolean;
 };
@@ -309,13 +370,14 @@ export type ResolveState_F = <
 ) => StateNode<Tc, Te>;
 
 export type ToTransition_F = <
-  TC extends PrimitiveObject,
+  Pc = any,
+  TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
 >(
   transition: TransitionConfig,
   options?: {
-    actions?: Partial<Record<string, Action<TC, TE>>>;
-    guards?: Partial<Record<string, PredicateS<TC, TE>>>;
+    actions?: Partial<Record<string, Action<Pc, TC, TE>>>;
+    guards?: Partial<Record<string, PredicateS<Pc, TC, TE>>>;
   },
   strict?: boolean,
 ) => Transition<TC, TE>;

@@ -12,10 +12,11 @@ import type {
 import type { PrimitiveObject } from '~types';
 
 export type PromiseFunction<
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
   R = any,
-> = Fn<[Tc, Te], Promise<R>>;
+> = Fn<[Pc, Tc, Te], Promise<R>>;
 
 export type PromiseMap<
   Tc extends PrimitiveObject,

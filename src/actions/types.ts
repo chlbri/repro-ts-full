@@ -8,15 +8,17 @@ export type FromAction<T extends ActionConfig> = T extends Describer
   : T;
 
 export type Action<
+  Pc = any,
   TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
   R = any,
-> = (context: TC, event: TE) => R;
+> = (privateContext: Pc, context: TC, event: TE) => R;
 
 export type ActionMap<
+  Pc = any,
   TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
-> = Partial<Record<string, Action<TC, TE>>>;
+> = Partial<Record<string, Action<Pc, TC, TE>>>;
 
 export type toActionParams<
   TC extends PrimitiveObject,
