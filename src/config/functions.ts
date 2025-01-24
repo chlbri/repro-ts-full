@@ -32,7 +32,7 @@ export const resolveConfig: ResolveConfig_F = (_config, children) => {
   const out = t.anify<any>(resolveState({ config, options: children }));
 
   const machines = toArray<ChildConfig>(_machines).map(child =>
-    toMachine({ child, children, strict }),
+    toMachine({ child, children, strict } as any),
   );
 
   out.machines = machines;

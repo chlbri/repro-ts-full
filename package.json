@@ -42,7 +42,7 @@
     "node": ">=20"
   },
   "scripts": {
-    ":pretest": "pnpm run build",
+    "pretest": "pnpm run build",
     "build": "pnpm rm:lib && pnpm run rollup",
     "ci": "pnpm run config:off && pnpm run lint && pnpm run test",
     "ci:admin": "pnpm run rm && pnpm run ci",
