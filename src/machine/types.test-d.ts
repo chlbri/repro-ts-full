@@ -14,7 +14,12 @@ const config1 = createConfig({
             state111: {},
           },
         },
-        state12: {},
+        state12: {
+          activities: {
+            DELAY5: 'deal',
+            DELAY17: 'deal17',
+          },
+        },
       },
     },
     state2: {
@@ -280,19 +285,22 @@ type Actions =
   | 'dodo5'
   | 'dodo6'
   | 'dodo7'
+  | 'deal'
+  | 'deal17'
   | 'doré'
   | 'doré1'
   | 'doré3';
 
-expectTypeOf<Mo1>().toEqualTypeOf<{
-  initials?: {
-    readonly '/'?: 'state1' | 'state2';
-    readonly '/state1'?: 'state11' | 'state12';
-    readonly '/state1/state11'?: 'state111';
-  };
+type Delays = 'DELAY' | 'DELAY2' | 'DELAY3' | 'DELAY5' | 'DELAY17';
 
+type Guards = 'ert' | 'guar34' | 'guard2';
+
+type Promisees = 'promise1' | 'promise2';
+
+expectTypeOf<Mo1>().toEqualTypeOf<{
+  initials: Gi1;
   actions?: Partial<Record<Actions, Action>>;
-  guards?: Partial<Record<'ert' | 'guar34' | 'guard2', PredicateS>>;
-  promises?: Partial<Record<'promise1' | 'promise2', PromiseFunction>>;
-  delays?: Partial<Record<'DELAY' | 'DELAY2' | 'DELAY3', Delay>>;
+  guards?: Partial<Record<Guards, PredicateS>>;
+  promises?: Partial<Record<Promisees, PromiseFunction>>;
+  delays?: Partial<Record<Delays, Delay>>;
 }>();

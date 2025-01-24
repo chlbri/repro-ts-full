@@ -1,6 +1,6 @@
 import type { SubType } from '@bemedev/basicfunc';
 import type { NotUndefined, UnionToIntersection2 } from '@bemedev/types';
-import type { Action, ActionConfig } from '~actions';
+import type { Action, ActionConfig, FromAction } from '~actions';
 import type { ChildConfig } from '~children';
 import type { Delay } from '~delays';
 import type { EventObject } from '~events';
@@ -13,7 +13,12 @@ import type {
   ExtractSrcFromTransitions,
   TransitionsConfig,
 } from '~transitions';
-import type { PrimitiveObject, SingleOrArrayR } from '~types';
+import type {
+  PrimitiveObject,
+  ReduceArray,
+  SingleOrArrayL,
+  SingleOrArrayR,
+} from '~types';
 
 export type NodeConfig =
   | NodeConfigAtomic
@@ -24,35 +29,49 @@ export type SNC = NodeConfig;
 
 export type NodesConfig = Record<string, NodeConfig>;
 
-export type NodeConfigAtomic = TransitionsConfig & {
-  readonly type?: 'atomic';
+export type ActivityConfig = Record<string, SingleOrArrayL<ActionConfig>>;
+
+export type ExtractActionsFromActivity<
+  T extends { activities: ActivityConfig },
+> = T['activities'] extends infer TA extends ActivityConfig
+  ? { [key in keyof TA]: FromAction<ReduceArray<TA[key]>> }[keyof TA]
+  : never;
+
+export type ExtractDelaysFromActivity<
+  T extends { activities: ActivityConfig },
+> = T['activities'] extends infer TA extends ActivityConfig
+  ? TA extends any
+    ? keyof TA
+    : never
+  : never;
+
+export type CommonNodeConfig = {
   readonly id?: string;
   readonly description?: string;
   readonly entry?: SingleOrArrayR<ActionConfig>;
   readonly exit?: SingleOrArrayR<ActionConfig>;
   readonly tags?: SingleOrArrayR<string>;
-  readonly states?: never;
+  readonly activities?: ActivityConfig;
 };
 
-export type NodeConfigCompound = TransitionsConfig & {
-  readonly type?: 'compound';
-  readonly id?: string;
-  readonly description?: string;
-  readonly states: NodesConfig;
-  readonly entry?: SingleOrArrayR<ActionConfig>;
-  readonly exit?: SingleOrArrayR<ActionConfig>;
-  readonly tags?: SingleOrArrayR<string>;
-};
+export type NodeConfigAtomic = TransitionsConfig &
+  CommonNodeConfig & {
+    readonly type?: 'atomic';
+    readonly id?: string;
+    readonly states?: never;
+  };
 
-export type NodeConfigParallel = TransitionsConfig & {
-  readonly type: 'parallel';
-  readonly id?: string;
-  readonly description?: string;
-  readonly states: NodesConfig;
-  readonly entry?: SingleOrArrayR<ActionConfig>;
-  readonly exit?: SingleOrArrayR<ActionConfig>;
-  readonly tags?: SingleOrArrayR<string>;
-};
+export type NodeConfigCompound = TransitionsConfig &
+  CommonNodeConfig & {
+    readonly type?: 'compound';
+    readonly states: NodesConfig;
+  };
+
+export type NodeConfigParallel = TransitionsConfig &
+  CommonNodeConfig & {
+    readonly type: 'parallel';
+    readonly states: NodesConfig;
+  };
 
 export type Config = (NodeConfigCompound | NodeConfigParallel) & {
   machines?: SingleOrArrayR<ChildConfig>;
@@ -106,9 +125,11 @@ export type GetInititals<NC extends Config> =
     : never;
 
 type _GetKeyActionsFromFlat<Flat extends FlatMapN> = {
-  [key in keyof Flat]: ExtractActionsFromTransitions<
-    Extract<Flat[key], TransitionsConfig>
-  > extends infer V
+  [key in keyof Flat]:
+    | ExtractActionsFromTransitions<Extract<Flat[key], TransitionsConfig>>
+    | ExtractActionsFromActivity<
+        Extract<Flat[key], { activities: ActivityConfig }>
+      > extends infer V
     ? unknown extends V
       ? never
       : V
@@ -136,9 +157,11 @@ type _GetKeySrcFromFlat<Flat extends FlatMapN> = {
 }[keyof Flat];
 
 export type _GetKeyDelaysFromFlat<Flat extends FlatMapN> = {
-  [key in keyof Flat]: ExtractDelaysFromTransitions<
-    Extract<Flat[key], TransitionsConfig>
-  > extends infer V
+  [key in keyof Flat]:
+    | ExtractDelaysFromTransitions<Extract<Flat[key], TransitionsConfig>>
+    | ExtractDelaysFromActivity<
+        Extract<Flat[key], { activities: ActivityConfig }>
+      > extends infer V
     ? unknown extends V
       ? never
       : V
@@ -175,13 +198,11 @@ export type MachineOptions<
   Te extends EventObject = EventObject,
   Flat extends FlatMapN<NC> = FlatMapN<NC>,
 > = {
-  initials?: Partial<GetInititalsFromFlat<Flat>>;
+  initials: GetInititalsFromFlat<Flat>;
   actions?: Partial<GetActionsFromFlat<Flat, Tc, Te>>;
   guards?: Partial<GetGuardsFromFlat<Flat, Tc, Te>>;
   promises?: Partial<GetSrcFromFlat<Flat, Tc, Te>>;
   delays?: Partial<GetDelaysFromFlat<Flat, Tc, Te>>;
-
-  //TODO: Add activities
 };
 
 export type CreateConfig_F = <const T extends Config>(config: T) => T;
