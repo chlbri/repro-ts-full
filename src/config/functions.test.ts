@@ -4,12 +4,12 @@ import { createConfig, flatMapMachine, resolveConfig } from './functions';
 
 describe('#1 => flatMapMachine', () => {
   type Fn1 = AnifyReturn<typeof flatMapMachine>;
-  const useTests = createTests<Fn1>(flatMapMachine);
+  const { success: useTests } = createTests<Fn1>(flatMapMachine);
 
   useTests(
-    [
-      'Machine with children states',
-      [
+    {
+      invite: 'Machine with children states',
+      parameters: [
         createConfig({
           always: 'always',
           description: 'description',
@@ -20,7 +20,7 @@ describe('#1 => flatMapMachine', () => {
           },
         }),
       ],
-      {
+      expected: {
         '/': {
           always: 'always',
           description: 'description',
@@ -33,10 +33,10 @@ describe('#1 => flatMapMachine', () => {
         '/state1': {},
         '/state2': {},
       },
-    ],
-    [
-      'Complex machine',
-      [
+    },
+    {
+      invite: 'Complex machine',
+      parameters: [
         {
           always: 'always',
           description: 'description',
@@ -54,7 +54,7 @@ describe('#1 => flatMapMachine', () => {
           },
         },
       ],
-      {
+      expected: {
         '/': {
           always: 'always',
           description: 'description',
@@ -83,16 +83,16 @@ describe('#1 => flatMapMachine', () => {
         '/state1/state4': {},
         '/state2': {},
       },
-    ],
+    },
   );
 });
 
 describe('#2 => resolveConfig', () => {
-  const useTests = createTests(resolveConfig);
+  const { success: useTests } = createTests(resolveConfig);
 
-  useTests([
-    'Compound',
-    [
+  useTests({
+    invite: 'Compound',
+    parameters: [
       createConfig({
         states: {
           state1: {},
@@ -101,7 +101,7 @@ describe('#2 => resolveConfig', () => {
         initial: '/state1',
       }),
     ],
-    {
+    expected: {
       initial: '/state1',
       tags: [],
       type: 'compound',
@@ -140,5 +140,5 @@ describe('#2 => resolveConfig', () => {
       machines: [],
       strict: false,
     },
-  ]);
+  });
 });

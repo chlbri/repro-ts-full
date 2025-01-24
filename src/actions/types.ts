@@ -16,7 +16,7 @@ export type Action<
 export type ActionMap<
   TC extends PrimitiveObject = PrimitiveObject,
   TE extends EventObject = EventObject,
-> = Record<string, Action<TC, TE>>;
+> = Partial<Record<string, Action<TC, TE>>>;
 
 export type toActionParams<
   TC extends PrimitiveObject,

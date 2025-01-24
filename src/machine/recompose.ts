@@ -1,9 +1,10 @@
 import type { Ru } from '@bemedev/types';
 import { merge } from 'ts-deepmerge';
 import { DEFAULT_DELIMITER } from '~constants';
+import type { NodeConfig, NodeConfigCompoundWithInitials } from './types';
 
 export function recomposeObjectUrl<T>(shape: string, value: T) {
-  let obj: any = {};
+  const obj: any = {};
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { states, ...rest } = value as any;
 
@@ -22,7 +23,7 @@ export function recomposeObjectUrl<T>(shape: string, value: T) {
     const key = keys.shift()!;
     const _value = recomposeObjectUrl(keys.join(DEFAULT_DELIMITER), value);
 
-    obj = rest;
+    // obj = rest;
     obj.states = {};
 
     obj.states[key] = _value;
@@ -30,7 +31,9 @@ export function recomposeObjectUrl<T>(shape: string, value: T) {
   return obj;
 }
 
-export function recomposeNode(shape: Ru) {
+export function recomposeNode<
+  T extends NodeConfig | NodeConfigCompoundWithInitials,
+>(shape: Ru): T {
   const entries = Object.entries(shape);
   const arr: any[] = [];
   entries.forEach(([key, value]) => {
@@ -38,5 +41,5 @@ export function recomposeNode(shape: Ru) {
   });
 
   const output = merge(...arr);
-  return output;
+  return output as any;
 }

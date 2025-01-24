@@ -15,7 +15,7 @@ import {
   toArray,
   toDescriber,
 } from '~utils';
-import { recomposeStateConfig } from './recompose';
+import { recomposeNode } from './recompose';
 import type {
   FlatMapState_F,
   GetInitialSimpleState_F,
@@ -359,7 +359,7 @@ export const valueToNode: ValueToNode_F = (body, from) => {
         out1[key] = (flatBody as any)[key];
       });
 
-      const out: any = recomposeStateConfig(out1);
+      const out: any = recomposeNode(out1);
       return out;
     }
     throw new Error(`${from} is not inside the body`);
