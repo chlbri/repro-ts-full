@@ -6,10 +6,9 @@ import type {
 } from '@bemedev/types';
 import type { AllowedNames, SubType } from 'src/types/subtype';
 import type { ActionConfig, FromActionConfig } from '~actions';
-import type { EventObject, EventsMap } from '~events';
+import type { EventsMap } from '~events';
 import type { AnyMachine } from '~machine';
 import type { PromiseConfig } from '~promises';
-import type { StateNode } from '~states';
 import type {
   ExtractActionsFromTransitions,
   ExtractDelaysFromTransitions,
@@ -452,8 +451,8 @@ export type ToSimple_F = Fn<
 >;
 
 type ResoleStateParams<
-  Pc = any,
   E extends EventsMap = EventsMap,
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
 > = {
   config: NodeConfigWithInitials;
@@ -461,12 +460,28 @@ type ResoleStateParams<
   strict?: boolean;
 };
 
-export type ResolveState_F = <
+export type Node<
+  E extends EventsMap = EventsMap,
+  Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-  Te extends EventObject = EventObject,
+> = {
+  id?: string;
+  description?: string;
+  type: StateType;
+  entry: Action<E, Pc, Tc>[];
+  exit: Action<E, Pc, Tc>[];
+  tags: string[];
+  states: Identitfy<Node<E, Pc, Tc>>[];
+  initial?: string;
+} & Transitions<E, Pc, Tc>;
+
+export type ResolveState_F = <
+  E extends EventsMap = EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
 >(
-  params: ResoleStateParams<Tc, Te>,
-) => StateNode<Tc, Te>;
+  params: ResoleStateParams<E, Pc, Tc>,
+) => Node<E, Pc, Tc>;
 
 export type Transition<
   E extends EventsMap = EventsMap,
@@ -479,6 +494,17 @@ export type Transition<
   readonly guards: Predicate<E, Pc, Tc>[];
   readonly description?: string;
   readonly in: string[];
+};
+
+export type Transitions<
+  E extends EventsMap = EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = {
+  on: Identitfy<Transition<E, Pc, Tc>>[];
+  always: Transition<E, Pc, Tc>[];
+  after: Identitfy<Transition<E, Pc, Tc>>[];
+  promises: Promisee<E, Pc, Tc>[];
 };
 
 export type ToTransition_F = <
