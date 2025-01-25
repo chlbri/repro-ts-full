@@ -1,6 +1,6 @@
+import { isString } from 'src/types/primitives';
 import { toAction, type ActionConfig } from '~actions';
 import { toPredicate, type GuardConfig } from '~guards';
-import { isString } from '~types';
 import { toArray } from '~utils';
 import type { ToTransition_F } from './types';
 

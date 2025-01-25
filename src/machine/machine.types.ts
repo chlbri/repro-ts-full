@@ -1,5 +1,5 @@
+import type { PrimitiveObject } from 'src/types/primitives';
 import type { Machine } from '~machine';
-import type { PrimitiveObject } from '~types';
 import type {
   Config,
   ConfigWithInitials,

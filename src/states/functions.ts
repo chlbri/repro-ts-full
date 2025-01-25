@@ -1,11 +1,11 @@
 import { isDefined } from '@bemedev/basicfunc';
 import { decompose, decomposeKeys, recompose } from '@bemedev/decompose';
 import { t } from '@bemedev/types';
+import { isString } from 'src/types/primitives';
 import { toAction, type ActionConfig } from '~actions';
 import { DEFAULT_DELIMITER } from '~constants';
 import { toPromise, type PromiseConfig } from '~promises';
 import { toTransition, type TransitionConfig } from '~transitions';
-import { isString } from '~types';
 import {
   deleteFirst,
   identify,

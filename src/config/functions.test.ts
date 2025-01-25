@@ -1,5 +1,5 @@
 import { createTests } from '@bemedev/vitest-extended';
-import type { AnifyReturn } from '~types';
+import type { AnifyReturn } from 'src/types/primitives';
 import { createConfig, flatMapMachine, resolveConfig } from './functions';
 
 describe('#1 => flatMapMachine', () => {

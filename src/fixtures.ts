@@ -1,7 +1,7 @@
 import { asyncfy } from '@bemedev/basicfunc';
 import { DEFAULT_MACHINE } from 'src/machine/machine';
+import type { ChangeProperty } from 'src/types/primitives';
 import type { MachineOptions } from '~config';
-import type { ChangeProperty } from '~types';
 
 export type TC = {
   val1?: string;

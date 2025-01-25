@@ -1,7 +1,7 @@
 import type { AnyMachine } from 'src/machine/machine';
+import { type SingleOrArrayR } from 'src/types/primitives';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
-import { type SingleOrArrayR } from '~types';
 
 export type MachineMap = Record<string, AnyMachine>;
 

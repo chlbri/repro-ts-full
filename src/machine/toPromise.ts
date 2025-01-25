@@ -1,10 +1,10 @@
+import { isDescriber } from 'src/types/primitives';
 import { ERRORS } from '~constants';
 import { asyncNothing } from '~promises';
-import { isDescriber } from '~types';
-import { defaultReturn, toArray } from '~utils';
-import type { ToPromise_F, ToPromiseSrc_F } from './types';
 import type { TransitionConfig } from '~transitions';
+import { defaultReturn, toArray } from '~utils';
 import { toTransition } from './toTransition';
+import type { ToPromise_F, ToPromiseSrc_F } from './types';
 
 export const toPromiseSrc: ToPromiseSrc_F = ({
   src,

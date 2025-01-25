@@ -1,12 +1,12 @@
 import { isDefined } from '@bemedev/basicfunc';
 import { t } from '@bemedev/types';
+import type { PrimitiveObject } from 'src/types/primitives';
 import type { Action } from '~actions';
 import type { Delay } from '~delays';
 import type { EventsMap, ToEvents } from '~events';
 import type { PredicateS } from '~guards';
 import type { PromiseFunction } from '~promises';
 import type { StateValue } from '~states';
-import type { PrimitiveObject } from '~types';
 import { flatMap } from './flatMap';
 import { getInitialNodeConfig } from './getInitialNodeConfig';
 import type { Elements } from './machine.types';

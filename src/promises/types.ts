@@ -1,4 +1,5 @@
 import type { Fn, NOmit, Require } from '@bemedev/types';
+import type { PrimitiveObject } from 'src/types/primitives';
 import type { ActionConfig } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
@@ -9,7 +10,6 @@ import type {
   Transition,
   TransitionConfigMapA,
 } from '~transitions';
-import type { PrimitiveObject } from '~types';
 
 export type PromiseFunction<
   Pc = any,

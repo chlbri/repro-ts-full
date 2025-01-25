@@ -1,16 +1,16 @@
 import type { KeysMatching } from '@bemedev/decompose';
 import type { FlatMapByKeys, Fn, PickKeysBy } from '@bemedev/types';
-import type { Action, ActionConfig } from '~actions';
-import type { MachineOptions } from '~config';
-import type { EventObject } from '~events';
-import type { Transitions, TransitionsConfig } from '~transitions';
 import type {
   Define,
   Describer2,
   Identitfy,
   PrimitiveObject,
   SingleOrArrayR,
-} from '~types';
+} from 'src/types/primitives';
+import type { Action, ActionConfig } from '~actions';
+import type { MachineOptions } from '~config';
+import type { EventObject } from '~events';
+import type { Transitions, TransitionsConfig } from '~transitions';
 
 export type StateType = 'atomic' | 'compound' | 'parallel';
 

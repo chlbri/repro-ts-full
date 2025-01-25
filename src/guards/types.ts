@@ -1,8 +1,8 @@
 import type { GuardDefUnion } from '@bemedev/boolean-recursive';
+import type { PrimitiveObject, ReduceArray } from 'src/types/primitives';
 import type { ActionConfig, FromActionConfig } from '~actions';
 import type { GUARD_TYPE } from '~constants';
 import type { EventObject } from '~events';
-import type { PrimitiveObject, ReduceArray } from '~types';
 
 type gType = typeof GUARD_TYPE;
 type and = gType['and'];

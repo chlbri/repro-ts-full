@@ -1,4 +1,10 @@
 import type { NotUndefined, Require } from '@bemedev/types';
+import type {
+  Identitfy,
+  PrimitiveObject,
+  ReduceArray,
+  SingleOrArrayL,
+} from 'src/types/primitives';
 import type { Action, ActionConfig, FromActionConfig } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
@@ -11,12 +17,6 @@ import type {
   PromiseConfig,
   Promisee,
 } from '~promises';
-import type {
-  Identitfy,
-  PrimitiveObject,
-  ReduceArray,
-  SingleOrArrayL,
-} from '~types';
 
 type _TransitionConfigMap = {
   readonly target?: SingleOrArrayL<string>;

@@ -264,6 +264,7 @@ export type FnMap<
   Tc extends PrimitiveObject = PrimitiveObject,
   R = any,
 > =
+  | ((pContext: Pc, context: Tc, eventsMap: E) => R)
   | {
       [key in keyof E]: (pContext: Pc, context: Tc, payload: E[key]) => R;
     }

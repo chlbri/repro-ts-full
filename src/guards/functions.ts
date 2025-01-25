@@ -1,6 +1,6 @@
 import recursive from '@bemedev/boolean-recursive';
+import { isDescriber, isString } from 'src/types/primitives';
 import { DEFAULT_NOTHING, ERRORS, GUARD_TYPE } from '~constants';
-import { isDescriber, isString } from '~types';
 import { defaultReturn } from '~utils';
 import type { _ToPredicateF, GuardUnion, ToPredicate_F } from './types';
 

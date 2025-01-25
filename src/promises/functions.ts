@@ -1,6 +1,6 @@
+import { isDescriber } from 'src/types/primitives';
 import { ERRORS } from '~constants';
 import { toTransition, type TransitionConfig } from '~transitions';
-import { isDescriber } from '~types';
 import { defaultReturn, nothing, toArray } from '~utils';
 import type { ToPromise_F, ToPromiseSrc_F } from './types';
 

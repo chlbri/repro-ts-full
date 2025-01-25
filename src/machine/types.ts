@@ -4,6 +4,15 @@ import type {
   NotUndefined,
   UnionToIntersection2,
 } from '@bemedev/types';
+import type {
+  Describer2,
+  FnMap,
+  Identitfy,
+  PrimitiveObject,
+  ReduceArray,
+  SingleOrArrayL,
+  SingleOrArrayR,
+} from 'src/types/primitives';
 import type { AllowedNames, SubType } from 'src/types/subtype';
 import type { ActionConfig, FromActionConfig } from '~actions';
 import type { EventsMap } from '~events';
@@ -17,15 +26,6 @@ import type {
   TransitionConfig,
   TransitionsConfig,
 } from '~transitions';
-import type {
-  Describer2,
-  FnMap,
-  Identitfy,
-  PrimitiveObject,
-  ReduceArray,
-  SingleOrArrayL,
-  SingleOrArrayR,
-} from '~types';
 
 export type NodeConfig =
   | NodeConfigAtomic

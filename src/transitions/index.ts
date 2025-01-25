@@ -1,2 +1,2 @@
-export * from '../types/types';
 export * from './functions';
+export * from './types';

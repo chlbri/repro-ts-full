@@ -3,7 +3,7 @@ import type {
   KeyStrings,
   PrimitiveObject,
   Simplify,
-} from '~types';
+} from 'src/types/primitives';
 
 const ttString = 'str';
 const ttNumber = 55;

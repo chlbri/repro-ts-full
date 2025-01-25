@@ -1,5 +1,5 @@
+import { isDescriber } from 'src/types/primitives';
 import { ERRORS } from '~constants';
-import { isDescriber } from '~types';
 import { defaultReturn, nothing as value } from '~utils';
 import type { ReduceAction_F, ToAction_F } from './types';
 

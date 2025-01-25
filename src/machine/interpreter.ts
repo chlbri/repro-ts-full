@@ -1,10 +1,10 @@
+import type { PrimitiveObject } from 'src/types/primitives';
 import type { Action } from '~actions';
 import type { Delay } from '~delays';
 import type { EventsMap, ToEvents } from '~events';
 import type { PredicateS } from '~guards';
 import { Machine, type AnyMachine } from '~machine';
 import type { PromiseFunction } from '~promises';
-import type { PrimitiveObject } from '~types';
 import type {
   Config,
   Keys,

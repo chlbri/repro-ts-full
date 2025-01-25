@@ -1,5 +1,9 @@
+import type {
+  Describer,
+  FromDescriber,
+  PrimitiveObject,
+} from 'src/types/primitives';
 import type { EventObject } from '~events';
-import type { Describer, FromDescriber, PrimitiveObject } from '~types';
 
 export type ActionConfig = string | Describer;
 

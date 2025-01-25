@@ -1,6 +1,6 @@
 import type { Fn } from '@bemedev/types';
+import type { PrimitiveObject } from 'src/types/primitives';
 import type { EventObject } from '~events';
-import type { PrimitiveObject } from '~types';
 
 export type Delay<
   Pc = any,

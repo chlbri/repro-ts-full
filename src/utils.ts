@@ -1,9 +1,4 @@
 import { isDefined } from '@bemedev/basicfunc';
-import {
-  DEFAULT_DELIMITER,
-  DEFAULT_NOTHING,
-  ESCAPE_REGEXP,
-} from '~constants';
 import type {
   Asyncfy_F,
   CheckKeys_F,
@@ -16,8 +11,13 @@ import type {
   ReplaceAll_F,
   ToArray_F,
   ToDescriber_F,
-} from '~types';
-import { isArray, isString } from '~types';
+} from 'src/types/primitives';
+import { isArray, isString } from 'src/types/primitives';
+import {
+  DEFAULT_DELIMITER,
+  DEFAULT_NOTHING,
+  ESCAPE_REGEXP,
+} from '~constants';
 
 export const toArray: ToArray_F = obj => {
   if (isArray(obj)) {

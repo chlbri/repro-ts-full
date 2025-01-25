@@ -1,3 +1,7 @@
+import type {
+  PrimitiveObject,
+  SingleOrArrayR,
+} from 'src/types/primitives';
 import type { ActionMap } from '~actions';
 import type { Child, ChildConfig, MachineMap } from '~children';
 import type { DelayMap } from '~delays';
@@ -10,7 +14,6 @@ import type {
   StateNodeConfigCompound,
   StateNodeConfigParallel,
 } from '~states';
-import type { PrimitiveObject, SingleOrArrayR } from '~types';
 
 export type Config = (
   | StateNodeConfigCompound

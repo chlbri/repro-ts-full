@@ -1,5 +1,5 @@
 import type { UnionToIntersection } from '@bemedev/types';
-import type { Simplify } from '~types';
+import type { Simplify } from 'src/types/primitives';
 import type { STR } from './types';
 
 const action = {
