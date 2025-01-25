@@ -106,7 +106,6 @@ export class Interpreter<
     }
   };
 }
-//TODO: Simplify typing
 
 export const createInterpreter = <
   const C extends Config = Config,

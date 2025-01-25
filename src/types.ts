@@ -94,7 +94,7 @@ export type Define<T, U> = T extends undefined
     : T;
 
 interface PrimitiveObjectMap {
-  [key: string]: SingleOrArray<PrimitiveObject>;
+  readonly [key: string]: SingleOrArray<PrimitiveObject>;
 }
 
 export type PrimitiveObject = Primitive | PrimitiveObjectMap;

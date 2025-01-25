@@ -1,4 +1,4 @@
-import type { SubType } from '@bemedev/basicfunc';
+import type { AllowedNames, SubType } from '@bemedev/basicfunc';
 import type {
   Fn,
   NOmit,
@@ -108,15 +108,17 @@ export type NodeConfigParallelWithInitials = TransitionsConfig &
     readonly states: NodesConfigWithInitials;
   };
 
-export type Config = (NodeConfigCompound | NodeConfigParallel) & {
+export type ConfigNode = NodeConfigCompound | NodeConfigParallel;
+export type ConfigNodeWithInitials =
+  | NodeConfigCompoundWithInitials
+  | NodeConfigParallelWithInitials;
+
+export type Config = ConfigNode & {
   readonly machines?: SingleOrArrayR<ActionConfig>;
   readonly strict?: boolean;
 };
 
-export type ConfigWithInitials = (
-  | NodeConfigCompoundWithInitials
-  | NodeConfigParallelWithInitials
-) & {
+export type ConfigWithInitials = ConfigNodeWithInitials & {
   machines?: SingleOrArrayR<ActionConfig>;
   strict?: boolean;
 };
@@ -130,14 +132,14 @@ type FlatMapNodeConfig<
       readonly [key in keyof T['states'] as `${Remaining}${key & string}`]: withChildren extends true
         ? T['states'][key]
         : Omit<T['states'][key], 'states'>;
-    } & (T['states'][keyof T['states']] extends infer S extends NodeConfig
-      ? S extends any
+    } & (T['states'][keyof T['states']] extends infer S
+      ? S extends NodeConfigParallel | NodeConfigCompound
         ? FlatMapNodeConfig<
             S,
             withChildren,
-            `${Remaining}${keyof SubType<NotUndefined<T['states']>, { states: NodesConfig }> & string}/`
+            `${Remaining}${AllowedNames<NotUndefined<T['states']>, { states: NodesConfig }> & string}/`
           >
-        : never
+        : S
       : never)
   : // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     {};

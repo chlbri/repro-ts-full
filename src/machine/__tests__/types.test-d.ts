@@ -1,4 +1,3 @@
-import type { NotUndefined } from '@bemedev/types';
 import type {
   ActionKeysFrom,
   ConfigFrom,
@@ -9,6 +8,7 @@ import type {
   GuardKeysFrom,
   MachineKeysFrom,
   MachineOptions,
+  MoF,
   PrivateContextFrom,
   PromiseKeysFrom,
 } from '../types';
@@ -19,12 +19,12 @@ expectTypeOf<TTConfig>().toEqualTypeOf(config1);
 
 type TTPrivate = PrivateContextFrom<Machine1>;
 expectTypeOf<TTPrivate>().toEqualTypeOf<{
-  readonly data: string;
+  data: string;
 }>();
 
 type TTC = ContextFrom<Machine1>;
 expectTypeOf<TTC>().toEqualTypeOf<{
-  readonly age: number;
+  age: number;
 }>();
 
 type TTEm = EventsMapFrom<Machine1>;
@@ -84,21 +84,6 @@ expectTypeOf<PromiseKeys>().toEqualTypeOf<'promise1' | 'promise2'>();
 type MachineKeys = MachineKeysFrom<Machine1>;
 expectTypeOf<MachineKeys>().toEqualTypeOf<'machine1'>();
 
-type Mo1 = Required<
-  NotUndefined<MachineOptions<TTConfig, TTPrivate, TTC, TTE>>
->;
-
-type MoActionKeys1 = keyof Mo1['actions'];
-expectTypeOf<MoActionKeys1>().toEqualTypeOf<ActionKeys>();
-
-type MoGuardKeys1 = keyof Mo1['guards'];
-expectTypeOf<MoGuardKeys1>().toEqualTypeOf<GuardKeys>();
-
-type MoDelayKeys1 = keyof Mo1['delays'];
-expectTypeOf<MoDelayKeys1>().toEqualTypeOf<DelayKeys>();
-
-type MoPromiseKeys1 = keyof Mo1['promises'];
-expectTypeOf<MoPromiseKeys1>().toEqualTypeOf<PromiseKeys>();
-
-type MoMachineKeys1 = keyof Mo1['machines'];
-expectTypeOf<MoMachineKeys1>().toEqualTypeOf<MachineKeys>();
+type Mo1 = MachineOptions<TTConfig, TTPrivate, TTC, TTE>;
+type Mo2 = MoF<Machine1>;
+expectTypeOf<Mo1>().toEqualTypeOf<Mo2>();

@@ -139,12 +139,12 @@ class Machine<
 
   get context() {
     const out = this.#elements.context;
-    return Object.freeze(out);
+    return out;
   }
 
   get pContext() {
     const out = this.#elements.pContext;
-    return Object.freeze(out);
+    return out;
   }
 
   get actions() {
