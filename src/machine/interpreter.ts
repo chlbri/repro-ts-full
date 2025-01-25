@@ -95,15 +95,12 @@ class Interpreter<
     if (this.#canBeStoped) this.#status = 'started';
   };
 
-  //TODO: use it !
-  // #makeBusy = () => {
-  //   this.#status = 'busy';
-  // };
+  #makeBusy = (): WorkingStatus => (this.#status = 'busy');
 
   // #region Types
   providePrivateContext = (pContext: Pc) => {
     this.#initialPpc = pContext;
-    this.#status = 'busy';
+    this.#makeBusy();
 
     if (this.#idle) {
       this.#machine = this.#machine.providePrivateContext(
@@ -119,7 +116,7 @@ class Interpreter<
 
   provideContext = (context: Tc) => {
     this.#initialContext = context;
-    this.#status = 'busy';
+    this.#makeBusy();
 
     if (this.#idle) {
       this.#machine = this.#machine.provideContext(
