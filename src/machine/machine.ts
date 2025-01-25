@@ -73,6 +73,14 @@ class Machine<
    * @deprecated
    * Just use for typing
    */
+  get actionParams() {
+    return t.anify<[Pc, Tc, EventM]>();
+  }
+
+  /**
+   * @deprecated
+   * Just use for typing
+   */
   get guard() {
     return t.anify<PredicateS<Pc, Tc, ToEvents<EventM>>>();
   }

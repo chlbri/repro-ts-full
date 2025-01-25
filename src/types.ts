@@ -9,7 +9,7 @@ import type {
   UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
-import type { EventObject } from '~events';
+import type { EventObject, EventsMap } from '~events';
 import type { StateValue } from '~states';
 import { checkKeys } from '~utils';
 
@@ -257,3 +257,20 @@ export type ReduceArray<T> = T extends readonly (infer U1)[]
   : T extends (infer U2)[]
     ? U2
     : T;
+
+export type FnMap<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  R = any,
+> =
+  | {
+      [key in keyof E]: (pContext: Pc, context: Tc, payload: E[key]) => R;
+    }
+  | ({
+      [key in keyof E]?: (pContext: Pc, context: Tc, payload: E[key]) => R;
+    } & {
+      else?: (pContext: Pc, context: Tc, eventsMap: E) => R;
+    });
+
+// TODO transform all functions

@@ -9,7 +9,7 @@ import type { Action, ActionConfig, FromAction } from '~actions';
 import type { Delay } from '~delays';
 import type { EventObject } from '~events';
 import type { PredicateS } from '~guards';
-import type { Machine } from '~machine';
+import type { AnyMachine } from '~machine';
 import type { PromiseConfig, Promisee, PromiseFunction } from '~promises';
 import type { StateNode } from '~states';
 import type {
@@ -173,8 +173,6 @@ export type GetInititalsFromFlat<Flat extends FlatMapN = FlatMapN> =
       }
     : never;
 
-// TODO Try to bypass flatMap
-
 export type GetInititals<NC extends Config> =
   FlatMapN<NC> extends infer Flat extends object
     ? SubType<
@@ -263,10 +261,23 @@ export type GetMachineKeysFromConfig<C extends Config> = FromAction<
   ReduceArray<NotUndefined<C['machines']>>
 >;
 
-export type GetMachinesFromConfig<C extends Config> = Record<
-  GetMachineKeysFromConfig<C>,
-  Machine
->;
+export type Child<
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = <T extends AnyMachine>(
+  machine: T,
+  pContext: Pc,
+  context: Tc,
+  events: Te,
+) => { subscriber: Fn<ActionParamsFrom<T>, Tc>; machine: T };
+
+export type GetMachinesFromConfig<
+  C extends Config,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  Te extends EventObject = EventObject,
+> = Record<GetMachineKeysFromConfig<C>, Child<Pc, Tc, Te>>;
 
 export type MachineOptions<
   NC extends Config = Config,
@@ -280,7 +291,7 @@ export type MachineOptions<
   guards?: Partial<GetGuardsFromFlat<Flat, Pc, Tc, Te>>;
   promises?: Partial<GetSrcFromFlat<Flat, Pc, Tc, Te>>;
   delays?: Partial<GetDelaysFromFlat<Flat, Pc, Tc, Te>>;
-  machines?: Partial<GetMachinesFromConfig<NC>>;
+  machines?: Partial<GetMachinesFromConfig<NC, Pc, Tc, Te>>;
 };
 
 export type KeyU<S extends string> = Record<S, unknown>;
@@ -303,9 +314,11 @@ export type ActionsFrom<T extends KeyU<'actions'>> = NotUndefined<
   T['actions']
 >;
 
-export type ActionFrom<T extends KeyU<'action'>> = NotUndefined<
-  T['action']
->;
+export type ActionFrom<T extends KeyU<'action'>> =
+  NotUndefined<T['action']> extends infer A extends any[] ? A : never;
+
+export type ActionParamsFrom<T extends KeyU<'actionParams'>> =
+  NotUndefined<T['actionParams']>;
 
 export type ActionKeysFrom<T extends KeyU<'actions'>> =
   keyof ActionsFrom<T>;
