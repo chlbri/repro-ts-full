@@ -1,4 +1,3 @@
-import type { Ru } from '@bemedev/types';
 import { merge } from 'ts-deepmerge';
 import { DEFAULT_DELIMITER } from '~constants';
 import type { NodeConfig, NodeConfigCompoundWithInitials } from './types';
@@ -33,7 +32,7 @@ export function recomposeObjectUrl<T>(shape: string, value: T) {
 
 export function recomposeNode<
   T extends NodeConfig | NodeConfigCompoundWithInitials,
->(shape: Ru): T {
+>(shape: T): NodeConfigCompoundWithInitials {
   const entries = Object.entries(shape);
   const arr: any[] = [];
   entries.forEach(([key, value]) => {

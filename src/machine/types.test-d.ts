@@ -2,6 +2,7 @@ import type { Action } from '~actions';
 import type { Delay } from '~delays';
 import type { PredicateS } from '~guards';
 import type { PromiseFunction } from '~promises';
+import type { Simplify } from '~types';
 import { createConfig } from './create';
 import type { GetInititals, MachineOptions } from './types';
 
@@ -272,7 +273,7 @@ expectTypeOf<Gi1>().toEqualTypeOf<{
   readonly '/state1/state11': 'state111';
 }>;
 
-type Mo1 = MachineOptions<C1>;
+type Mo1 = Simplify<MachineOptions<C1>>;
 
 type Actions =
   | 'action12'
@@ -303,4 +304,5 @@ expectTypeOf<Mo1>().toEqualTypeOf<{
   guards?: Partial<Record<Guards, PredicateS>>;
   promises?: Partial<Record<Promisees, PromiseFunction>>;
   delays?: Partial<Record<Delays, Delay>>;
+  machines?: {};
 }>();

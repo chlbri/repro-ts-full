@@ -31,4 +31,5 @@ export type Elements<
   guards?: Mo['guards'];
   delays?: Mo['delays'];
   promises?: Mo['promises'];
+  machines?: Mo['machines'];
 };

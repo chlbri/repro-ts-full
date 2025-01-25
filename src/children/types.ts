@@ -1,9 +1,9 @@
-import type { Machine } from 'src/machine/machine';
+import type { AnyMachine } from 'src/machine/machine';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import { type SingleOrArrayR } from '~types';
 
-export type MachineMap = Record<string, Machine>;
+export type MachineMap = Record<string, AnyMachine>;
 
 export type ChildConfig = {
   name: string;
@@ -13,7 +13,7 @@ export type ChildConfig = {
 
 export type Child = {
   name: string;
-  machine: Machine;
+  machine: AnyMachine;
   events?: SingleOrArrayR<string>;
 };
 

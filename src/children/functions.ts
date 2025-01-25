@@ -24,7 +24,7 @@ export const toMachine: ToMachine_F = ({
   const error = ERRORS.machine.notDescribed.error;
 
   return defaultReturn({
-    config: { strict, value },
+    config: { strict, value } as any,
     error,
     _return,
   });

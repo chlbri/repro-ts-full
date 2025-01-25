@@ -1,13 +1,16 @@
 import { t } from '@bemedev/types';
-import { Machine } from '~machine';
+import { createMachine } from '~machine';
 import { config1 } from './fixtures';
 
 describe('simple', () => {
-  let machine = t.anify<Machine<typeof config1>>();
-
-  test('#0 => Initialize machine', () => {
-    machine = new Machine(config1) as any;
+  const machine = createMachine(config1, {
+    context: t.buildObject({
+      data: t.string,
+    }),
+    pContext: t.object,
+    eventsMap: t.object,
   });
+  test('#0 => Initialize machine', () => {});
 
   test('#1 => Before all, simple is empty', () => {
     expect(machine.simple).toBeUndefined();

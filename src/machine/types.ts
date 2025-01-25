@@ -6,10 +6,10 @@ import type {
   UnionToIntersection2,
 } from '@bemedev/types';
 import type { Action, ActionConfig, FromAction } from '~actions';
-import type { ChildConfig } from '~children';
 import type { Delay } from '~delays';
 import type { EventObject } from '~events';
 import type { PredicateS } from '~guards';
+import type { Machine } from '~machine';
 import type { PromiseConfig, Promisee, PromiseFunction } from '~promises';
 import type { StateNode } from '~states';
 import type {
@@ -56,11 +56,11 @@ export type ExtractActionsFromActivity<
   ? { [key in keyof TA]: FromAction<ReduceArray<TA[key]>> }[keyof TA]
   : never;
 
-export type ExtractDelaysFromActivity<
-  T extends { activities: ActivityConfig },
-> = T['activities'] extends infer TA extends ActivityConfig
-  ? TA extends any
-    ? keyof TA
+export type ExtractDelaysFromActivity<T> = 'activities' extends keyof T
+  ? T['activities'] extends infer TA extends ActivityConfig
+    ? TA extends any
+      ? keyof TA
+      : never
     : never
   : never;
 
@@ -84,6 +84,7 @@ export type NodeConfigAtomic = TransitionsConfig &
 export type NodeConfigCompound = TransitionsConfig &
   CommonNodeConfig & {
     readonly type?: 'compound';
+    readonly initial?: never;
     readonly states: NodesConfig;
   };
 
@@ -114,9 +115,9 @@ export type Config = (NodeConfigCompound | NodeConfigParallel) & {
 
 export type ConfigWithInitials = (
   | NodeConfigCompoundWithInitials
-  | NodeConfigParallel
+  | NodeConfigParallelWithInitials
 ) & {
-  machines?: SingleOrArrayR<ChildConfig>;
+  machines?: SingleOrArrayR<ActionConfig>;
   strict?: boolean;
 };
 
@@ -170,6 +171,8 @@ export type GetInititalsFromFlat<Flat extends FlatMapN = FlatMapN> =
       }
     : never;
 
+// TODO Try to bypass flatMap
+
 export type GetInititals<NC extends Config> =
   FlatMapN<NC> extends infer Flat extends object
     ? SubType<
@@ -219,9 +222,7 @@ type _GetKeySrcFromFlat<Flat extends FlatMapN> = {
 export type _GetKeyDelaysFromFlat<Flat extends FlatMapN> = {
   [key in keyof Flat]:
     | ExtractDelaysFromTransitions<Extract<Flat[key], TransitionsConfig>>
-    | ExtractDelaysFromActivity<
-        Extract<Flat[key], { activities: ActivityConfig }>
-      > extends infer V
+    | ExtractDelaysFromActivity<Flat[key]> extends infer V
     ? unknown extends V
       ? never
       : V
@@ -256,8 +257,17 @@ export type GetDelaysFromFlat<
   Te extends EventObject = EventObject,
 > = Record<_GetKeyDelaysFromFlat<Flat>, Delay<Pc, Tc, Te>>;
 
+export type GetMachineKeysFromConfig<C extends Config> = FromAction<
+  ReduceArray<NotUndefined<C['machines']>>
+>;
+
+export type GetMachinesFromConfig<C extends Config> = Record<
+  GetMachineKeysFromConfig<C>,
+  Machine
+>;
+
 export type MachineOptions<
-  NC extends Config,
+  NC extends Config = Config,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   Te extends EventObject = EventObject,
@@ -268,6 +278,7 @@ export type MachineOptions<
   guards?: Partial<GetGuardsFromFlat<Flat, Pc, Tc, Te>>;
   promises?: Partial<GetSrcFromFlat<Flat, Pc, Tc, Te>>;
   delays?: Partial<GetDelaysFromFlat<Flat, Pc, Tc, Te>>;
+  machines?: Partial<GetMachinesFromConfig<NC>>;
 };
 
 export type KeyU<S extends string> = Record<S, unknown>;
@@ -288,6 +299,10 @@ export type EventsFrom<T extends KeyU<'events'>> = T['events'];
 
 export type ActionsFrom<T extends KeyU<'actions'>> = NotUndefined<
   T['actions']
+>;
+
+export type ActionFrom<T extends KeyU<'action'>> = NotUndefined<
+  T['action']
 >;
 
 export type ActionKeysFrom<T extends KeyU<'actions'>> =
@@ -312,6 +327,17 @@ export type PromisesFrom<T extends KeyU<'promises'>> = NotUndefined<
 export type PromiseKeysFrom<T extends KeyU<'promises'>> =
   keyof PromisesFrom<T>;
 
+export type MachinesFrom<T extends KeyU<'machines'>> = NotUndefined<
+  T['machines']
+>;
+
+export type MachineKeysFrom<T extends KeyU<'machines'>> =
+  keyof MachinesFrom<T> extends infer M
+    ? unknown extends M
+      ? never
+      : M
+    : never;
+
 export type RecordS<T> = Record<string, T>;
 
 export type SimpleMachineOptions<
@@ -324,6 +350,7 @@ export type SimpleMachineOptions<
   guards?: Partial<RecordS<PredicateS<Pc, Tc, Te>>>;
   promises?: Partial<RecordS<PromiseFunction<Pc, Tc, Te>>>;
   delays?: Partial<RecordS<Delay<Tc, Te>>>;
+  machines?: Partial<RecordS<any>>;
 };
 
 export type SimpleMachineOptions2 = {
@@ -332,6 +359,7 @@ export type SimpleMachineOptions2 = {
   guards?: any;
   promises?: any;
   delays?: any;
+  machines?: any;
 };
 
 export type CreateConfig_F = <const T extends Config>(config: T) => T;
@@ -351,7 +379,10 @@ export type SimpleStateConfig = {
   tags: string[];
 };
 
-export type ToSimple_F = Fn<[state: NodeConfig], SimpleStateConfig>;
+export type ToSimple_F = Fn<
+  [state: NodeConfig | NodeConfigWithInitials],
+  SimpleStateConfig
+>;
 
 type ResoleStateParams<
   Tc extends PrimitiveObject = PrimitiveObject,
@@ -400,4 +431,15 @@ export type ToPromise_F = <
   strict?: boolean;
 }) => Promisee<TC, TE>;
 
+export type StateMap = {
+  states?: Record<string, StateMap>;
+  type: StateType;
+  id: string;
+};
+
+export type Values<T> = NotUndefined<
+  NotUndefined<T>[keyof NotUndefined<T>]
+>;
+
+export type Keys<T> = keyof NotUndefined<T>;
 // export type ToAction_F = {};

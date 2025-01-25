@@ -7,6 +7,7 @@ import type {
   EventsFrom,
   EventsMapFrom,
   GuardKeysFrom,
+  MachineKeysFrom,
   MachineOptions,
   PrivateContextFrom,
   PromiseKeysFrom,
@@ -80,6 +81,9 @@ expectTypeOf<DelayKeys>().toEqualTypeOf<
 type PromiseKeys = PromiseKeysFrom<Machine1>;
 expectTypeOf<PromiseKeys>().toEqualTypeOf<'promise1' | 'promise2'>();
 
+type MachineKeys = MachineKeysFrom<Machine1>;
+expectTypeOf<MachineKeys>().toEqualTypeOf<'machine1'>();
+
 type Mo1 = Required<
   NotUndefined<MachineOptions<TTConfig, TTPrivate, TTC, TTE>>
 >;
@@ -95,3 +99,6 @@ expectTypeOf<MoDelayKeys1>().toEqualTypeOf<DelayKeys>();
 
 type MoPromiseKeys1 = keyof Mo1['promises'];
 expectTypeOf<MoPromiseKeys1>().toEqualTypeOf<PromiseKeys>();
+
+type MoMachineKeys1 = keyof Mo1['machines'];
+expectTypeOf<MoMachineKeys1>().toEqualTypeOf<MachineKeys>();

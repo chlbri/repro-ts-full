@@ -1,5 +1,5 @@
 import { t } from '@bemedev/types';
-import { Machine } from '~machine';
+import { createMachine } from '~machine';
 import { createConfig } from '../create';
 
 export const config1 = createConfig({
@@ -75,21 +75,23 @@ export const config1 = createConfig({
       ],
     },
   },
+  machines: { description: 'A beautiful machine', name: 'machine1' },
 });
 
-export const machine1 = new Machine(config1)
-  .providePrivateContext(t.buildObject({ data: t.string }))
-  .provideContext(t.buildObject({ age: t.number }))
-  .provideEvents({
+export const machine1 = createMachine(config1, {
+  pContext: { data: t.string },
+  context: { age: t.number },
+  eventsMap: {
     AUTH: t.buildObject({
       password: t.string,
       username: t.string,
     }),
     SEND: t.string,
-  })
-  .provideActions({})
-  .provideGuards({})
-  .provideDelays({})
-  .providePromises({});
+  },
+});
+// .provideActions({})
+// .provideGuards({})
+// .provideDelays({})
+// .providePromises({});
 
 export type Machine1 = typeof machine1;

@@ -7,7 +7,7 @@ import type { ToSimple_F } from './types';
 
 export const toSimple: ToSimple_F = config => {
   const type = getStateType(config);
-  const initial = config.initial;
+  const initial = (config as any).initial;
 
   const entry = toArray<ActionConfig>(config.entry).map(toDescriber);
   const exit = toArray<ActionConfig>(config.exit).map(toDescriber);

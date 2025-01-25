@@ -12,6 +12,10 @@ describe('provideInitials', () => {
   const expected1 = {
     description: 'cdd',
     initial: 'state1',
+    machines: {
+      description: 'A beautiful machine',
+      name: 'machine1',
+    },
     states: {
       state1: {
         initial: 'state11',
@@ -121,6 +125,10 @@ describe('provideInitials', () => {
   const expected2 = {
     description: 'cdd',
     initial: 'state2',
+    machines: {
+      description: 'A beautiful machine',
+      name: 'machine1',
+    },
     states: {
       state1: {
         initial: 'state12',
