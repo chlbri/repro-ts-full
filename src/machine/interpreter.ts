@@ -1,7 +1,7 @@
 import type { EventsMap } from '~events';
 import type { Machine } from '~machine';
 import type { PrimitiveObject } from '~types';
-import type { WorkingStatus } from './interpreter.types';
+import type { Interpreter_F, WorkingStatus } from './interpreter.types';
 import type {
   Action,
   Child,
@@ -97,14 +97,9 @@ class Interpreter<
   };
 }
 
-export const interpret = <
-  const C extends Config = Config,
-  Pc = any,
-  Tc extends PrimitiveObject = PrimitiveObject,
-  E extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
->(
-  machine: Machine<C, Pc, Tc, E, Mo>,
-) => {
-  return new Interpreter<C, Pc, Tc, E, Mo>(machine);
+export type { Interpreter };
+
+export const interpret: Interpreter_F = machine => {
+  const out = new Interpreter(machine);
+  return out;
 };
