@@ -1,32 +1,44 @@
-import type { PrimitiveObject } from 'src/types/primitives';
-import type { Action } from '~actions';
-import type { Delay } from '~delays';
-import type { EventsMap, ToEvents } from '~events';
-import type { PredicateS } from '~guards';
-import { Machine, type AnyMachine } from '~machine';
-import type { PromiseFunction } from '~promises';
+import type { EventsMap } from '~events';
+import type { Machine } from '~machine';
+import type { PrimitiveObject } from '~types';
+import type { WorkingStatus } from './interpreter.types';
 import type {
+  Action,
+  Child,
   Config,
+  Delay,
   Keys,
   MachineOptions,
+  PredicateS,
+  PromiseFunction,
   SimpleMachineOptions2,
 } from './types';
 
-export type WorkingStatus = 'started' | 'idle' | 'stopped' | 'busy';
-
-export class Interpreter<
+class Interpreter<
   const C extends Config = Config,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-  EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
+  E extends EventsMap = EventsMap,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
 > {
-  #machine: Machine<C, Pc, Tc, EventM, Mo>;
+  #machine: Machine<C, Pc, Tc, E, Mo>;
 
   #status: WorkingStatus = 'idle';
 
-  constructor(machine: Machine<C, Pc, Tc, EventM, Mo>) {
-    this.#machine = machine;
+  get #canBeStoped() {
+    const check1 = this.#status === 'started';
+    const check2 = this.#status === 'busy';
+    const check3 = check1 || check2;
+
+    return check3;
+  }
+
+  get #canAct() {
+    return this.#status === 'started';
+  }
+
+  constructor(machine: Machine<C, Pc, Tc, E, Mo>) {
+    this.#machine = machine.renew;
   }
 
   get status() {
@@ -38,78 +50,61 @@ export class Interpreter<
   };
 
   stop = () => {
-    const check1 = this.#status === 'started';
-    const check2 = this.#status === 'busy';
-    const check3 = check1 || check2;
-
-    if (check3) this.#status = 'started';
+    if (this.#canBeStoped) this.#status = 'started';
   };
-
-  get #canAct() {
-    return this.#status === 'started';
-  }
 
   //TODO: use it !
   // #makeBusy = () => {
   //   this.#status = 'busy';
   // };
 
-  addAction = (
-    key: Keys<Mo['actions']>,
-    action: Action<Pc, Tc, ToEvents<EventM>>,
-  ) => {
+  addAction = (key: Keys<Mo['actions']>, action: Action<E, Pc, Tc>) => {
     if (this.#canAct) {
-      const out: any = { [key]: action };
+      const out = { [key]: action };
       this.#machine.addActions(out);
     }
   };
 
-  addGuard = (
-    key: Keys<Mo['guards']>,
-    guard: PredicateS<Pc, Tc, ToEvents<EventM>>,
-  ) => {
+  addGuard = (key: Keys<Mo['guards']>, guard: PredicateS<E, Pc, Tc>) => {
     if (this.#canAct) {
-      const out: any = { [key]: guard };
+      const out = { [key]: guard };
       this.#machine.addGuards(out);
     }
   };
 
   addPromise = (
     key: Keys<Mo['promises']>,
-    promise: PromiseFunction<Pc, Tc, ToEvents<EventM>>,
+    promise: PromiseFunction<E, Pc, Tc>,
   ) => {
     if (this.#canAct) {
-      const out: any = { [key]: promise };
+      const out = { [key]: promise };
       this.#machine.addPromises(out);
     }
   };
 
-  addDelay = (
-    key: Keys<Mo['delays']>,
-    delay: Delay<Pc, Tc, ToEvents<EventM>>,
-  ) => {
+  addDelay = (key: Keys<Mo['delays']>, delay: Delay<E, Pc, Tc>) => {
     if (this.#canAct) {
-      const out: any = { [key]: delay };
+      const out = { [key]: delay };
       this.#machine.addDelays(out);
     }
   };
 
-  addMachine = (key: Keys<Mo['machines']>, machine: AnyMachine) => {
+  addMachine = (key: Keys<Mo['machines']>, machine: Child<E, Pc, Tc>) => {
     if (this.#canAct) {
-      const out: any = { [key]: machine };
+      const out = { [key]: machine };
       this.#machine.addMachines(out);
     }
   };
 }
 
-export const createInterpreter = <
+export const interpret = <
   const C extends Config = Config,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-  EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
+  E extends EventsMap = EventsMap,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
 >(
-  machine: Machine<C, Pc, Tc, EventM, Mo>,
+  machine: Machine<C, Pc, Tc, E, Mo>,
 ) => {
-  return new Interpreter<C, Pc, Tc, EventM, Mo>(machine);
+  return new Interpreter<C, Pc, Tc, E, Mo>(machine);
 };

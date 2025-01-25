@@ -1,22 +1,22 @@
 import { isDefined } from '@bemedev/basicfunc';
 import { t } from '@bemedev/types';
-import type { PrimitiveObject } from 'src/types/primitives';
-import type { Action } from '~actions';
-import type { Delay } from '~delays';
 import type { EventsMap, ToEvents } from '~events';
-import type { PredicateS } from '~guards';
-import type { PromiseFunction } from '~promises';
 import type { StateValue } from '~states';
+import type { PrimitiveObject } from '~types';
 import { flatMap } from './flatMap';
 import { getInitialNodeConfig } from './getInitialNodeConfig';
 import type { Elements } from './machine.types';
 import { recomposeNode } from './recompose';
 import { toSimple } from './toSimple';
 import type {
+  Action,
   Config,
+  Delay,
   FlatMapN,
   MachineOptions,
   NodeConfigWithInitials,
+  PredicateS,
+  PromiseFunction,
   SimpleMachineOptions2,
 } from './types';
 import { valueToNode } from './valueToNode';
@@ -25,8 +25,8 @@ class Machine<
   const C extends Config = Config,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-  EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
+  E extends EventsMap = EventsMap,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
 > {
   #config: C;
   #flat: FlatMapN<C, true>;
@@ -45,7 +45,7 @@ class Machine<
    * Just use for typing
    */
   get events() {
-    return t.anify<ToEvents<EventM>>();
+    return t.anify<ToEvents<E>>();
   }
 
   /**
@@ -53,7 +53,7 @@ class Machine<
    * Just use for typing
    */
   get eventsMap() {
-    return t.anify<EventM>();
+    return t.anify<E>();
   }
 
   /**
@@ -61,7 +61,7 @@ class Machine<
    * Just use for typing
    */
   get action() {
-    return t.anify<Action<Pc, Tc, ToEvents<EventM>>>();
+    return t.anify<Action<E, Pc, Tc>>();
   }
 
   /**
@@ -69,7 +69,7 @@ class Machine<
    * Just use for typing
    */
   get actionParams() {
-    return t.anify<{ pContext: Pc; context: Tc; map: EventM }>();
+    return t.anify<{ pContext: Pc; context: Tc; map: E }>();
   }
 
   /**
@@ -77,7 +77,7 @@ class Machine<
    * Just use for typing
    */
   get guard() {
-    return t.anify<PredicateS<Pc, Tc, ToEvents<EventM>>>();
+    return t.anify<PredicateS<E, Pc, Tc>>();
   }
 
   /**
@@ -85,7 +85,7 @@ class Machine<
    * Just use for typing
    */
   get delay() {
-    return t.anify<Delay<Pc, Tc, ToEvents<EventM>>>();
+    return t.anify<Delay<E, Pc, Tc>>();
   }
 
   /**
@@ -93,7 +93,7 @@ class Machine<
    * Just use for typing
    */
   get promise() {
-    return t.anify<PromiseFunction<Pc, Tc, ToEvents<EventM>>>();
+    return t.anify<PromiseFunction<E, Pc, Tc>>();
   }
 
   /**
@@ -210,7 +210,7 @@ class Machine<
   provideMachines = (machines?: Mo['machines']) =>
     this.#renew('machines', machines);
 
-  provideOptions = (options?: Mo): Machine<C, Pc, Tc, EventM, Mo> => {
+  provideOptions = (options?: Mo): Machine<C, Pc, Tc, E, Mo> => {
     const out = this.#renew('actions', options?.actions);
 
     out.addGuards(options?.guards);
@@ -249,23 +249,24 @@ class Machine<
   }
 
   #provideElements = <T extends keyof Elements>(
-    key: T,
-    value: Elements<C, Pc, Tc, Mo>[T],
+    key?: T,
+    value?: Elements<C, Pc, Tc, Mo>[T],
   ): Elements<C, Pc, Tc, Mo> => {
     const out = this.#elements;
+    const check = isDefined(key);
 
-    (this as any)['#actions'] = value;
-
-    return {
-      ...out,
-      [key]: value,
-    };
+    return check
+      ? {
+          ...out,
+          [key]: value,
+        }
+      : out;
   };
 
-  #renew = (
-    key: keyof Elements,
-    value: Elements<C, Pc, Tc, Mo>[typeof key],
-  ): Machine<C, Pc, Tc, EventM, Mo> => {
+  #renew = <T extends keyof Elements>(
+    key?: T,
+    value?: Elements<C, Pc, Tc, Mo>[T],
+  ): Machine<C, Pc, Tc, E, Mo> => {
     const {
       config,
       initials,
@@ -278,7 +279,7 @@ class Machine<
       machines,
     } = this.#provideElements(key, value);
 
-    const out = new Machine<C, Pc, Tc, EventM, Mo>(config);
+    const out = new Machine<C, Pc, Tc, E, Mo>(config);
     const check1 = isDefined(initials);
     if (check1) out._provideInitials(initials);
 
@@ -294,13 +295,17 @@ class Machine<
     return out;
   };
 
+  get renew() {
+    return this.#renew();
+  }
+
   /**
    * Reset all options
    */
   providePrivateContext = <T>(pContext: T) => {
     const { context, initials, config } = this.#elements;
 
-    const out = new Machine<C, T, Tc, EventM>(config);
+    const out = new Machine<C, T, Tc, E>(config);
 
     const check1 = isDefined(initials);
     if (check1) out._provideInitials(initials);
@@ -317,7 +322,7 @@ class Machine<
   provideContext = <T extends PrimitiveObject>(context: T) => {
     const { pContext, initials, config } = this.#elements;
 
-    const out = new Machine<C, Pc, T, EventM>(config);
+    const out = new Machine<C, Pc, T, E>(config);
     const check1 = isDefined(initials);
     if (check1) out._provideInitials(initials);
 
