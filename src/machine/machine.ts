@@ -26,12 +26,7 @@ class Machine<
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<
-    C,
-    Pc,
-    Tc,
-    ToEvents<EventM>
-  >,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
 > {
   #config: C;
   #flat: FlatMapN<C, true>;
@@ -74,7 +69,7 @@ class Machine<
    * Just use for typing
    */
   get actionParams() {
-    return t.anify<[Pc, Tc, EventM]>();
+    return t.anify<{ pContext: Pc; context: Tc; map: EventM }>();
   }
 
   /**
@@ -392,12 +387,7 @@ type CreateMachine_F = <
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<
-    C,
-    Pc,
-    Tc,
-    ToEvents<EventM>
-  >,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
 >(
   config: C,
   types: { pContext: Pc; context: Tc; eventsMap: EventM },

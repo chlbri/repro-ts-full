@@ -96,6 +96,7 @@ export const machine1 = createMachine(config1, {
 // .providePromises({});
 
 export type Machine1 = typeof machine1;
+
 export type Config1 = typeof config1;
 
 export type Flat1 = FlatMapN<Config1>;

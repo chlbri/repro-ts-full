@@ -19,12 +19,7 @@ export class Interpreter<
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<
-    C,
-    Pc,
-    Tc,
-    ToEvents<EventM>
-  >,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
 > {
   #machine: Machine<C, Pc, Tc, EventM, Mo>;
 
@@ -112,12 +107,7 @@ export const createInterpreter = <
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
   EventM extends EventsMap = EventsMap,
-  Mo extends SimpleMachineOptions2 = MachineOptions<
-    C,
-    Pc,
-    Tc,
-    ToEvents<EventM>
-  >,
+  Mo extends SimpleMachineOptions2 = MachineOptions<C, EventM, Pc, Tc>,
 >(
   machine: Machine<C, Pc, Tc, EventM, Mo>,
 ) => {

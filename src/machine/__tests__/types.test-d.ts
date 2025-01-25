@@ -12,10 +12,10 @@ import type {
   PrivateContextFrom,
   PromiseKeysFrom,
 } from '../types';
-import { config1, Machine1 } from './fixtures';
+import { Config1, Machine1 } from './fixtures';
 
 type TTConfig = ConfigFrom<Machine1>;
-expectTypeOf<TTConfig>().toEqualTypeOf(config1);
+expectTypeOf<TTConfig>().toEqualTypeOf<Config1>();
 
 type TTPrivate = PrivateContextFrom<Machine1>;
 expectTypeOf<TTPrivate>().toEqualTypeOf<{
@@ -84,6 +84,6 @@ expectTypeOf<PromiseKeys>().toEqualTypeOf<'promise1' | 'promise2'>();
 type MachineKeys = MachineKeysFrom<Machine1>;
 expectTypeOf<MachineKeys>().toEqualTypeOf<'machine1'>();
 
-type Mo1 = MachineOptions<TTConfig, TTPrivate, TTC, TTE>;
+type Mo1 = MachineOptions<TTConfig, TTEm, TTPrivate, TTC>;
 type Mo2 = MoF<Machine1>;
 expectTypeOf<Mo1>().toEqualTypeOf<Mo2>();

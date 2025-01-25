@@ -2,7 +2,7 @@ import { toAction, type ActionConfig } from '~actions';
 import { GuardConfig, toPredicate } from '~guards';
 import { isString } from '~types';
 import { toArray } from '~utils';
-import type { ToTransition_F } from './types';
+import type { ToTransition_F } from '../types/types';
 
 export const toTransition: ToTransition_F = (
   config,

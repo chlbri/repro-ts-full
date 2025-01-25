@@ -1,5 +1,5 @@
 import type { NotUndefined, Require } from '@bemedev/types';
-import type { Action, ActionConfig, FromAction } from '~actions';
+import type { Action, ActionConfig, FromActionConfig } from '~actions';
 import type { MachineOptions } from '~config';
 import type { EventObject } from '~events';
 import type { FromGuard, GuardConfig, Predicate } from '~guards';
@@ -31,7 +31,7 @@ type _ExtractActionsFromMap<
   T extends { actions: SingleOrArrayL<ActionConfig> },
 > =
   ReduceArray<T['actions']> extends infer R extends ActionConfig
-    ? FromAction<R>
+    ? FromActionConfig<R>
     : never;
 
 type _ExtractGuardsFromMap<

@@ -3,7 +3,7 @@ import type { Describer, FromDescriber, PrimitiveObject } from '~types';
 
 export type ActionConfig = string | Describer;
 
-export type FromAction<T extends ActionConfig> = T extends Describer
+export type FromActionConfig<T extends ActionConfig> = T extends Describer
   ? FromDescriber<T>
   : T;
 

@@ -1,5 +1,5 @@
 import type { GuardDefUnion } from '@bemedev/boolean-recursive';
-import type { ActionConfig, FromAction } from '~actions';
+import type { ActionConfig, FromActionConfig } from '~actions';
 import type { GUARD_TYPE } from '~constants';
 import type { EventObject } from '~events';
 import type { PrimitiveObject, ReduceArray } from '~types';
@@ -21,7 +21,7 @@ export type GuardOr = {
 export type GuardConfig = GuardUnion;
 
 export type FromGuard<T extends GuardConfig> = T extends ActionConfig
-  ? FromAction<T>
+  ? FromActionConfig<T>
   : T extends GuardAnd
     ? FromGuard<ReduceArray<T['and']>>
     : T extends GuardOr

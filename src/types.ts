@@ -272,5 +272,3 @@ export type FnMap<
     } & {
       else?: (pContext: Pc, context: Tc, eventsMap: E) => R;
     });
-
-// TODO transform all functions
