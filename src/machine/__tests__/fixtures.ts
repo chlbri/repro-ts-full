@@ -79,17 +79,21 @@ export const config1 = createConfig({
   machines: { description: 'A beautiful machine', name: 'machine1' },
 });
 
-export const machine1 = createMachine(config1, {
-  pContext: { data: t.string },
-  context: { age: t.number },
-  eventsMap: {
-    AUTH: t.buildObject({
-      password: t.string,
-      username: t.string,
-    }),
-    SEND: t.string,
+export const machine1 = createMachine(
+  config1,
+  {
+    pContext: { data: t.string },
+    context: { age: t.number },
+    eventsMap: {
+      AUTH: t.buildObject({
+        password: t.string,
+        username: t.string,
+      }),
+      SEND: t.string,
+    },
   },
-});
+  { '/': 'state1', '/state1': 'state11', '/state1/state11': 'state111' },
+);
 // .provideActions({})
 // .provideGuards({})
 // .provideDelays({})

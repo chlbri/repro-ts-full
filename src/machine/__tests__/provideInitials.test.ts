@@ -3,7 +3,7 @@ import { createTests } from '@bemedev/vitest-extended';
 import { machine1 } from './fixtures';
 
 describe('provideInitials', () => {
-  const provide = reFunction(machine1, '_provideInitials');
+  const provide = reFunction(machine1, 'addInitials');
 
   const { acceptation, success } = createTests(provide);
 

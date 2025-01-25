@@ -1,11 +1,12 @@
 import { isDefined } from '@bemedev/basicfunc';
-import { t } from '@bemedev/types';
+import { t, type NOmit } from '@bemedev/types';
 import type { EventsMap, ToEvents } from '~events';
 import type { StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
 import { flatMap } from './flatMap';
 import { getInitialNodeConfig } from './getInitialNodeConfig';
 import type { Elements } from './machine.types';
+import { nodeToValue } from './nodeToValue';
 import { recomposeNode } from './recompose';
 import { toSimple } from './toSimple';
 import type {
@@ -101,20 +102,31 @@ class Machine<
    * Just use for typing
    */
   get machine() {
-    return t.anify<AnyMachine>();
+    return t.anify<this>();
   }
   // #endregion
 
+  // #region private
   #actions?: Mo['actions'];
+
   #guards?: Mo['guards'];
+
   #delays?: Mo['delays'];
+
   #promises?: Mo['promises'];
+
   #machines?: Mo['machines'];
+
   #initials?: Mo['initials'];
+
   #context!: Tc;
+
   #pContext!: Pc;
 
   #postConfig?: NodeConfigWithInitials;
+
+  #initialNode!: NodeConfigWithInitials;
+  // #endregion
 
   constructor(config: C) {
     this.#config = config;
@@ -171,7 +183,7 @@ class Machine<
   }
 
   // #region Providers
-  _provideInitials = (initials: Mo['initials']) => {
+  addInitials = (initials: Mo['initials']) => {
     this.#initials = initials;
     const entries = Object.entries(this.#initials!);
     const flat: any = flatMap<C, true>(this.#config);
@@ -181,6 +193,8 @@ class Machine<
     });
 
     this.#postConfig = recomposeNode(flat);
+    this.#initialNode = getInitialNodeConfig(this.#postConfig);
+
     return this.#postConfig;
   };
 
@@ -210,7 +224,19 @@ class Machine<
   provideMachines = (machines?: Mo['machines']) =>
     this.#renew('machines', machines);
 
-  provideOptions = (options?: Mo): Machine<C, Pc, Tc, E, Mo> => {
+  addOptions = (options?: Mo) => {
+    const out = this.#renew();
+
+    out.addActions(options?.actions);
+    out.addGuards(options?.guards);
+    out.addDelays(options?.delays);
+    out.addPromises(options?.promises);
+    out.addMachines(options?.machines);
+  };
+
+  provideOptions = (
+    options?: NOmit<Mo, 'initials'>,
+  ): Machine<C, Pc, Tc, E, Mo> => {
     const out = this.#renew('actions', options?.actions);
 
     out.addGuards(options?.guards);
@@ -281,7 +307,7 @@ class Machine<
 
     const out = new Machine<C, Pc, Tc, E, Mo>(config);
     const check1 = isDefined(initials);
-    if (check1) out._provideInitials(initials);
+    if (check1) out.addInitials(initials);
 
     out.#pContext = pContext;
     out.#context = context;
@@ -302,13 +328,14 @@ class Machine<
   /**
    * Reset all options
    */
+
   providePrivateContext = <T>(pContext: T) => {
     const { context, initials, config } = this.#elements;
 
     const out = new Machine<C, T, Tc, E>(config);
 
     const check1 = isDefined(initials);
-    if (check1) out._provideInitials(initials);
+    if (check1) out.addInitials(initials);
 
     out.#context = context;
     out.#pContext = pContext;
@@ -324,7 +351,7 @@ class Machine<
 
     const out = new Machine<C, Pc, T, E>(config);
     const check1 = isDefined(initials);
-    if (check1) out._provideInitials(initials);
+    if (check1) out.addInitials(initials);
 
     out.#pContext = pContext;
     out.#context = context;
@@ -341,7 +368,7 @@ class Machine<
 
     const out = new Machine<C, Pc, Tc, T>(config);
     const check1 = isDefined(initials);
-    if (check1) out._provideInitials(initials);
+    if (check1) out.addInitials(initials);
 
     out.#pContext = pContext;
     out.#context = context;
@@ -360,21 +387,43 @@ class Machine<
 
     if (check) return valueToNode(config, from);
 
-    console.error('The machine is not configured');
-    return undefined;
+    this.#addError('The machine is not configured');
+    return t.anify<NodeConfigWithInitials>();
   };
+
+  // #region TODO
+  // TODO : Use It
+
+  // #throw = () => {
+  //   const check = this.#errorsCollector.size > 0;
+  //   if (check) {
+  //     const errors = this.errorsCollector.join('\n');
+  //     const error = new Error(errors);
+
+  //     throw error;
+  //   }
+  // };
+  // #endregion
+
+  get initialNode() {
+    return this.#initialNode;
+  }
+
+  get initialValue() {
+    return nodeToValue(this.initialNode);
+  }
 
   toNode = this.valueToNode;
 
-  get initialNode() {
-    const config = this.#postConfig;
-    const check = isDefined(config);
+  #errorsCollector = new Set<string>();
 
-    if (check) return getInitialNodeConfig(config);
-
-    console.error('The machine is not configured');
-    return undefined;
+  get errorsCollector() {
+    return Array.from(this.#errorsCollector);
   }
+
+  #addError = (error: string) => {
+    this.#errorsCollector.add(error);
+  };
 }
 
 export type { Machine };
@@ -396,21 +445,25 @@ type CreateMachine_F = <
 >(
   config: C,
   types: { pContext: Pc; context: Tc; eventsMap: EventM },
-  options?: Mo,
+  initials: Mo['initials'],
+  options?: NOmit<Mo, 'initials'>,
 ) => Machine<C, Pc, Tc, EventM, Mo>;
 
 export const createMachine: CreateMachine_F = (
   config,
   { eventsMap, pContext, context },
+  initials,
   options,
 ) => {
-  const out: any = new Machine(config)
+  const out = new Machine(config);
+  out.addInitials(initials);
+  out
     .provideEvents(eventsMap)
     .providePrivateContext(pContext)
     .provideContext(context)
     .provideOptions(options);
 
-  return out;
+  return out as any;
 };
 
 export const DEFAULT_MACHINE = new Machine({

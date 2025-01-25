@@ -1,23 +1,14 @@
-import { t } from '@bemedev/types';
-import { createMachine } from '~machine';
-import { config1 } from './fixtures';
+import { machine1 } from "./fixtures";
 
 describe('simple', () => {
-  const machine = createMachine(config1, {
-    context: t.buildObject({
-      data: t.string,
-    }),
-    pContext: t.object,
-    eventsMap: t.object,
-  });
   test('#0 => Initialize machine', () => {});
 
   test('#1 => Before all, simple is empty', () => {
-    expect(machine.simple).toBeUndefined();
+    expect(machine1.simple).toBeUndefined();
   });
 
   test('#2 => ProbideInitials', () => {
-    machine._provideInitials({
+    machine1.addInitials({
       '/': 'state1',
       '/state1': 'state11',
       '/state1/state11': 'state111',
@@ -25,7 +16,7 @@ describe('simple', () => {
   });
 
   test.todo('Console.log', () => {
-    console.log(JSON.stringify(machine.simple, null, 2));
+    console.log(JSON.stringify(machine1.simple, null, 2));
   });
 
   test('#3 => simple is defined, check it !', () => {
@@ -83,6 +74,6 @@ describe('simple', () => {
       ],
     };
 
-    expect(machine.simple).toStrictEqual(expected);
+    expect(machine1.simple).toStrictEqual(expected);
   });
 });

@@ -18,4 +18,5 @@ export type Interpreter_F = <
   Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
 >(
   machine: Machine<C, Pc, Tc, E, Mo>,
+  config: { pContext: Pc; context: Tc },
 ) => Interpreter<C, Pc, Tc, E, Mo>;

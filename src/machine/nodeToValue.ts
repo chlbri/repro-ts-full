@@ -15,8 +15,6 @@ export const nodeToValue: NodeToValue_F = body => {
     const __id = body.initial;
     const initial = body.states[__id];
 
-    console.log(__id, initial);
-
     const check3 = length === 1;
     const check4 = isAtomic(initial);
     const check5 = check3 && check4;
