@@ -139,7 +139,8 @@ type FlatMapNodeConfig<
             withChildren,
             `${Remaining}${AllowedNames<NotUndefined<T['states']>, { states: NodesConfig }> & string}/`
           >
-        : S
+        : // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+          {}
       : never)
   : // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     {};

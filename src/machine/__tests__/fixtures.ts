@@ -1,6 +1,7 @@
 import { t } from '@bemedev/types';
 import { createMachine } from '~machine';
 import { createConfig } from '../create';
+import type { FlatMapN } from '../types';
 
 export const config1 = createConfig({
   description: 'cdd',
@@ -95,3 +96,8 @@ export const machine1 = createMachine(config1, {
 // .providePromises({});
 
 export type Machine1 = typeof machine1;
+export type Config1 = typeof config1;
+
+export type Flat1 = FlatMapN<Config1>;
+
+export type FlatKeys1 = keyof Flat1;
