@@ -15,7 +15,7 @@ describe('Interpreter', () => {
 
     test('#1 => The machine is at "status: idle"', () => {
       const actual = service.status;
-      expect(actual).toBe('idle');
+      expect(actual).toBe('starting');
     });
 
     test('#2 => Start the machine', () => {

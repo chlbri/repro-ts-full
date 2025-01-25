@@ -8,7 +8,12 @@ import type {
   SimpleMachineOptions2,
 } from './types';
 
-export type WorkingStatus = 'started' | 'idle' | 'stopped' | 'busy';
+export type WorkingStatus =
+  | 'idle'
+  | 'starting'
+  | 'started'
+  | 'stopped'
+  | 'busy';
 
 export type Interpreter_F = <
   const C extends Config = Config,

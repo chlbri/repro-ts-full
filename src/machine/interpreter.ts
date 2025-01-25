@@ -31,6 +31,9 @@ class Interpreter<
 
   #initialNodeConfig: NodeConfigWithInitials;
 
+  #initialPpc!: Pc;
+  #initialContext!: Tc;
+
   get #canBeStoped() {
     const check1 = this.#status === 'started';
     const check2 = this.#status === 'busy';
@@ -70,6 +73,14 @@ class Interpreter<
     return this.#currentNodeConfig;
   }
 
+  get renew() {
+    const out = new Interpreter(this.#machine);
+    out.providePrivateContext(this.#initialPpc);
+    out.provideContext(this.#initialContext);
+
+    return out;
+  }
+
   get value() {
     return nodeToValue(this.#currentNodeConfig);
   }
@@ -91,20 +102,32 @@ class Interpreter<
 
   // #region Types
   providePrivateContext = (pContext: Pc) => {
+    this.#initialPpc = pContext;
+    this.#status = 'busy';
+
     if (this.#idle) {
-      this.#machine = this.#machine.providePrivateContext(pContext) as any;
+      this.#machine = this.#machine.providePrivateContext(
+        this.#initialPpc,
+      ) as any;
     }
 
+    this.#status = 'starting';
     return this.#machine;
   };
 
   ppC = this.providePrivateContext;
 
   provideContext = (context: Tc) => {
+    this.#initialContext = context;
+    this.#status = 'busy';
+
     if (this.#idle) {
-      this.#machine = this.#machine.provideContext(context) as any;
+      this.#machine = this.#machine.provideContext(
+        this.#initialContext,
+      ) as any;
     }
 
+    this.#status = 'starting';
     return this.#machine;
   };
   // #endregion
