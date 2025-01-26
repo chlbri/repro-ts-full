@@ -9,7 +9,7 @@ import type {
   UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
-import type { EventObject, EventsMap } from '~events';
+import type { EventObject, EventsMap, ToEvents } from '~events';
 import type { StateValue } from '~states';
 import { checkKeys } from '~utils';
 
@@ -264,12 +264,12 @@ export type FnMap<
   Tc extends PrimitiveObject = PrimitiveObject,
   R = any,
 > =
-  | ((pContext: Pc, context: Tc, eventsMap: E) => R)
+  | ((pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R)
   | {
       [key in keyof E]: (pContext: Pc, context: Tc, payload: E[key]) => R;
     }
   | ({
       [key in keyof E]?: (pContext: Pc, context: Tc, payload: E[key]) => R;
     } & {
-      else?: (pContext: Pc, context: Tc, eventsMap: E) => R;
+      else?: (pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R;
     });
