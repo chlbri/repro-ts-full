@@ -378,7 +378,9 @@ class Machine<
 
   get simple() {
     if (this.#postConfig) return toSimple(this.#postConfig);
-    return undefined;
+    this.#addError('"postConfig" is not defined');
+
+    return t.notUndefined(this.#postConfig);
   }
 
   valueToNode = (from: StateValue) => {
@@ -390,6 +392,8 @@ class Machine<
     this.#addError('The machine is not configured');
     return t.anify<NodeConfigWithInitials>();
   };
+
+  //TODO handle errors
 
   // #region TODO
   // TODO : Use It

@@ -16,7 +16,7 @@ import type {
   SimpleMachineOptions2,
 } from './types';
 
-class Interpreter<
+export class Interpreter<
   const C extends Config = Config,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
@@ -169,9 +169,26 @@ class Interpreter<
     }
   };
   // #endregion
-}
 
-export type { Interpreter };
+  #errorsCollector = new Set<string>();
+  #warningsCollector = new Set<string>();
+
+  get errorsCollector() {
+    return Array.from(this.#errorsCollector);
+  }
+
+  get warningsCollector() {
+    return Array.from(this.#warningsCollector);
+  }
+
+  protected addError = (error: string) => {
+    this.#errorsCollector.add(error);
+  };
+
+  protected addWarning = (error: string) => {
+    this.#errorsCollector.add(error);
+  };
+}
 
 export type AnyInterpreter = Interpreter<
   Config,
