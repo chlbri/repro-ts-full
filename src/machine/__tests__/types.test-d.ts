@@ -15,6 +15,7 @@ import type {
 import { Config1, Machine1 } from './fixtures';
 
 type TTConfig = ConfigFrom<Machine1>;
+
 expectTypeOf<TTConfig>().toEqualTypeOf<Config1>();
 
 type TTPrivate = PrivateContextFrom<Machine1>;
