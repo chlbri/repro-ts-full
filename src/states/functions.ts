@@ -31,7 +31,7 @@ import type {
   StateNodeConfigCompound,
   StateNodeConfigParallel,
   ToSimple_F,
-  ToStateValue_F as ToStateMap_F,
+  ToStateMap_F,
   ValueToNode_F,
 } from './types';
 

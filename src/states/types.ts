@@ -198,7 +198,7 @@ export type StateMap = {
   type: StateType;
 };
 
-export type ToStateValue_F = (node: StateNodeConfig) => StateMap;
+export type ToStateMap_F = (node: StateNodeConfig) => StateMap;
 
 export type StateValue = string | StateValueMap;
 
