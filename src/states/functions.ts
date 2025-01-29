@@ -1,4 +1,4 @@
-import { isDefined } from '@bemedev/basicfunc';
+import { isDefined } from '@bemedev/basifun';
 import { decompose, decomposeKeys, recompose } from '@bemedev/decompose';
 import { t } from '@bemedev/types';
 import { isString } from 'src/types/primitives';
@@ -23,8 +23,8 @@ import type {
   GetInitialStateValue_F,
   GetNextSimple_F,
   GetNextStateConfig_F,
-  GetNextStateValue_F,
   GetStateType_F,
+  NextStateValue_F,
   NodeToValue_F,
   ResolveState_F,
   StateNodeConfigAtomic,
@@ -444,17 +444,19 @@ export const nodeToValue: NodeToValue_F = body => {
   return out;
 };
 
-export const getNextStateValue: GetNextStateValue_F = (from, target) => {
+export const nextSV: NextStateValue_F = (from, target) => {
   const check0 = isStringEmpty(from);
   if (check0) return {};
 
   const checkT = isDefined(target);
+  if (!checkT) return from;
+
+  const check1 = isStringEmpty(target);
+  if (check1) return from;
 
   const check2 = isString(from);
 
   if (check2) {
-    const check3 = !checkT || isStringEmpty(target);
-    if (check3) return from;
     const check31 = target.includes(`${from}/`);
 
     if (check31) {
@@ -468,35 +470,31 @@ export const getNextStateValue: GetNextStateValue_F = (from, target) => {
 
   const check4 = keys.length === 0;
   if (check4) {
-    if (checkT) return target;
     return from;
   }
 
   const decomposed = decompose(from);
 
-  if (checkT) {
-    const last = target.lastIndexOf(DEFAULT_DELIMITER);
-    if (last === -1) return from;
+  const last = target.lastIndexOf(DEFAULT_DELIMITER);
+  if (last === -1) return from;
 
-    const entry = target.substring(0, last);
+  const entry = target.substring(0, last);
 
-    const _target2 = replaceAll({
-      entry,
-      match: DEFAULT_DELIMITER,
-      replacement: '.',
-    });
+  const _target2 = replaceAll({
+    entry,
+    match: DEFAULT_DELIMITER,
+    replacement: '.',
+  });
 
-    const target2 = deleteFirst(_target2, '.');
-    const keysD = decomposeKeys(from);
-    const check5 = keysD.includes(target2);
+  const target2 = deleteFirst(_target2, '.');
+  const keysD = decomposeKeys(from);
+  const check5 = keysD.includes(target2);
 
-    if (check5) {
-      decomposed[target2] = target.substring(last);
-    } else return target;
-  }
+  if (check5) {
+    decomposed[target2] = target.substring(last);
+  } else return target;
 
   const out: any = recompose(decomposed);
-
   return out;
 };
 
@@ -505,13 +503,7 @@ export const getNextStateConfig: GetNextStateConfig_F = ({
   body,
   to,
 }) => {
-  const flatBody = flatMapState(body);
-  const flatKeys = Object.keys(flatBody);
-
-  const check2 = !flatKeys.includes(to);
-  if (check2) throw new Error(`${to} is not inside the config`);
-
-  const nextValue = getNextStateValue(from, to);
+  const nextValue = nextSV(from, to);
 
   return valueToNode(body, nextValue);
 };

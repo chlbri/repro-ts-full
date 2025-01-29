@@ -1,3 +1,4 @@
+import type { GuardDefUnion } from '@bemedev/boolean-recursive';
 import type {
   Fn,
   NOmit,
@@ -15,7 +16,8 @@ import type {
 } from 'src/types/primitives';
 import type { AllowedNames, SubType } from 'src/types/subtype';
 import type { ActionConfig, FromActionConfig } from '~actions';
-import type { EventsMap } from '~events';
+import type { EventsMap, ToEvents } from '~events';
+import type { GuardConfig } from '~guards';
 import type { AnyMachine } from '~machine';
 import type { PromiseConfig } from '~promises';
 import type {
@@ -26,6 +28,7 @@ import type {
   TransitionConfig,
   TransitionsConfig,
 } from '~transitions';
+import type { Mode } from './interpreter.types';
 
 export type NodeConfig =
   | NodeConfigAtomic
@@ -240,6 +243,12 @@ export type PredicateS<
   Tc extends PrimitiveObject = PrimitiveObject,
 > = FnMap<E, Pc, Tc, boolean>;
 
+export type PredicateS2<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = Fn<[Pc, Tc, ToEvents<E>], boolean>;
+
 export type PredicateUnion<
   E extends EventsMap,
   Pc = any,
@@ -270,6 +279,39 @@ export type Predicate<
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
 > = PredicateUnion<E, Pc, Tc>;
+
+export type PredicateMap<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = Partial<RecordS<PredicateS<E, Pc, Tc>>>;
+
+type ToPredicateParams<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = {
+  events: E;
+  guard?: GuardConfig;
+  predicates?: PredicateMap<E, Pc, Tc>;
+  mode: Mode;
+};
+
+export type _ToPredicateF = <
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+>(
+  params: ToPredicateParams<E, Pc, Tc>,
+) => GuardDefUnion<[Pc, Tc, ToEvents<E>]>;
+
+export type ToPredicate_F = <
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+>(
+  params: ToPredicateParams<E, Pc, Tc>,
+) => PredicateS2<E, Pc, Tc>;
 
 export type GetGuardsFromFlat<
   Flat extends FlatMapN,
@@ -432,7 +474,7 @@ export type CreateConfig_F = <const T extends Config>(config: T) => T;
 
 export type StateType = 'atomic' | 'compound' | 'parallel';
 
-export type GetStateType_F = (
+export type StateType_F = (
   node: NodeConfig | NodeConfigWithInitials,
 ) => StateType;
 
@@ -455,9 +497,10 @@ type ResoleStateParams<
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
 > = {
+  events: E;
   config: NodeConfigWithInitials;
-  options?: SimpleMachineOptions<E, Pc, Tc>;
-  strict?: boolean;
+  options?: NOmit<SimpleMachineOptions<E, Pc, Tc>, 'initials'>;
+  mode: Mode;
 };
 
 export type Node<
@@ -475,7 +518,7 @@ export type Node<
   initial?: string;
 } & Transitions<E, Pc, Tc>;
 
-export type ResolveState_F = <
+export type ResolveNode_F = <
   E extends EventsMap = EventsMap,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
@@ -511,14 +554,15 @@ export type ToTransition_F = <
   E extends EventsMap = EventsMap,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
->(
-  transition: TransitionConfig,
+>(params: {
+  events: E;
+  config: TransitionConfig;
+  mode?: Mode;
   options?: {
     actions?: Partial<Record<string, Action<E, Pc, Tc>>>;
     guards?: Partial<Record<string, PredicateS<E, Pc, Tc>>>;
-  },
-  strict?: boolean,
-) => Transition<E, Pc, Tc>;
+  };
+}) => Transition<E, Pc, Tc>;
 
 export type PromiseFunction<
   E extends EventsMap = EventsMap,
@@ -531,9 +575,10 @@ export type ToPromiseSrc_F = <
   Pc = any,
   TC extends PrimitiveObject = PrimitiveObject,
 >(params: {
+  events: E;
   src: ActionConfig;
   promises?: SimpleMachineOptions<E, Pc, TC>['promises'];
-  strict?: boolean;
+  mode?: Mode;
 }) => PromiseFunction<E, Pc, TC>;
 
 export type Promisee<
@@ -547,9 +592,10 @@ export type ToPromise_F = <
   Pc = any,
   TC extends PrimitiveObject = PrimitiveObject,
 >(params: {
+  events: E;
   promise: PromiseConfig;
-  options?: NOmit<SimpleMachineOptions<E, Pc, TC>, 'delays'>;
-  strict?: boolean;
+  options?: NOmit<SimpleMachineOptions<E, Pc, TC>, 'initials'>;
+  mode: Mode;
 }) => Promisee<E, Pc, TC>;
 
 export type StateMap = {
@@ -570,4 +616,33 @@ export type Action<
   Tc extends PrimitiveObject = PrimitiveObject,
   R = any,
 > = FnMap<E, Pc, Tc, R>;
-// export type ToAction_F = {};
+
+export type ActionMap<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  R = any,
+> = Partial<Record<string, Action<E, Pc, Tc, R>>>;
+
+export type toActionParams<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  R = any,
+> = {
+  events: E;
+  action?: ActionConfig;
+  actions?: ActionMap<E, Pc, Tc, R>;
+  mode: Mode;
+};
+
+export type ToAction_F = <
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  R = any,
+>(
+  params: toActionParams<E, Pc, Tc, R>,
+) => Action<E, Pc, Tc, R>;
+
+export type ReduceAction_F = (action: ActionConfig) => string;

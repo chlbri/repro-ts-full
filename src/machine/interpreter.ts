@@ -1,8 +1,16 @@
 import type { EventsMap } from '~events';
 import type { Machine } from '~machine';
+import { nextSV, type StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
-import type { Interpreter_F, WorkingStatus } from './interpreter.types';
+import { stateType } from './getStateType';
+import type {
+  Interpreter_F,
+  Mode,
+  WorkingStatus,
+} from './interpreter.types';
 import { nodeToValue } from './nodeToValue';
+import { resolveNode } from './resolveState';
+import { toSimple } from './toSimple';
 import type {
   Action,
   Child,
@@ -10,6 +18,10 @@ import type {
   Delay,
   Keys,
   MachineOptions,
+  Node,
+  NodeConfigAtomic,
+  NodeConfigCompound,
+  NodeConfigParallel,
   NodeConfigWithInitials,
   PredicateS,
   PromiseFunction,
@@ -27,9 +39,14 @@ export class Interpreter<
 
   #status: WorkingStatus = 'idle';
 
-  #currentNodeConfig: NodeConfigWithInitials;
+  #currentConfig: NodeConfigWithInitials;
+  #value: StateValue;
+  #mode: Mode;
+  readonly #initialNode: Node<E, Pc, Tc>;
+  #currentNode: Node<E, Pc, Tc>;
+  #iterator = 0;
 
-  #initialNodeConfig: NodeConfigWithInitials;
+  readonly #initialNodeConfig: NodeConfigWithInitials;
 
   #initialPpc!: Pc;
   #initialContext!: Tc;
@@ -50,39 +67,69 @@ export class Interpreter<
     return this.#status === 'started';
   }
 
-  constructor(machine: Machine<C, Pc, Tc, E, Mo>) {
+  constructor(machine: Machine<C, Pc, Tc, E, Mo>, mode: Mode = 'normal') {
     this.#machine = machine.renew;
 
-    this.#initialNodeConfig = this.#machine.initialNode;
-    this.#currentNodeConfig = this.#initialNodeConfig;
+    this.#initialNodeConfig = this.#machine.initialConfig;
+    this.#currentConfig = this.#initialNodeConfig;
+    this.#value = nodeToValue(this.#currentConfig);
+    this.#mode = mode;
+    this.#initialNode = this.#resolveNode(this.#initialNodeConfig);
+    this.#currentNode = this.#initialNode;
   }
+
+  protected iterate = () => this.#iterator++;
+
+  #resolveNode = (config: NodeConfigWithInitials) => {
+    const options = this.#machine.options;
+    const mode = this.#mode;
+    const events = this.#machine.eventsMap;
+
+    return resolveNode({ config, options, mode, events });
+  };
+
+  get initialNode() {
+    return this.#initialNode;
+  }
+
+  get node() {
+    return this.#currentNode;
+  }
+
+  makeStrict = () => {
+    this.#mode = 'strict';
+  };
+
+  makeStrictest = () => {
+    this.#mode = 'strictest';
+  };
 
   get status() {
     return this.#status;
   }
 
-  get initialNodeConfig() {
-    return this.#initialNodeConfig;
+  get initialConfig() {
+    return this.#machine.initialConfig;
   }
 
   get initialValue() {
     return this.#machine.initialValue;
   }
 
-  get currentNodeConfig() {
-    return this.#currentNodeConfig;
+  get config() {
+    return this.#currentConfig;
   }
 
   get renew() {
     const out = new Interpreter(this.#machine);
-    out.providePrivateContext(this.#initialPpc);
+    out.ppC(this.#initialPpc);
     out.provideContext(this.#initialContext);
 
     return out;
   }
 
   get value() {
-    return nodeToValue(this.#currentNodeConfig);
+    return this.#value;
   }
 
   #start = (): WorkingStatus => (this.#status = 'started');
@@ -188,6 +235,39 @@ export class Interpreter<
   protected addWarning = (error: string) => {
     this.#errorsCollector.add(error);
   };
+
+  // #region Checkers
+  static isAtomic = (arg: any): arg is NodeConfigAtomic => {
+    return stateType(arg) === 'atomic';
+  };
+
+  static isCompound = (arg: any): arg is NodeConfigCompound => {
+    return stateType(arg) === 'compound';
+  };
+
+  static isParallel = (arg: any): arg is NodeConfigParallel => {
+    return stateType(arg) === 'parallel';
+  };
+  // #endregion
+
+  // #region Next
+  nextSV = (target: string) => nextSV(this.#value, target);
+
+  nextConfig = (target: string) => {
+    const nextValue = this.nextSV(target);
+    const out = this.#machine.valueToConfig(nextValue);
+
+    return out;
+  };
+
+  nextSimple = (target: string) => {
+    const config = this.nextConfig(target);
+    const out = toSimple(config);
+
+    return out;
+  };
+
+  // #endregion
 }
 
 export type AnyInterpreter = Interpreter<
@@ -200,9 +280,9 @@ export type AnyInterpreter = Interpreter<
 
 export const interpret: Interpreter_F = (
   machine,
-  { context, pContext },
+  { context, pContext, mode },
 ) => {
-  const out = new Interpreter(machine);
+  const out = new Interpreter(machine, mode);
 
   out.ppC(pContext);
   out.provideContext(context);

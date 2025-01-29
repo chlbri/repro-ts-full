@@ -9,6 +9,7 @@ import type {
   UnionToIntersection,
   ValuesOf,
 } from '@bemedev/types';
+import type { Mode } from 'src/machine/interpreter.types';
 import type { EventObject, EventsMap, ToEvents } from '~events';
 import type { StateValue } from '~states';
 import { checkKeys } from '~utils';
@@ -265,11 +266,25 @@ export type FnMap<
   R = any,
 > =
   | ((pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R)
-  | {
+  | ({
       [key in keyof E]: (pContext: Pc, context: Tc, payload: E[key]) => R;
-    }
+    } & {
+      else?: (pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R;
+    })
   | ({
       [key in keyof E]?: (pContext: Pc, context: Tc, payload: E[key]) => R;
     } & {
-      else?: (pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R;
+      else: (pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R;
     });
+
+export type ReduceFnMap_F = <
+  const E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+  R = any,
+>(params: {
+  events: E;
+  fn: FnMap<E, Pc, Tc, R>;
+  mode: Mode;
+  _default: () => R;
+}) => (pContext: Pc, context: Tc, eventsMap: ToEvents<E>) => R;

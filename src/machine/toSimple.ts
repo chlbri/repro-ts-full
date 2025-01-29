@@ -1,12 +1,12 @@
-import { isDefined } from '@bemedev/basicfunc';
+import { isDefined } from '@bemedev/basifun';
 import { t } from '@bemedev/types';
 import type { ActionConfig } from '~actions';
 import { toArray, toDescriber } from '~utils';
-import { getStateType } from './getStateType';
+import { stateType } from './getStateType';
 import type { ToSimple_F } from './types';
 
 export const toSimple: ToSimple_F = config => {
-  const type = getStateType(config);
+  const type = stateType(config);
   const initial = (config as any).initial;
 
   const entry = toArray<ActionConfig>(config.entry).map(toDescriber);

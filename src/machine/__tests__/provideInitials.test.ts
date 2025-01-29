@@ -1,4 +1,4 @@
-import { reFunction } from '@bemedev/basicfunc';
+import { reFunction } from '@bemedev/basifun';
 import { createTests } from '@bemedev/vitest-extended';
 import { machine1 } from './fixtures';
 

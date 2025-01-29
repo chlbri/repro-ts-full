@@ -15,6 +15,8 @@ export type WorkingStatus =
   | 'stopped'
   | 'busy';
 
+export type Mode = 'normal' | 'strict' | 'strictest';
+
 export type Interpreter_F = <
   const C extends Config = Config,
   Pc = any,
@@ -23,5 +25,5 @@ export type Interpreter_F = <
   Mo extends SimpleMachineOptions2 = MachineOptions<C, E, Pc, Tc>,
 >(
   machine: Machine<C, Pc, Tc, E, Mo>,
-  config: { pContext: Pc; context: Tc },
+  config: { pContext: Pc; context: Tc; mode?: Mode },
 ) => Interpreter<C, Pc, Tc, E, Mo>;

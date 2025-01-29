@@ -1,5 +1,6 @@
-import { isDefined } from '@bemedev/basicfunc';
+import { isDefined } from '@bemedev/basifun';
 import { t, type NOmit } from '@bemedev/types';
+import cloneDeep from 'clone-deep';
 import type { EventsMap, ToEvents } from '~events';
 import type { StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
@@ -20,7 +21,7 @@ import type {
   PromiseFunction,
   SimpleMachineOptions2,
 } from './types';
-import { valueToNode } from './valueToNode';
+import { valueToConfig } from './valueToNode';
 
 class Machine<
   const C extends Config = Config,
@@ -31,6 +32,11 @@ class Machine<
 > {
   #config: C;
   #flat: FlatMapN<C, true>;
+  #eventsMap!: E;
+
+  get eventsMap() {
+    return this.#eventsMap;
+  }
 
   // #region Types
   /**
@@ -47,14 +53,6 @@ class Machine<
    */
   get events() {
     return t.anify<ToEvents<E>>();
-  }
-
-  /**
-   * @deprecated
-   * Just use for typing
-   */
-  get eventsMap() {
-    return t.anify<E>();
   }
 
   /**
@@ -117,7 +115,7 @@ class Machine<
 
   #machines?: Mo['machines'];
 
-  #initials?: Mo['initials'];
+  #initials!: Mo['initials'];
 
   #context!: Tc;
 
@@ -125,7 +123,7 @@ class Machine<
 
   #postConfig?: NodeConfigWithInitials;
 
-  #initialNode!: NodeConfigWithInitials;
+  #initialConfig!: NodeConfigWithInitials;
   // #endregion
 
   constructor(config: C) {
@@ -145,7 +143,7 @@ class Machine<
    * Use after providing initials
    */
   get postConfig() {
-    return this.#postConfig;
+    return this.#postConfig!;
   }
 
   get initials() {
@@ -193,7 +191,7 @@ class Machine<
     });
 
     this.#postConfig = recomposeNode(flat);
-    this.#initialNode = getInitialNodeConfig(this.#postConfig);
+    this.#initialConfig = getInitialNodeConfig(this.#postConfig);
 
     return this.#postConfig;
   };
@@ -224,7 +222,7 @@ class Machine<
   provideMachines = (machines?: Mo['machines']) =>
     this.#renew('machines', machines);
 
-  addOptions = (options?: Mo) => {
+  addOptions = (options?: NOmit<Mo, 'initials'>) => {
     const out = this.#renew();
 
     out.addActions(options?.actions);
@@ -253,13 +251,13 @@ class Machine<
   get #elements(): Elements<C, Pc, Tc, Mo> {
     const config = structuredClone(this.#config);
     const initials = structuredClone(this.#initials);
-    const pContext = structuredClone(this.#pContext);
+    const pContext = cloneDeep(this.#pContext);
     const context = structuredClone(this.#context);
-    const actions = structuredClone(this.#actions);
-    const guards = structuredClone(this.#guards);
-    const delays = structuredClone(this.#delays);
-    const promises = structuredClone(this.#promises);
-    const machines = structuredClone(this.#machines);
+    const actions = cloneDeep(this.#actions);
+    const guards = cloneDeep(this.#guards);
+    const delays = cloneDeep(this.#delays);
+    const promises = cloneDeep(this.#promises);
+    const machines = cloneDeep(this.#machines);
 
     return {
       config,
@@ -362,8 +360,8 @@ class Machine<
   /**
    * Reset all options
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  provideEvents = <T extends EventsMap>(_: T) => {
+
+  provideEvents = <T extends EventsMap>(events: T) => {
     const { pContext, initials, config, context } = this.#elements;
 
     const out = new Machine<C, Pc, Tc, T>(config);
@@ -372,25 +370,26 @@ class Machine<
 
     out.#pContext = pContext;
     out.#context = context;
+    out.#eventsMap = events;
 
     return out;
   };
 
   get simple() {
     if (this.#postConfig) return toSimple(this.#postConfig);
-    this.#addError('"postConfig" is not defined');
 
+    this.#addError('"postConfig" is not defined');
     return t.notUndefined(this.#postConfig);
   }
 
-  valueToNode = (from: StateValue) => {
+  valueToConfig = (from: StateValue) => {
     const config = this.#postConfig;
     const check = isDefined(config);
 
-    if (check) return valueToNode(config, from);
+    if (check) return valueToConfig(config, from);
 
     this.#addError('The machine is not configured');
-    return t.anify<NodeConfigWithInitials>();
+    return t.notUndefined(config);
   };
 
   //TODO handle errors
@@ -409,15 +408,15 @@ class Machine<
   // };
   // #endregion
 
-  get initialNode() {
-    return this.#initialNode;
+  get initialConfig() {
+    return this.#initialConfig;
   }
 
   get initialValue() {
-    return nodeToValue(this.initialNode);
+    return nodeToValue(this.initialConfig);
   }
 
-  toNode = this.valueToNode;
+  toNode = this.valueToConfig;
 
   #errorsCollector = new Set<string>();
 
@@ -428,6 +427,16 @@ class Machine<
   #addError = (error: string) => {
     this.#errorsCollector.add(error);
   };
+
+  get options() {
+    const guards = this.#guards;
+    const actions = this.#actions;
+    const delays = this.#delays;
+    const promises = this.#promises;
+    const machines = this.#machines;
+
+    return { guards, actions, delays, promises, machines };
+  }
 }
 
 export type { Machine };
@@ -461,11 +470,12 @@ export const createMachine: CreateMachine_F = (
 ) => {
   const out = new Machine(config);
   out.addInitials(initials);
+
   out
     .provideEvents(eventsMap)
     .providePrivateContext(pContext)
     .provideContext(context)
-    .provideOptions(options);
+    .addOptions(options);
 
   return out as any;
 };

@@ -1,14 +1,17 @@
 import { isString } from 'src/types/primitives';
-import { toAction, type ActionConfig } from '~actions';
-import { toPredicate, type GuardConfig } from '~guards';
+import { type ActionConfig } from '~actions';
+import { type GuardConfig } from '~guards';
 import { toArray } from '~utils';
+import { toAction } from './toAction';
+import { toPredicate } from './toPredicate';
 import type { ToTransition_F } from './types';
 
-export const toTransition: ToTransition_F = (
+export const toTransition: ToTransition_F = ({
   config,
+  mode = 'normal',
   options,
-  strict = false,
-) => {
+  events,
+}) => {
   const __id = (config as any).__id;
   if (isString(config)) {
     const target = toArray<string>(config);
@@ -19,10 +22,15 @@ export const toTransition: ToTransition_F = (
   const target = toArray<string>(config.target);
 
   const actions = toArray<ActionConfig>(config.actions).map(action =>
-    toAction({ action, actions: options?.actions as any, strict }),
+    toAction({ events, action, actions: options?.actions, mode }),
   );
   const guards = toArray<GuardConfig>(config.guards).map(guard =>
-    toPredicate({ guard, predicates: options?.guards as any, strict }),
+    toPredicate({
+      events,
+      guard,
+      predicates: options?.guards as any,
+      mode,
+    }),
   );
 
   const out = { target, actions, guards } as any;

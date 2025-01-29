@@ -231,7 +231,7 @@ export type ValueToNode_F = <T extends StateValue>(
 
 export type NodeToValue_F = (body: StateNodeConfig) => StateValue;
 
-export type GetNextStateValue_F = <T extends StateValue>(
+export type NextStateValue_F = <T extends StateValue>(
   from: T,
   target?: string | undefined,
 ) => StateValue;

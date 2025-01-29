@@ -7,9 +7,9 @@ import { getChildren } from './getChildren';
 import { getParents } from './getParents';
 import { recomposeNode } from './recompose';
 import type { NodeConfig } from './types';
-import type { ValueToNode_F } from './valueToNode.type';
+import type { ValueToConfig_F } from './valueToNode.type';
 
-export const valueToNode: ValueToNode_F = (body, from) => {
+export const valueToConfig: ValueToConfig_F = (body, from) => {
   const flatBody = flatMap(body as NodeConfig, false);
   const keysB = Object.keys(flatBody);
   const check1 = isString(from);

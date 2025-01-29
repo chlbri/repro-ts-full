@@ -1,48 +1,51 @@
 import { t } from '@bemedev/types';
-import { toAction, type ActionConfig } from '~actions';
+import { type ActionConfig } from '~actions';
 import { type PromiseConfig } from '~promises';
 import { type TransitionConfig } from '~transitions';
 import { identify, toArray } from '~utils';
-import { getStateType } from './getStateType';
+import { stateType } from './getStateType';
+import { toAction } from './toAction';
 import { toPromise } from './toPromise';
 import { toTransition } from './toTransition';
-import type { ResolveState_F } from './types';
+import type { ResolveNode_F } from './types';
 
-export const resolveState: ResolveState_F = ({
+export const resolveNode: ResolveNode_F = ({
+  events,
   config,
   options,
-  strict,
+  mode,
 }) => {
   // #region functions
   const aMapper = (action: any) => {
     return toAction({
+      events,
       action,
-      actions: options?.actions as any,
-      strict,
+      actions: options?.actions,
+      mode,
     });
   };
 
-  const tMapper = (transition: any) => {
-    return toTransition(transition, options, strict);
+  const tMapper = (config: any) => {
+    return toTransition({ events, config, options, mode });
   };
   // #endregion
 
   const { id, description, initial, tags: _tags } = config;
   const __id = (config as any).__id;
-  const type = getStateType(config);
+  const type = stateType(config);
   const tags = toArray<string>(_tags);
   const entry = toArray<ActionConfig>(config.entry).map(aMapper);
   const exit = toArray<ActionConfig>(config.exit).map(aMapper);
 
   const states = identify(config.states).map(config =>
-    resolveState({ config, options, strict }),
+    resolveNode({ events, config, options, mode }),
   );
 
   const on = identify(config.on).map(tMapper);
   const always = toArray<TransitionConfig>(config.always).map(tMapper);
   const after = identify(config.after).map(tMapper);
   const promises = toArray<PromiseConfig>(config.promises).map(promise =>
-    toPromise({ promise, options, strict }),
+    toPromise({ events, promise, options, mode }),
   );
 
   const out = t.anify<any>({

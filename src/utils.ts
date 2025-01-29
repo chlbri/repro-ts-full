@@ -1,4 +1,4 @@
-import { isDefined } from '@bemedev/basicfunc';
+import { isDefined } from '@bemedev/basifun';
 import type {
   Asyncfy_F,
   CheckKeys_F,
@@ -64,7 +64,7 @@ export const ERRORS = {
   noParams: { error: new Error('No params'), string: 'No params' },
 };
 
-// TDODO: add to basicfunc
+// TDODO: add to basifun
 export const identify: Identify_F = arg => {
   if (!arg) return [];
   const entries = Object.entries(arg);
