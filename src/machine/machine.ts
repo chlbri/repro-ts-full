@@ -1,12 +1,13 @@
-import { isDefined } from '@bemedev/basifun';
+import { isDefined, toArray } from '@bemedev/basifun';
 import { t, type NOmit } from '@bemedev/types';
 import cloneDeep from 'clone-deep';
 import type { EventsMap, ToEvents } from '~events';
-import type { StateValue } from '~states';
+import { type StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
 import { flatMap } from './flatMap';
 import { getInitialNodeConfig } from './getInitialNodeConfig';
-import type { Elements } from './machine.types';
+import { stateType } from './getStateType';
+import type { Elements, GetIO2_F, GetIO_F } from './machine.types';
 import { nodeToValue } from './nodeToValue';
 import { recomposeNode } from './recompose';
 import { toSimple } from './toSimple';
@@ -16,6 +17,9 @@ import type {
   Delay,
   FlatMapN,
   MachineOptions,
+  NodeConfigAtomic,
+  NodeConfigCompoundWithInitials,
+  NodeConfigParallelWithInitials,
   NodeConfigWithInitials,
   PredicateS,
   PromiseFunction,
@@ -107,7 +111,7 @@ class Machine<
   // #region private
   #actions?: Mo['actions'];
 
-  #guards?: Mo['guards'];
+  #predicates?: Mo['predicates'];
 
   #delays?: Mo['delays'];
 
@@ -164,8 +168,8 @@ class Machine<
     return this.#actions;
   }
 
-  get guards() {
-    return this.#guards;
+  get predicates() {
+    return this.#predicates;
   }
 
   get delays() {
@@ -204,9 +208,10 @@ class Machine<
   provideActions = (actions?: Mo['actions']) =>
     this.#renew('actions', actions);
 
-  addGuards = (guards?: Mo['guards']) => (this.#guards = guards);
+  addGuards = (guards?: Mo['predicates']) => (this.#predicates = guards);
 
-  provideGuards = (guards?: Mo['guards']) => this.#renew('guards', guards);
+  provideGuards = (guards?: Mo['predicates']) =>
+    this.#renew('guards', guards);
 
   addDelays = (delays?: Mo['delays']) => (this.#delays = delays);
 
@@ -226,7 +231,7 @@ class Machine<
     const out = this.#renew();
 
     out.addActions(options?.actions);
-    out.addGuards(options?.guards);
+    out.addGuards(options?.predicates);
     out.addDelays(options?.delays);
     out.addPromises(options?.promises);
     out.addMachines(options?.machines);
@@ -237,7 +242,7 @@ class Machine<
   ): Machine<C, Pc, Tc, E, Mo> => {
     const out = this.#renew('actions', options?.actions);
 
-    out.addGuards(options?.guards);
+    out.addGuards(options?.predicates);
     out.addDelays(options?.delays);
     out.addPromises(options?.promises);
     out.addMachines(options?.machines);
@@ -254,7 +259,7 @@ class Machine<
     const pContext = cloneDeep(this.#pContext);
     const context = structuredClone(this.#context);
     const actions = cloneDeep(this.#actions);
-    const guards = cloneDeep(this.#guards);
+    const guards = cloneDeep(this.#predicates);
     const delays = cloneDeep(this.#delays);
     const promises = cloneDeep(this.#promises);
     const machines = cloneDeep(this.#machines);
@@ -429,7 +434,7 @@ class Machine<
   };
 
   get options() {
-    const guards = this.#guards;
+    const guards = this.#predicates;
     const actions = this.#actions;
     const delays = this.#delays;
     const promises = this.#promises;
@@ -437,6 +442,49 @@ class Machine<
 
     return { guards, actions, delays, promises, machines };
   }
+
+  // #region Checkers
+  static isAtomic = (arg: any): arg is NodeConfigAtomic => {
+    return stateType(arg) === 'atomic';
+  };
+
+  static isCompound = (
+    arg: any,
+  ): arg is NodeConfigCompoundWithInitials => {
+    return stateType(arg) === 'compound';
+  };
+
+  static isParallel = (
+    arg: any,
+  ): arg is NodeConfigParallelWithInitials => {
+    return stateType(arg) === 'parallel';
+  };
+  // #endregion
+
+  static #getIO: GetIO_F = (node, key) => {
+    const out = toArray<string>(node[key]);
+
+    if (this.isAtomic(node)) {
+      return out;
+    }
+
+    if (this.isCompound(node)) {
+      const initial = node.states[node.initial];
+
+      out.push(...this.#getIO(initial, key));
+    } else {
+      const values = Object.values(node.states);
+
+      values.forEach(node1 => {
+        out.push(...this.#getIO(node1, key));
+      });
+    }
+
+    return out;
+  };
+
+  static getEntries: GetIO2_F = node => this.#getIO(node, 'entry');
+  static getExits: GetIO2_F = node => this.#getIO(node, 'exit');
 }
 
 export type { Machine };
@@ -480,6 +528,6 @@ export const createMachine: CreateMachine_F = (
   return out as any;
 };
 
-export const DEFAULT_MACHINE = new Machine({
+export const DEFAULT_MACHINE: AnyMachine = new Machine({
   states: {},
 });

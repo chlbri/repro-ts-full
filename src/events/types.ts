@@ -1,6 +1,7 @@
 import type { Unionize } from '@bemedev/types';
+import type { PrimitiveObject } from '~types';
 
-export type EventObject<T = any> = {
+export type EventObject<T extends PrimitiveObject = PrimitiveObject> = {
   type: string;
   payload?: T;
 };

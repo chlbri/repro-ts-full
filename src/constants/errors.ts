@@ -12,6 +12,11 @@ const guard = {
   capital: 'Guard',
 } as const satisfies STR;
 
+const delay = {
+  normal: 'delay',
+  capital: 'Delay',
+} as const satisfies STR;
+
 const promise = {
   normal: 'promise',
   capital: 'Promise',
@@ -69,4 +74,10 @@ const produceErrors = <const T extends STR[]>(...types: T) => {
   return out as Simplify<UnionToIntersection<Out>>;
 };
 
-export const ERRORS = produceErrors(action, guard, promise, machine);
+export const ERRORS = produceErrors(
+  action,
+  guard,
+  delay,
+  promise,
+  machine,
+);

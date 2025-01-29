@@ -27,3 +27,7 @@ export type Interpreter_F = <
   machine: Machine<C, Pc, Tc, E, Mo>,
   config: { pContext: Pc; context: Tc; mode?: Mode },
 ) => Interpreter<C, Pc, Tc, E, Mo>;
+
+export const INIT_EVENT = 'machine$$init';
+
+export type InitEvent = typeof INIT_EVENT;

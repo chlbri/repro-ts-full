@@ -4,6 +4,7 @@ import type {
   Config,
   ConfigWithInitials,
   MachineOptions,
+  NodeConfigWithInitials,
   SimpleMachineOptions2,
 } from './types';
 
@@ -28,8 +29,15 @@ export type Elements<
   pContext: Pc;
   context: Tc;
   actions?: Mo['actions'];
-  guards?: Mo['guards'];
+  guards?: Mo['predicates'];
   delays?: Mo['delays'];
   promises?: Mo['promises'];
   machines?: Mo['machines'];
 };
+
+export type GetIO_F = (
+  node: NodeConfigWithInitials,
+  key: 'exit' | 'entry',
+) => string[];
+
+export type GetIO2_F = (node: NodeConfigWithInitials) => string[];

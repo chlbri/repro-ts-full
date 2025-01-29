@@ -278,7 +278,10 @@ export type Predicate<
   E extends EventsMap,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-> = PredicateUnion<E, Pc, Tc>;
+> =
+  | PredicateS2<E, Pc, Tc>
+  | PredicateAnd<E, Pc, Tc>
+  | PredicateOr<E, Pc, Tc>;
 
 export type PredicateMap<
   E extends EventsMap,
@@ -331,7 +334,7 @@ export type Delay<
   E extends EventsMap = EventsMap,
   Pc = any,
   Tc extends PrimitiveObject = PrimitiveObject,
-> = number | FnMap<E, Pc, Tc>;
+> = number | FnMap<E, Pc, Tc, number>;
 
 export type GetDelaysFromFlat<
   Flat extends FlatMapN,
@@ -350,20 +353,32 @@ export type Child<
   Tc extends PrimitiveObject = PrimitiveObject,
 > = <T extends AnyMachine>(
   machine: T,
-  types?: {
-    map?: E;
-    pContext?: Pc;
-    context?: Tc;
-  },
-) => {
-  machine: T;
-  subcriber: FnMap<
-    EventsMapFrom<T>,
-    PrivateContextFrom<T>,
-    ContextFrom<T>,
-    Tc
-  >;
-};
+) => FnMap<
+  E,
+  Pc,
+  Tc,
+  {
+    machine: T;
+    subcriber: FnMap<
+      EventsMapFrom<T>,
+      PrivateContextFrom<T>,
+      ContextFrom<T>,
+      Tc
+    >;
+  }
+>;
+
+export type Child2<
+  E extends EventsMap = EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = Fn<
+  [Pc, Tc, ToEvents<E>],
+  {
+    machine: AnyMachine;
+    subscriber: FnMap<EventsMap, any, PrimitiveObject, Tc>;
+  }
+>;
 
 export type GetMachinesFromConfig<
   C extends Config,
@@ -381,7 +396,7 @@ export type MachineOptions<
 > = {
   initials: GetInititalsFromFlat<Flat>;
   actions?: Partial<GetActionsFromFlat<Flat, E, Pc, Tc>>;
-  guards?: Partial<GetGuardsFromFlat<Flat, E, Pc, Tc>>;
+  predicates?: Partial<GetGuardsFromFlat<Flat, E, Pc, Tc>>;
   promises?: Partial<GetSrcFromFlat<Flat, E, Pc, Tc>>;
   delays?: Partial<GetDelaysFromFlat<Flat, E, Pc, Tc>>;
   machines?: Partial<GetMachinesFromConfig<C, E, Pc, Tc>>;
@@ -416,11 +431,12 @@ export type ActionParamsFrom<T extends KeyU<'actionParams'>> =
 export type ActionKeysFrom<T extends KeyU<'actions'>> =
   keyof ActionsFrom<T>;
 
-export type GuardsFrom<T extends KeyU<'guards'>> = NotUndefined<
-  T['guards']
+export type GuardsFrom<T extends KeyU<'predicates'>> = NotUndefined<
+  T['predicates']
 >;
 
-export type GuardKeysFrom<T extends KeyU<'guards'>> = keyof GuardsFrom<T>;
+export type GuardKeysFrom<T extends KeyU<'predicates'>> =
+  keyof GuardsFrom<T>;
 
 export type DelaysFrom<T extends KeyU<'delays'>> = NotUndefined<
   T['delays']
@@ -455,7 +471,7 @@ export type SimpleMachineOptions<
 > = {
   initials: RecordS<string>;
   actions?: Partial<RecordS<Action<E, Pc, Tc>>>;
-  guards?: Partial<RecordS<PredicateS<E, Pc, Tc>>>;
+  predicates?: Partial<RecordS<PredicateS<E, Pc, Tc>>>;
   promises?: Partial<RecordS<PromiseFunction<E, Pc, Tc>>>;
   delays?: Partial<RecordS<Delay<E, Pc, Tc>>>;
   machines?: Partial<RecordS<any>>;
@@ -464,7 +480,7 @@ export type SimpleMachineOptions<
 export type SimpleMachineOptions2 = {
   initials: any;
   actions?: any;
-  guards?: any;
+  predicates?: any;
   promises?: any;
   delays?: any;
   machines?: any;
@@ -533,7 +549,7 @@ export type Transition<
 > = {
   readonly target: string[];
   // readonly internal?: boolean;
-  readonly actions: Action<E, Pc, Tc>[];
+  readonly actions: Fn<[Pc, Tc, ToEvents<E>]>[];
   readonly guards: Predicate<E, Pc, Tc>[];
   readonly description?: string;
   readonly in: string[];
@@ -643,6 +659,56 @@ export type ToAction_F = <
   R = any,
 >(
   params: toActionParams<E, Pc, Tc, R>,
-) => Action<E, Pc, Tc, R>;
+) => Fn<[Pc, Tc, ToEvents<E>], R>;
+
+export type DelayMap<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = Partial<Record<string, Delay<E, Pc, Tc>>>;
+
+export type toDelayParams<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = {
+  events: E;
+  delay?: string;
+  delays?: DelayMap<E, Pc, Tc>;
+  mode: Mode;
+};
+
+export type ToDelay_F = <
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+>(
+  params: toDelayParams<E, Pc, Tc>,
+) => Fn<[Pc, Tc, ToEvents<E>]>;
+
+export type MachineMap<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = Partial<Record<string, Child<E, Pc, Tc>>>;
+
+export type toMachineParams<
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+> = {
+  events: E;
+  machine?: ActionConfig;
+  machines?: MachineMap<E, Pc, Tc>;
+  mode: Mode;
+};
+
+export type ToMachine_F = <
+  E extends EventsMap,
+  Pc = any,
+  Tc extends PrimitiveObject = PrimitiveObject,
+>(
+  params: toMachineParams<E, Pc, Tc>,
+) => Child2<E, Pc, Tc>;
 
 export type ReduceAction_F = (action: ActionConfig) => string;

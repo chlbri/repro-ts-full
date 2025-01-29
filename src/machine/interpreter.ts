@@ -1,15 +1,24 @@
-import type { EventsMap } from '~events';
+import type { ActionConfig } from '~actions';
+import type { EventsMap, ToEvents } from '~events';
+import type { GuardConfig } from '~guards';
 import type { Machine } from '~machine';
+import type { PromiseConfig } from '~promises';
 import { nextSV, type StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
-import { stateType } from './getStateType';
-import type {
-  Interpreter_F,
-  Mode,
-  WorkingStatus,
+import {
+  INIT_EVENT,
+  type InitEvent,
+  type Interpreter_F,
+  type Mode,
+  type WorkingStatus,
 } from './interpreter.types';
 import { nodeToValue } from './nodeToValue';
 import { resolveNode } from './resolveState';
+import { toAction } from './toAction';
+import { toDelay } from './toDelay';
+import { toMachine } from './toMachine';
+import { toPredicate } from './toPredicate';
+import { toPromise } from './toPromise';
 import { toSimple } from './toSimple';
 import type {
   Action,
@@ -19,9 +28,6 @@ import type {
   Keys,
   MachineOptions,
   Node,
-  NodeConfigAtomic,
-  NodeConfigCompound,
-  NodeConfigParallel,
   NodeConfigWithInitials,
   PredicateS,
   PromiseFunction,
@@ -46,17 +52,15 @@ export class Interpreter<
   #currentNode: Node<E, Pc, Tc>;
   #iterator = 0;
 
+  #event: ToEvents<E> | InitEvent = INIT_EVENT;
+
   readonly #initialNodeConfig: NodeConfigWithInitials;
 
   #initialPpc!: Pc;
   #initialContext!: Tc;
 
   get #canBeStoped() {
-    const check1 = this.#status === 'started';
-    const check2 = this.#status === 'busy';
-    const check3 = check1 || check2;
-
-    return check3;
+    return this.#status === 'started';
   }
 
   get #idle() {
@@ -65,6 +69,10 @@ export class Interpreter<
 
   get #canAct() {
     return this.#status === 'started';
+  }
+
+  get event() {
+    return this.#event;
   }
 
   constructor(machine: Machine<C, Pc, Tc, E, Mo>, mode: Mode = 'normal') {
@@ -185,7 +193,10 @@ export class Interpreter<
     }
   };
 
-  addGuard = (key: Keys<Mo['guards']>, guard: PredicateS<E, Pc, Tc>) => {
+  addGuard = (
+    key: Keys<Mo['predicates']>,
+    guard: PredicateS<E, Pc, Tc>,
+  ) => {
     if (this.#canAct) {
       const out = { [key]: guard };
       this.#machine.addGuards(out);
@@ -236,20 +247,6 @@ export class Interpreter<
     this.#errorsCollector.add(error);
   };
 
-  // #region Checkers
-  static isAtomic = (arg: any): arg is NodeConfigAtomic => {
-    return stateType(arg) === 'atomic';
-  };
-
-  static isCompound = (arg: any): arg is NodeConfigCompound => {
-    return stateType(arg) === 'compound';
-  };
-
-  static isParallel = (arg: any): arg is NodeConfigParallel => {
-    return stateType(arg) === 'parallel';
-  };
-  // #endregion
-
   // #region Next
   nextSV = (target: string) => nextSV(this.#value, target);
 
@@ -268,6 +265,46 @@ export class Interpreter<
   };
 
   // #endregion
+
+  toAction = (action?: ActionConfig) => {
+    const events = this.#machine.eventsMap;
+    const actions = this.#machine.actions;
+    const mode = this.#mode;
+
+    return toAction({ action, events, actions, mode });
+  };
+
+  toPredicate = (guard?: GuardConfig) => {
+    const events = this.#machine.eventsMap;
+    const predicates = this.#machine.predicates;
+    const mode = this.#mode;
+
+    return toPredicate({ guard, events, predicates, mode });
+  };
+
+  toPromise = (promise: PromiseConfig) => {
+    const events = this.#machine.eventsMap;
+    const options = this.#machine.options;
+    const mode = this.#mode;
+
+    return toPromise({ promise, events, options, mode });
+  };
+
+  toDelay = (delay: string) => {
+    const events = this.#machine.eventsMap;
+    const delays = this.#machine.delays;
+    const mode = this.#mode;
+
+    return toDelay({ delay, events, delays, mode });
+  };
+
+  toMachine = (machine: ActionConfig) => {
+    const events = this.#machine.eventsMap;
+    const machines = this.#machine.machines;
+    const mode = this.#mode;
+
+    return toMachine({ machine, events, machines, mode });
+  };
 }
 
 export type AnyInterpreter = Interpreter<
