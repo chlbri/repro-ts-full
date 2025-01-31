@@ -1,6 +1,7 @@
 import { isDefined, toArray } from '@bemedev/basifun';
 import { t, type NOmit } from '@bemedev/types';
 import cloneDeep from 'clone-deep';
+import { DEFAULT_DELIMITER } from '~constants';
 import type { EventsMap, ToEvents } from '~events';
 import { type StateValue } from '~states';
 import type { PrimitiveObject } from '~types';
@@ -17,12 +18,14 @@ import type {
   Delay,
   FlatMapN,
   MachineOptions,
+  NodeConfig,
   NodeConfigAtomic,
   NodeConfigCompoundWithInitials,
   NodeConfigParallelWithInitials,
   NodeConfigWithInitials,
   PredicateS,
   PromiseFunction,
+  RecordS,
   SimpleMachineOptions2,
 } from './types';
 import { valueToConfig } from './valueToNode';
@@ -125,7 +128,10 @@ class Machine<
 
   #pContext!: Pc;
 
-  #postConfig?: NodeConfigWithInitials;
+  #postConfig!: NodeConfigWithInitials;
+  #postFlat!: RecordS<NodeConfigWithInitials>;
+
+  #initialKeys: string[] = [];
 
   #initialConfig!: NodeConfigWithInitials;
   // #endregion
@@ -184,12 +190,15 @@ class Machine<
     return this.#machines;
   }
 
+  get postFlat() {
+    return this.#postFlat;
+  }
+
   // #region Providers
   addInitials = (initials: Mo['initials']) => {
     this.#initials = initials;
     const entries = Object.entries(this.#initials!);
-    const flat: any = flatMap<C, true>(this.#config);
-
+    const flat: any = structuredClone(this.#flat);
     entries.forEach(([key, initial]) => {
       flat[key] = { ...flat[key], initial };
     });
@@ -197,7 +206,42 @@ class Machine<
     this.#postConfig = recomposeNode(flat);
     this.#initialConfig = getInitialNodeConfig(this.#postConfig);
 
+    this.#getInitialKeys();
+
     return this.#postConfig;
+  };
+
+  #getInitialKeys = () => {
+    const postConfig = this.#postConfig as unknown as NodeConfig;
+    this.#postFlat = flatMap(postConfig) as any;
+
+    const entries = Object.entries(this.#postFlat);
+    entries.forEach(([key, { initial }]) => {
+      const check1 = initial !== undefined;
+      if (check1) {
+        const toPush = `${key}${DEFAULT_DELIMITER}${initial}`;
+        this.#initialKeys.push(toPush);
+      }
+    });
+  };
+
+  isInitial = (target: string) => {
+    return this.#initialKeys.includes(target);
+  };
+
+  retrieveParentFromInitial = (target: string): NodeConfigWithInitials => {
+    const check1 = this.isInitial(target);
+    if (check1) {
+      const parent = target.substring(
+        0,
+        target.lastIndexOf(DEFAULT_DELIMITER),
+      );
+      const check2 = this.isInitial(parent);
+
+      if (check2) return this.retrieveParentFromInitial(parent);
+      return this.#postFlat[parent];
+    }
+    return this.#postFlat[target];
   };
 
   provideInitials = (initials: Mo['initials']) =>
@@ -442,50 +486,50 @@ class Machine<
 
     return { guards, actions, delays, promises, machines };
   }
-
-  // #region Checkers
-  static isAtomic = (arg: any): arg is NodeConfigAtomic => {
-    return stateType(arg) === 'atomic';
-  };
-
-  static isCompound = (
-    arg: any,
-  ): arg is NodeConfigCompoundWithInitials => {
-    return stateType(arg) === 'compound';
-  };
-
-  static isParallel = (
-    arg: any,
-  ): arg is NodeConfigParallelWithInitials => {
-    return stateType(arg) === 'parallel';
-  };
-  // #endregion
-
-  static #getIO: GetIO_F = (node, key) => {
-    const out = toArray<string>(node[key]);
-
-    if (this.isAtomic(node)) {
-      return out;
-    }
-
-    if (this.isCompound(node)) {
-      const initial = node.states[node.initial];
-
-      out.push(...this.#getIO(initial, key));
-    } else {
-      const values = Object.values(node.states);
-
-      values.forEach(node1 => {
-        out.push(...this.#getIO(node1, key));
-      });
-    }
-
-    return out;
-  };
-
-  static getEntries: GetIO2_F = node => this.#getIO(node, 'entry');
-  static getExits: GetIO2_F = node => this.#getIO(node, 'exit');
 }
+
+// #region Checkers
+export const isAtomic = (arg: any): arg is NodeConfigAtomic => {
+  return stateType(arg) === 'atomic';
+};
+
+export const isCompound = (
+  arg: any,
+): arg is NodeConfigCompoundWithInitials => {
+  return stateType(arg) === 'compound';
+};
+
+export const isParallel = (
+  arg: any,
+): arg is NodeConfigParallelWithInitials => {
+  return stateType(arg) === 'parallel';
+};
+// #endregion
+
+export const getIO: GetIO_F = (node, key) => {
+  const out = toArray<string>(node[key]);
+
+  if (isAtomic(node)) {
+    return out;
+  }
+
+  if (isCompound(node)) {
+    const initial = node.states[node.initial];
+
+    out.push(...getIO(initial, key));
+  } else {
+    const values = Object.values(node.states);
+
+    values.forEach(node1 => {
+      out.push(...getIO(node1, key));
+    });
+  }
+
+  return out;
+};
+
+export const getEntries: GetIO2_F = node => getIO(node, 'entry');
+export const getExits: GetIO2_F = node => getIO(node, 'exit');
 
 export type { Machine };
 

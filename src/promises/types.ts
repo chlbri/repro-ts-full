@@ -28,12 +28,7 @@ export type FinallyConfig =
     TransitionConfigMapA,
     'target'
   >
-    ?
-        | (F | string)
-        | readonly [
-            ...(Require<F, 'guards'> | Require<F, 'in'>)[],
-            F | string,
-          ]
+    ? (F | string) | readonly [...Require<F, 'guards'>[], F | string]
     : never;
 
 export type PromiseConfig = {

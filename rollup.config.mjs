@@ -43,6 +43,7 @@ export default defineConfig({
       tsconfigOverride: {
         exclude: ignore,
       },
+      check: false,
     }),
     circularDependencies({
       exclude: [

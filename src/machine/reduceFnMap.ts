@@ -11,7 +11,11 @@ export const reduceFnMap: ReduceFnMap_F = ({
 
   const keys = Object.keys(events);
 
-  return (pContext, context, { payload, type }) => {
+  return (pContext, context, event) => {
+    const check5 = typeof event === 'string';
+    if (check5) return _default();
+
+    const { payload, type } = event;
     const _else = fn.else;
 
     for (const key of keys) {
@@ -23,7 +27,7 @@ export const reduceFnMap: ReduceFnMap_F = ({
       if (check4) return func(pContext, context, payload);
     }
 
-    if (_else) return _else(pContext, context, { type, payload } as any);
+    if (_else) return _else(pContext, context, event);
 
     if (mode === 'normal') return _default();
     throw 'not';

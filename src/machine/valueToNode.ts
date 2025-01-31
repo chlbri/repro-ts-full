@@ -30,7 +30,7 @@ export const valueToConfig: ValueToConfig_F = (body, from) => {
       const out: any = recomposeNode(out1);
       return out;
     }
-    throw new Error(`${from} is not inside the body`);
+    return {};
   }
 
   const flatFrom = decompose(from);
@@ -44,7 +44,7 @@ export const valueToConfig: ValueToConfig_F = (body, from) => {
     const check3 = !(Object.keys(value).length === 0);
 
     if (check3) {
-      key1 = `${_key}.${value}`;
+      key1 += `.${value}`;
     }
 
     const key2 = replaceAll({

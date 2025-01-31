@@ -85,7 +85,7 @@ describe('provideInitials', () => {
                 guards: 'guar34',
               },
               {
-                in: '/state4',
+                guards: 'guard4',
                 actions: 'action13',
               },
               'action22',
@@ -111,7 +111,7 @@ describe('provideInitials', () => {
             ],
             finally: [
               {
-                in: '/state4',
+                guards: 'guard',
                 actions: 'action12',
               },
               'action20',
@@ -198,7 +198,7 @@ describe('provideInitials', () => {
                 guards: 'guar34',
               },
               {
-                in: '/state4',
+                guards: 'guard4',
                 actions: 'action13',
               },
               'action22',
@@ -224,7 +224,7 @@ describe('provideInitials', () => {
             ],
             finally: [
               {
-                in: '/state4',
+                guards: 'guard',
                 actions: 'action12',
               },
               'action20',

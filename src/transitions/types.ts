@@ -1,4 +1,5 @@
 import type { NotUndefined, Require } from '@bemedev/types';
+import type { RecordS } from 'src/machine/types';
 import type {
   Identitfy,
   PrimitiveObject,
@@ -24,7 +25,6 @@ type _TransitionConfigMap = {
   readonly actions?: SingleOrArrayL<ActionConfig>;
   readonly guards?: SingleOrArrayL<GuardConfig>;
   readonly description?: string;
-  readonly in?: SingleOrArrayL<string>;
 };
 
 type _ExtractActionsFromMap<
@@ -59,8 +59,6 @@ export type ArrayTransitions = readonly [
   ...(
     | Require<TransitionConfigMapF, 'guards'>
     | Require<TransitionConfigMapA, 'guards'>
-    | Require<TransitionConfigMapF, 'in'>
-    | Require<TransitionConfigMapA, 'in'>
   )[],
   TransitionConfig,
 ];
@@ -76,7 +74,7 @@ export type AlwaysConfig =
     ]
   | TransitionConfigF;
 
-export type DelayedTransitions = Record<string, SingleOrArrayT>;
+export type DelayedTransitions = RecordS<SingleOrArrayT>;
 
 export type ExtractActionsFromDelayed<T> = _ExtractActionsFromMap<
   Extract<T[keyof T], { actions: SingleOrArrayL<ActionConfig> }>

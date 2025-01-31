@@ -113,7 +113,6 @@ assertType<TransitionsConfig>({
     },
     EVENT2: {
       actions: 'action1',
-      in: '/state1',
     },
     EVENT3: '/state1',
   },
@@ -151,7 +150,6 @@ assertType<TransitionsConfig>({
     },
     TIME2: {
       actions: ['action11'],
-      in: '/state1',
     },
     TIME3: '/state1',
   },
@@ -238,7 +236,7 @@ assertType<TransitionsConfig>({
   promises: {
     src: 'promise1',
     then: { actions: 'action1' },
-    catch: [{ in: '/ert', target: '/state2' }, '/state1'],
+    catch: [{ guards: '/ert', target: '/state2' }, '/state1'],
     finally: { actions: 'action12' },
   },
 });
@@ -330,7 +328,7 @@ assertType<TransitionsConfig>({
     catch: [{ guards: 'ert', actions: 'action14' }, '/state1'],
     finally: [
       {
-        in: '/state4',
+        guards: '/state4',
         actions: 'action1',
       },
       'action20',
@@ -373,7 +371,7 @@ type Tr1 = {
           guards: 'guar34';
         },
         {
-          in: '/state4';
+          guards: 'guard';
           actions: 'action13';
         },
         'action22',
@@ -388,7 +386,7 @@ type Tr1 = {
       catch: [{ guards: 'ert'; actions: 'action15' }, '/state1'];
       finally: [
         {
-          in: '/state4';
+          guards: 'guard';
           actions: 'action12';
         },
         'action20',

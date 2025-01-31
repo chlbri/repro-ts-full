@@ -52,7 +52,7 @@ export const config1 = createConfig({
               guards: 'guar34',
             },
             {
-              in: '/state4',
+              guards: 'guard4',
               actions: 'action13',
             },
             'action22',
@@ -67,7 +67,7 @@ export const config1 = createConfig({
           catch: [{ guards: 'ert', actions: 'action15' }, '/state1'],
           finally: [
             {
-              in: '/state4',
+              guards: 'guard',
               actions: 'action12',
             },
             'action20',

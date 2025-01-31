@@ -24,7 +24,7 @@ export const toDelay: ToDelay_F = ({ delays, delay, mode, events }) => {
   if (check) return () => fn;
 
   const func = fn
-    ? reduceFnMap({ events, _default: value as any, mode, fn })
+    ? reduceFnMap({ events, _default: value, mode, fn })
     : undefined;
 
   return out(ERRORS.delay.notProvided.error, func);

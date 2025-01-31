@@ -1,3 +1,4 @@
+import type { AlwaysEvent, InitEvent } from '../interpreter.types';
 import type {
   ActionKeysFrom,
   ConfigFrom,
@@ -50,6 +51,8 @@ expectTypeOf<TTE>().toEqualTypeOf<
       type: 'SEND';
       payload: string;
     }
+  | InitEvent
+  | AlwaysEvent
 >();
 
 type ActionKeys = ActionKeysFrom<Machine1>;
@@ -72,7 +75,9 @@ expectTypeOf<ActionKeys>().toEqualTypeOf<
 >();
 
 type GuardKeys = GuardKeysFrom<Machine1>;
-expectTypeOf<GuardKeys>().toEqualTypeOf<'ert' | 'guar34' | 'guard2'>();
+expectTypeOf<GuardKeys>().toEqualTypeOf<
+  'guard' | 'guard2' | 'ert' | 'guar34' | 'guard4'
+>();
 
 type DelayKeys = DelayKeysFrom<Machine1>;
 expectTypeOf<DelayKeys>().toEqualTypeOf<

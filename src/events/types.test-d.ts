@@ -1,3 +1,7 @@
+import type {
+  AlwaysEvent,
+  InitEvent,
+} from 'src/machine/interpreter.types';
 import type { ToEvents } from './types';
 
 type TT1 = ToEvents<{
@@ -19,4 +23,6 @@ expectTypeOf<TT1>().toEqualTypeOf<
         data?: any;
       };
     }
+  | InitEvent
+  | AlwaysEvent
 >();
