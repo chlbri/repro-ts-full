@@ -64,7 +64,7 @@ export const ERRORS = {
   noParams: { error: new Error('No params'), string: 'No params' },
 };
 
-// TDODO: add to basifun
+// TODO: add to basifun
 export const identify: Identify_F = arg => {
   if (!arg) return [];
   const entries = Object.entries(arg);
